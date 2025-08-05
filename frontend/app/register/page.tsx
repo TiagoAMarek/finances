@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button'; // Importar o componente Button do shadcn/ui
 
 const RegisterPage: NextPage = () => {
   const [name, setName] = useState('');
@@ -38,13 +39,13 @@ const RegisterPage: NextPage = () => {
       } else {
         setError(data.detail || 'Erro ao registrar usuário.');
       }
-    } catch (err) {
-      setError('Erro de conexão com o servidor.');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Erro de conexão com o servidor.');
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+    <div className="flex flex-col items-center justify-center bg-gray-100 py-8">
       <div className="w-full max-w-md rounded-md bg-white p-8 shadow-md">
         <h1 className="mb-6 text-center text-2xl font-bold text-gray-700">
           Criar sua conta
@@ -115,12 +116,12 @@ const RegisterPage: NextPage = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
-          <button
+          <Button
             type="submit"
-            className="w-full rounded-md bg-blue-600 p-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+            className="w-full"
           >
             Criar conta
-          </button>
+          </Button>
         </form>
         <div className="mt-4 text-center">
           <a href="/login" className="text-sm text-blue-600 hover:underline">

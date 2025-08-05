@@ -130,12 +130,16 @@ def login_user():
     access_token = create_access_token(identity=user.id)
     return jsonify(access_token=access_token), 200
 
+@jwt.user_identity_loader
+def user_identity_lookup(user_id):
+    return str(user_id)
+
 # Rotas para Contas Bancárias
 @app.route("/accounts", methods=["POST"])
 @jwt_required()
 def create_bank_account():
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     account_data = request.json
 
     new_account = BankAccount(
@@ -163,7 +167,7 @@ def create_bank_account():
 @jwt_required()
 def get_bank_accounts():
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
 
     accounts = db.query(BankAccount).filter(BankAccount.owner_id == user_id).all()
     return jsonify([
@@ -181,7 +185,7 @@ def get_bank_accounts():
 @jwt_required()
 def update_bank_account(account_id):
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     account = db.query(BankAccount).filter(BankAccount.id == account_id, BankAccount.owner_id == user_id).first()
     if not account:
         return jsonify({"detail": "Account not found or not authorized"}), 404
@@ -208,7 +212,7 @@ def update_bank_account(account_id):
 @jwt_required()
 def delete_bank_account(account_id):
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     account = db.query(BankAccount).filter(BankAccount.id == account_id, BankAccount.owner_id == user_id).first()
     if not account:
         return jsonify({"detail": "Account not found or not authorized"}), 404
@@ -223,7 +227,7 @@ def delete_bank_account(account_id):
 @jwt_required()
 def create_credit_card():
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     card_data = request.json
 
     new_card = CreditCard(
@@ -251,7 +255,7 @@ def create_credit_card():
 @jwt_required()
 def get_credit_cards():
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
 
     cards = db.query(CreditCard).filter(CreditCard.owner_id == user_id).all()
     return jsonify([
@@ -269,7 +273,7 @@ def get_credit_cards():
 @jwt_required()
 def update_credit_card(card_id):
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     card = db.query(CreditCard).filter(CreditCard.id == card_id, CreditCard.owner_id == user_id).first()
     if not card:
         return jsonify({"detail": "Credit card not found or not authorized"}), 404
@@ -296,7 +300,7 @@ def update_credit_card(card_id):
 @jwt_required()
 def delete_credit_card(card_id):
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     card = db.query(CreditCard).filter(CreditCard.id == card_id, CreditCard.owner_id == user_id).first()
     if not card:
         return jsonify({"detail": "Credit card not found or not authorized"}), 404
@@ -311,7 +315,7 @@ def delete_credit_card(card_id):
 @jwt_required()
 def create_transaction():
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     transaction_data = request.json
 
     new_transaction = Transaction(
@@ -364,7 +368,7 @@ def create_transaction():
 @jwt_required()
 def get_transactions():
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
 
     transactions = db.query(Transaction).filter(Transaction.owner_id == user_id).all()
     return jsonify([
@@ -386,7 +390,7 @@ def get_transactions():
 @jwt_required()
 def update_transaction(transaction_id):
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     transaction = db.query(Transaction).filter(Transaction.id == transaction_id, Transaction.owner_id == user_id).first()
     if not transaction:
         return jsonify({"detail": "Transaction not found or not authorized"}), 404
@@ -454,7 +458,7 @@ def update_transaction(transaction_id):
 @jwt_required()
 def delete_transaction(transaction_id):
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
     transaction = db.query(Transaction).filter(Transaction.id == transaction_id, Transaction.owner_id == user_id).first()
     if not transaction:
         return jsonify({"detail": "Transaction not found or not authorized"}), 404
@@ -484,7 +488,7 @@ def delete_transaction(transaction_id):
 @jwt_required()
 def get_monthly_summary():
     db = next(get_db())
-    user_id = get_jwt_identity()
+    user_id = str(get_jwt_identity())
 
     month = request.args.get("month", type=int)
     year = request.args.get("year", type=int)
