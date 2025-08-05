@@ -14,15 +14,6 @@ interface Transaction {
   credit_card_id: number | null;
 }
 
-interface BankAccount {
-  id: number;
-  name: string;
-}
-
-interface CreditCard {
-  id: number;
-  name: string;
-}
 
 // Fetch Transactions
 export const useTransactions = () => {
@@ -38,33 +29,6 @@ export const useTransactions = () => {
   });
 };
 
-// Fetch Accounts
-export const useAccounts = () => {
-  return useQuery<BankAccount[]>({
-    queryKey: ['accounts'],
-    queryFn: async () => {
-      const response = await fetchWithAuth('http://localhost:8000/accounts');
-      if (!response.ok) {
-        throw new Error('Erro ao carregar contas bancárias.');
-      }
-      return response.json();
-    },
-  });
-};
-
-// Fetch Credit Cards
-export const useCreditCards = () => {
-  return useQuery<CreditCard[]>({ 
-    queryKey: ['creditCards'],
-    queryFn: async () => {
-      const response = await fetchWithAuth('http://localhost:8000/credit_cards');
-      if (!response.ok) {
-        throw new Error('Erro ao carregar cartões de crédito.');
-      }
-      return response.json();
-    },
-  });
-};
 
 // Create Transaction
 export const useCreateTransaction = () => {

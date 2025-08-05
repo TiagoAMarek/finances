@@ -3,39 +3,29 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button'; // Importar o componente Button do shadcn/ui
+import { Button } from '@/components/ui/button';
+import { useLogin } from '@/hooks/useAuth';
 
 const LoginPage: NextPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const loginMutation = useLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    try {
-      const response = await fetch('http://localhost:8000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          localStorage.setItem('access_token', data.access_token);
+          alert('Login bem-sucedido!');
+          router.push('/dashboard');
         },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('access_token', data.access_token);
-        alert('Login bem-sucedido!');
-        router.push('/dashboard');
-      } else {
-        setError(data.detail || 'Erro ao fazer login.');
       }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+    );
   };
 
   return (
@@ -45,7 +35,7 @@ const LoginPage: NextPage = () => {
           Entrar na sua conta
         </h1>
         <form onSubmit={handleSubmit}>
-          {error && <p className="mb-4 text-center text-red-500">{error}</p>}
+          {loginMutation.error && <p className="mb-4 text-center text-red-500">{loginMutation.error.message}</p>}
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -81,8 +71,9 @@ const LoginPage: NextPage = () => {
           <Button
             type="submit"
             className="w-full"
+            disabled={loginMutation.isPending}
           >
-            Entrar
+            {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
         <div className="mt-4 flex items-center justify-between">

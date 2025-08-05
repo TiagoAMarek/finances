@@ -5,12 +5,12 @@ import type { NextPage } from 'next';
 import { Button } from '@/components/ui/button';
 import {
   useTransactions,
-  useAccounts,
-  useCreditCards,
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransaction,
 } from '@/hooks/useTransactions';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useCreditCards } from '@/hooks/useCreditCards';
 
 interface Transaction {
   id: number;

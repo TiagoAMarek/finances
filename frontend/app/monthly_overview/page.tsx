@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { NextPage } from 'next';
-import { fetchWithAuth } from '@/utils/api';
 import { Bar } from 'react-chartjs-2';
+import { useMonthlySummary } from '@/hooks/useReports';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,13 +23,6 @@ ChartJS.register(
   Legend
 );
 
-interface MonthlySummary {
-  month: number;
-  year: number;
-  total_income: number;
-  total_expense: number;
-  balance: number;
-}
 
 const MonthlyOverviewPage: NextPage = () => {
   const currentMonth = new Date().getMonth() + 1;
@@ -37,33 +30,9 @@ const MonthlyOverviewPage: NextPage = () => {
 
   const [month, setMonth] = useState<number>(currentMonth);
   const [year, setYear] = useState<number>(currentYear);
-  const [summary, setSummary] = useState<MonthlySummary | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchMonthlySummary = async () => {
-      setError(null);
-      setLoading(true);
-      try {
-        const response = await fetchWithAuth(`http://localhost:8000/monthly_summary?month=${month}&year=${year}`);
-        if (response.ok) {
-          const data: MonthlySummary = await response.json();
-          setSummary(data);
-        } else {
-          const data = await response.json();
-          setError(data.detail || 'Erro ao carregar resumo mensal.');
-          setSummary(null);
-        }
-      } catch (err: unknown) {
-        setError((err as Error).message || 'Erro de conexão com o servidor.');
-        setSummary(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMonthlySummary();
-  }, [month, year]);
+  const { data: summary, error, isLoading } = useMonthlySummary(month, year);
+
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setMonth(parseInt(e.target.value));
@@ -114,7 +83,7 @@ const MonthlyOverviewPage: NextPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">Visão Geral Mensal</h1>
 
-      {error && <p className="mb-4 text-red-500">{error}</p>}
+      {error && <p className="mb-4 text-red-500">{error.message}</p>}
 
       <div className="mb-8 rounded-md bg-white p-6 shadow-md">
         <h2 className="mb-4 text-2xl font-semibold text-gray-700">Selecionar Período</h2>
@@ -152,7 +121,7 @@ const MonthlyOverviewPage: NextPage = () => {
         </div>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex items-center justify-center py-8">Carregando resumo...</div>
       ) : summary ? (
         <div className="rounded-md bg-white p-6 shadow-md">

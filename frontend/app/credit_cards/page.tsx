@@ -1,74 +1,49 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { NextPage } from 'next';
-import { fetchWithAuth } from '@/utils/api';
-import { Button } from '@/components/ui/button'; // Importar o componente Button do shadcn/ui
+import { Button } from '@/components/ui/button';
+import { useCreditCards, useCreateCreditCard, useUpdateCreditCard, useDeleteCreditCard } from '@/hooks/useCreditCards';
 
-interface CreditCard {
+type CreditCard = {
   id: number;
   name: string;
   limit: number;
   current_bill: number;
   owner_id: number;
-}
+};
 
 const CreditCardsPage: NextPage = () => {
-  const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [cardName, setCardName] = useState('');
   const [cardLimit, setCardLimit] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const [editingCard, setEditingCard] = useState<CreditCard | null>(null);
   const [editedName, setEditedName] = useState('');
   const [editedLimit, setEditedLimit] = useState<number>(0);
   const [editedCurrentBill, setEditedCurrentBill] = useState<number>(0);
 
-  const fetchCreditCards = async () => {
-    try {
-      setLoading(true);
-      const response = await fetchWithAuth('http://localhost:8000/credit_cards');
-      if (response.ok) {
-        const data: CreditCard[] = await response.json();
-        setCreditCards(data);
-      } else {
-        setError('Erro ao carregar cartões de crédito.');
-      }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
-  };
+  const { data: creditCards = [], isLoading, error } = useCreditCards();
+  const createCardMutation = useCreateCreditCard();
+  const updateCardMutation = useUpdateCreditCard();
+  const deleteCardMutation = useDeleteCreditCard();
+
 
   const handleCreateCreditCard = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
-    try {
-      const response = await fetchWithAuth('http://localhost:8000/credit_cards', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    createCardMutation.mutate(
+      {
+        name: cardName,
+        limit: cardLimit,
+        current_bill: 0,
+      },
+      {
+        onSuccess: () => {
+          alert('Cartão de crédito criado com sucesso!');
+          setCardName('');
+          setCardLimit(0);
         },
-        body: JSON.stringify({
-          name: cardName,
-          limit: cardLimit,
-          current_bill: 0, // Saldo inicial da fatura é 0
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Cartão de crédito criado com sucesso!');
-        setCardName('');
-        setCardLimit(0);
-        fetchCreditCards(); // Recarregar a lista de cartões
-      } else {
-        setError(data.detail || 'Erro ao criar cartão de crédito.');
       }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+    );
   };
 
   const handleEditClick = (card: CreditCard) => {
@@ -80,65 +55,39 @@ const CreditCardsPage: NextPage = () => {
 
   const handleUpdateCreditCard = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
     if (!editingCard) return;
 
-    try {
-      const response = await fetchWithAuth(`http://localhost:8000/credit_cards/${editingCard.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+    updateCardMutation.mutate(
+      {
+        ...editingCard,
+        name: editedName,
+        limit: editedLimit,
+        current_bill: editedCurrentBill,
+      },
+      {
+        onSuccess: () => {
+          alert('Cartão de crédito atualizado com sucesso!');
+          setEditingCard(null);
         },
-        body: JSON.stringify({
-          name: editedName,
-          limit: editedLimit,
-          current_bill: editedCurrentBill,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Cartão de crédito atualizado com sucesso!');
-        setEditingCard(null);
-        fetchCreditCards(); // Recarregar a lista de cartões
-      } else {
-        setError(data.detail || 'Erro ao atualizar cartão de crédito.');
       }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+    );
   };
 
   const handleDeleteCreditCard = async (cardId: number) => {
     if (!confirm('Tem certeza que deseja excluir este cartão de crédito?')) {
       return;
     }
-    setError(null);
 
-    try {
-      const response = await fetchWithAuth(`http://localhost:8000/credit_cards/${cardId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
+    deleteCardMutation.mutate(cardId, {
+      onSuccess: () => {
         alert('Cartão de crédito excluído com sucesso!');
-        fetchCreditCards(); // Recarregar a lista de cartões
-      } else {
-        const data = await response.json();
-        setError(data.detail || 'Erro ao excluir cartão de crédito.');
-      }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+      },
+    });
   };
 
-  useEffect(() => {
-    fetchCreditCards();
-  }, []);
 
-  if (loading) {
+  if (isLoading) {
     return <div className="flex items-center justify-center py-8">Carregando cartões de crédito...</div>;
   }
 
@@ -146,7 +95,10 @@ const CreditCardsPage: NextPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">Meus Cartões de Crédito</h1>
 
-      {error && <p className="mb-4 text-red-500">{error}</p>}
+      {error && <p className="mb-4 text-red-500">{error.message}</p>}
+      {createCardMutation.error && <p className="mb-4 text-red-500">{createCardMutation.error.message}</p>}
+      {updateCardMutation.error && <p className="mb-4 text-red-500">{updateCardMutation.error.message}</p>}
+      {deleteCardMutation.error && <p className="mb-4 text-red-500">{deleteCardMutation.error.message}</p>}
 
       <div className="mb-8 rounded-md bg-white p-6 shadow-md">
         <h2 className="mb-4 text-2xl font-semibold text-gray-700">Adicionar Novo Cartão</h2>
@@ -181,8 +133,9 @@ const CreditCardsPage: NextPage = () => {
           <Button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700"
+            disabled={createCardMutation.isPending}
           >
-            Adicionar Cartão
+            {createCardMutation.isPending ? 'Criando...' : 'Adicionar Cartão'}
           </Button>
         </form>
       </div>
@@ -236,8 +189,9 @@ const CreditCardsPage: NextPage = () => {
               <Button
                 type="submit"
                 className="bg-green-600 hover:bg-green-700"
+                disabled={updateCardMutation.isPending}
               >
-                Salvar Alterações
+                {updateCardMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
               <Button
                 type="button"
@@ -274,8 +228,9 @@ const CreditCardsPage: NextPage = () => {
                   <Button
                     onClick={() => handleDeleteCreditCard(card.id)}
                     className="bg-red-600 hover:bg-red-700"
+                    disabled={deleteCardMutation.isPending}
                   >
-                    Excluir
+                    {deleteCardMutation.isPending ? 'Excluindo...' : 'Excluir'}
                   </Button>
                 </div>
               </li>

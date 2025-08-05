@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button'; // Importar o componente Button do shadcn/ui
+import { Button } from '@/components/ui/button';
+import { useRegister } from '@/hooks/useAuth';
 
 const RegisterPage: NextPage = () => {
   const [name, setName] = useState('');
@@ -12,6 +13,8 @@ const RegisterPage: NextPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const registerMutation = useRegister();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,26 +25,15 @@ const RegisterPage: NextPage = () => {
       return;
     }
 
-    try {
-      const response = await fetch('http://localhost:8000/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    registerMutation.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          alert('Usuário registrado com sucesso!');
+          router.push('/login');
         },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Usuário registrado com sucesso!');
-        router.push('/login');
-      } else {
-        setError(data.detail || 'Erro ao registrar usuário.');
       }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+    );
   };
 
   return (
@@ -51,7 +43,11 @@ const RegisterPage: NextPage = () => {
           Criar sua conta
         </h1>
         <form onSubmit={handleSubmit}>
-          {error && <p className="mb-4 text-center text-red-500">{error}</p>}
+          {(error || registerMutation.error) && (
+            <p className="mb-4 text-center text-red-500">
+              {error || registerMutation.error?.message}
+            </p>
+          )}
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -119,8 +115,9 @@ const RegisterPage: NextPage = () => {
           <Button
             type="submit"
             className="w-full"
+            disabled={registerMutation.isPending}
           >
-            Criar conta
+            {registerMutation.isPending ? 'Criando conta...' : 'Criar conta'}
           </Button>
         </form>
         <div className="mt-4 text-center">

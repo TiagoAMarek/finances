@@ -1,75 +1,48 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { NextPage } from 'next';
-import { fetchWithAuth } from '@/utils/api';
-import { Button } from '@/components/ui/button'; // Importar o componente Button do shadcn/ui
+import { Button } from '@/components/ui/button';
+import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
 
-interface BankAccount {
+type BankAccount = {
   id: number;
   name: string;
   balance: number;
   currency: string;
   owner_id: number;
-}
+};
 
 const AccountsPage: NextPage = () => {
-  const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [accountName, setAccountName] = useState('');
   const [accountBalance, setAccountBalance] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
   const [editedName, setEditedName] = useState('');
   const [editedBalance, setEditedBalance] = useState<number>(0);
 
-  const fetchAccounts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetchWithAuth('http://localhost:8000/accounts');
-      if (response.ok) {
-        const data: BankAccount[] = await response.json();
-        setAccounts(data);
-      } else {
-        setError('Erro ao carregar contas.');
-      }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: accounts = [], isLoading, error } = useAccounts();
+  const createAccountMutation = useCreateAccount();
+  const updateAccountMutation = useUpdateAccount();
+  const deleteAccountMutation = useDeleteAccount();
+
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
-    try {
-      const response = await fetchWithAuth('http://localhost:8000/accounts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    createAccountMutation.mutate(
+      {
+        name: accountName,
+        balance: accountBalance,
+        currency: "BRL",
+      },
+      {
+        onSuccess: () => {
+          alert('Conta criada com sucesso!');
+          setAccountName('');
+          setAccountBalance(0);
         },
-        body: JSON.stringify({
-          name: accountName,
-          balance: accountBalance,
-          currency: "BRL", // Moeda padrão
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Conta criada com sucesso!');
-        setAccountName('');
-        setAccountBalance(0);
-        fetchAccounts(); // Recarregar a lista de contas
-      } else {
-        setError(data.detail || 'Erro ao criar conta.');
       }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+    );
   };
 
   const handleEditClick = (account: BankAccount) => {
@@ -80,65 +53,38 @@ const AccountsPage: NextPage = () => {
 
   const handleUpdateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
     if (!editingAccount) return;
 
-    try {
-      const response = await fetchWithAuth(`http://localhost:8000/accounts/${editingAccount.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+    updateAccountMutation.mutate(
+      {
+        ...editingAccount,
+        name: editedName,
+        balance: editedBalance,
+      },
+      {
+        onSuccess: () => {
+          alert('Conta atualizada com sucesso!');
+          setEditingAccount(null);
         },
-        body: JSON.stringify({
-          name: editedName,
-          balance: editedBalance,
-          currency: editingAccount.currency, // Manter a moeda existente
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Conta atualizada com sucesso!');
-        setEditingAccount(null);
-        fetchAccounts(); // Recarregar a lista de contas
-      } else {
-        setError(data.detail || 'Erro ao atualizar conta.');
       }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+    );
   };
 
   const handleDeleteAccount = async (accountId: number) => {
     if (!confirm('Tem certeza que deseja excluir esta conta?')) {
       return;
     }
-    setError(null);
 
-    try {
-      const response = await fetchWithAuth(`http://localhost:8000/accounts/${accountId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
+    deleteAccountMutation.mutate(accountId, {
+      onSuccess: () => {
         alert('Conta excluída com sucesso!');
-        fetchAccounts(); // Recarregar a lista de contas
-      } else {
-        const data = await response.json();
-        setError(data.detail || 'Erro ao excluir conta.');
-      }
-    } catch (error: unknown) {
-      setError((error as Error).message || 'Erro de conexão com o servidor.');
-    }
+      },
+    });
   };
 
-  useEffect(() => {
-    fetchAccounts();
-  }, []);
 
-  if (loading) {
+  if (isLoading) {
     return <div className="flex items-center justify-center py-8">Carregando contas...</div>;
   }
 
@@ -146,7 +92,10 @@ const AccountsPage: NextPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">Minhas Contas Bancárias</h1>
 
-      {error && <p className="mb-4 text-red-500">{error}</p>}
+      {error && <p className="mb-4 text-red-500">{error.message}</p>}
+      {createAccountMutation.error && <p className="mb-4 text-red-500">{createAccountMutation.error.message}</p>}
+      {updateAccountMutation.error && <p className="mb-4 text-red-500">{updateAccountMutation.error.message}</p>}
+      {deleteAccountMutation.error && <p className="mb-4 text-red-500">{deleteAccountMutation.error.message}</p>}
 
       <div className="mb-8 rounded-md bg-white p-6 shadow-md">
         <h2 className="mb-4 text-2xl font-semibold text-gray-700">Adicionar Nova Conta</h2>
@@ -181,8 +130,9 @@ const AccountsPage: NextPage = () => {
           <Button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700"
+            disabled={createAccountMutation.isPending}
           >
-            Adicionar Conta
+            {createAccountMutation.isPending ? 'Criando...' : 'Adicionar Conta'}
           </Button>
         </form>
       </div>
@@ -222,8 +172,9 @@ const AccountsPage: NextPage = () => {
               <Button
                 type="submit"
                 className="bg-green-600 hover:bg-green-700"
+                disabled={updateAccountMutation.isPending}
               >
-                Salvar Alterações
+                {updateAccountMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
               <Button
                 type="button"
@@ -259,8 +210,9 @@ const AccountsPage: NextPage = () => {
                   <Button
                     onClick={() => handleDeleteAccount(account.id)}
                     className="bg-red-600 hover:bg-red-700"
+                    disabled={deleteAccountMutation.isPending}
                   >
-                    Excluir
+                    {deleteAccountMutation.isPending ? 'Excluindo...' : 'Excluir'}
                   </Button>
                 </div>
               </li>
