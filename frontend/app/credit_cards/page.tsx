@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useCreditCards, useCreateCreditCard, useUpdateCreditCard, useDeleteCreditCard } from '@/hooks/useCreditCards';
 
 type CreditCard = {
@@ -88,156 +92,173 @@ const CreditCardsPage: NextPage = () => {
 
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-8">Carregando cartões de crédito...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Carregando cartões de crédito...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="mb-6 text-3xl font-bold text-gray-800">Meus Cartões de Crédito</h1>
+    <div className="container mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold">Meus Cartões de Crédito</h1>
 
-      {error && <p className="mb-4 text-red-500">{error.message}</p>}
-      {createCardMutation.error && <p className="mb-4 text-red-500">{createCardMutation.error.message}</p>}
-      {updateCardMutation.error && <p className="mb-4 text-red-500">{updateCardMutation.error.message}</p>}
-      {deleteCardMutation.error && <p className="mb-4 text-red-500">{deleteCardMutation.error.message}</p>}
-
-      <div className="mb-8 rounded-md bg-white p-6 shadow-md">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-700">Adicionar Novo Cartão</h2>
-        <form onSubmit={handleCreateCreditCard}>
-          <div className="mb-4">
-            <label htmlFor="cardName" className="block text-sm font-medium text-gray-600">
-              Nome do Cartão
-            </label>
-            <input
-              type="text"
-              id="cardName"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={cardName}
-              onChange={(e) => setCardName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="cardLimit" className="block text-sm font-medium text-gray-600">
-              Limite (R$)
-            </label>
-            <input
-              type="number"
-              id="cardLimit"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={cardLimit}
-              onChange={(e) => setCardLimit(parseFloat(e.target.value))}
-              step="0.01"
-              required
-            />
-          </div>
-          <Button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700"
-            disabled={createCardMutation.isPending}
-          >
-            {createCardMutation.isPending ? 'Criando...' : 'Adicionar Cartão'}
-          </Button>
-        </form>
-      </div>
-
-      {editingCard && (
-        <div className="mb-8 rounded-md bg-white p-6 shadow-md">
-          <h2 className="mb-4 text-2xl font-semibold text-gray-700">Editar Cartão</h2>
-          <form onSubmit={handleUpdateCreditCard}>
-            <div className="mb-4">
-              <label htmlFor="editedName" className="block text-sm font-medium text-gray-600">
-                Nome do Cartão
-              </label>
-              <input
-                type="text"
-                id="editedName"
-                className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="editedLimit" className="block text-sm font-medium text-gray-600">
-                Limite (R$)
-              </label>
-              <input
-                type="number"
-                id="editedLimit"
-                className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-                value={editedLimit}
-                onChange={(e) => setEditedLimit(parseFloat(e.target.value))}
-                step="0.01"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="editedCurrentBill" className="block text-sm font-medium text-gray-600">
-                Fatura Atual (R$)
-              </label>
-              <input
-                type="number"
-                id="editedCurrentBill"
-                className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-                value={editedCurrentBill}
-                onChange={(e) => setEditedCurrentBill(parseFloat(e.target.value))}
-                step="0.01"
-                required
-              />
-            </div>
-            <div className="flex space-x-4">
-              <Button
-                type="submit"
-                className="bg-green-600 hover:bg-green-700"
-                disabled={updateCardMutation.isPending}
-              >
-                {updateCardMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => setEditingCard(null)}
-                className="bg-gray-400 hover:bg-gray-500"
-              >
-                Cancelar
-              </Button>
-            </div>
-          </form>
-        </div>
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error.message}</AlertDescription>
+        </Alert>
+      )}
+      {createCardMutation.error && (
+        <Alert variant="destructive">
+          <AlertDescription>{createCardMutation.error.message}</AlertDescription>
+        </Alert>
+      )}
+      {updateCardMutation.error && (
+        <Alert variant="destructive">
+          <AlertDescription>{updateCardMutation.error.message}</AlertDescription>
+        </Alert>
+      )}
+      {deleteCardMutation.error && (
+        <Alert variant="destructive">
+          <AlertDescription>{deleteCardMutation.error.message}</AlertDescription>
+        </Alert>
       )}
 
-      <div className="rounded-md bg-white p-6 shadow-md">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-700">Cartões Existentes</h2>
-        {creditCards.length === 0 ? (
-          <p className="text-gray-500">Nenhum cartão de crédito cadastrado ainda.</p>
-        ) : (
-          <ul className="space-y-4">
-            {creditCards.map((card) => (
-              <li key={card.id} className="flex items-center justify-between rounded-md border border-gray-200 p-4">
-                <div>
-                  <p className="text-lg font-medium text-gray-900">{card.name}</p>
-                  <p className="text-sm text-gray-600">Limite: R$ {card.limit.toFixed(2)}</p>
-                  <p className="text-sm text-gray-600">Fatura Atual: R$ {card.current_bill.toFixed(2)}</p>
-                </div>
-                <div className="space-x-2">
-                  <Button
-                    onClick={() => handleEditClick(card)}
-                    className="bg-yellow-500 hover:bg-yellow-600"
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteCreditCard(card.id)}
-                    className="bg-red-600 hover:bg-red-700"
-                    disabled={deleteCardMutation.isPending}
-                  >
-                    {deleteCardMutation.isPending ? 'Excluindo...' : 'Excluir'}
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Adicionar Novo Cartão</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleCreateCreditCard} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="cardName">Nome do Cartão</Label>
+              <Input
+                type="text"
+                id="cardName"
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cardLimit">Limite (R$)</Label>
+              <Input
+                type="number"
+                id="cardLimit"
+                value={cardLimit}
+                onChange={(e) => setCardLimit(parseFloat(e.target.value))}
+                step="0.01"
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={createCardMutation.isPending}
+            >
+              {createCardMutation.isPending ? 'Criando...' : 'Adicionar Cartão'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {editingCard && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Editar Cartão</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdateCreditCard} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="editedName">Nome do Cartão</Label>
+                <Input
+                  type="text"
+                  id="editedName"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editedLimit">Limite (R$)</Label>
+                <Input
+                  type="number"
+                  id="editedLimit"
+                  value={editedLimit}
+                  onChange={(e) => setEditedLimit(parseFloat(e.target.value))}
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editedCurrentBill">Fatura Atual (R$)</Label>
+                <Input
+                  type="number"
+                  id="editedCurrentBill"
+                  value={editedCurrentBill}
+                  onChange={(e) => setEditedCurrentBill(parseFloat(e.target.value))}
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div className="flex space-x-4">
+                <Button
+                  type="submit"
+                  disabled={updateCardMutation.isPending}
+                >
+                  {updateCardMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingCard(null)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Cartões Existentes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {creditCards.length === 0 ? (
+            <p className="text-muted-foreground">Nenhum cartão de crédito cadastrado ainda.</p>
+          ) : (
+            <div className="space-y-4">
+              {creditCards.map((card) => (
+                <Card key={card.id}>
+                  <CardContent className="flex items-center justify-between p-4">
+                    <div>
+                      <p className="text-lg font-medium">{card.name}</p>
+                      <p className="text-sm text-muted-foreground">Limite: R$ {card.limit.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">Fatura Atual: R$ {card.current_bill.toFixed(2)}</p>
+                    </div>
+                    <div className="space-x-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditClick(card)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDeleteCreditCard(card.id)}
+                        disabled={deleteCardMutation.isPending}
+                      >
+                        {deleteCardMutation.isPending ? 'Excluindo...' : 'Excluir'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

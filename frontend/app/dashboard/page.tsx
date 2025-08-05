@@ -3,7 +3,8 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button'; // Importar o componente Button do shadcn/ui
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const DashboardPage: NextPage = () => {
   const router = useRouter();
@@ -14,39 +15,49 @@ const DashboardPage: NextPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 py-8">
-      <h1 className="text-4xl font-bold text-gray-800">Bem-vindo ao Dashboard!</h1>
-      <p className="mt-2 text-gray-600">Esta é a sua página principal.</p>
-      <div className="mt-8 flex flex-wrap justify-center gap-4">
-        <Link href="/accounts" passHref>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            Gerenciar Contas
-          </Button>
-        </Link>
-        <Link href="/credit_cards" passHref>
-          <Button className="bg-purple-600 hover:bg-purple-700">
-            Gerenciar Cartões
-          </Button>
-        </Link>
-        <Link href="/transactions" passHref>
-          <Button className="bg-green-600 hover:bg-green-700">
-            Gerenciar Transações
-          </Button>
-        </Link>
-        <Link href="/monthly_overview" passHref>
-          <Button className="bg-orange-600 hover:bg-orange-700">
-            Visão Geral Mensal
-          </Button>
-        </Link>
+    <div className="container mx-auto p-4 min-h-screen flex flex-col items-center justify-center space-y-8">
+      <div className="text-center space-y-2">
+        <h1 className="text-4xl font-bold">Bem-vindo ao Dashboard!</h1>
+        <p className="text-muted-foreground">Esta é a sua página principal.</p>
       </div>
-      <div className="mt-8">
-        <Button
-          onClick={handleLogout}
-          className="bg-red-600 hover:bg-red-700"
-        >
-          Sair (Logout)
-        </Button>
-      </div>
+      
+      <Card className="w-full max-w-4xl">
+        <CardHeader>
+          <CardTitle className="text-center">Gerenciamento Financeiro</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link href="/accounts" passHref>
+              <Button className="w-full h-16 text-lg" variant="default">
+                💳 Gerenciar Contas
+              </Button>
+            </Link>
+            <Link href="/credit_cards" passHref>
+              <Button className="w-full h-16 text-lg" variant="secondary">
+                💸 Gerenciar Cartões
+              </Button>
+            </Link>
+            <Link href="/transactions" passHref>
+              <Button className="w-full h-16 text-lg" variant="outline">
+                📊 Gerenciar Transações
+              </Button>
+            </Link>
+            <Link href="/monthly_overview" passHref>
+              <Button className="w-full h-16 text-lg" variant="outline">
+                📈 Visão Geral Mensal
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Button
+        onClick={handleLogout}
+        variant="destructive"
+        size="lg"
+      >
+        Sair (Logout)
+      </Button>
     </div>
   );
 };

@@ -4,6 +4,10 @@ import { useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRegister } from '@/hooks/useAuth';
 
 const RegisterPage: NextPage = () => {
@@ -37,95 +41,81 @@ const RegisterPage: NextPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 py-8">
-      <div className="w-full max-w-md rounded-md bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-700">
-          Criar sua conta
-        </h1>
-        <form onSubmit={handleSubmit}>
-          {(error || registerMutation.error) && (
-            <p className="mb-4 text-center text-red-500">
-              {error || registerMutation.error?.message}
-            </p>
-          )}
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="mb-2 block text-sm font-medium text-gray-600"
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background py-8">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl">
+            Criar sua conta
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {(error || registerMutation.error) && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  {error || registerMutation.error?.message}
+                </AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="name">Nome</Label>
+              <Input
+                type="text"
+                id="name"
+                placeholder="Seu nome completo"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="seuemail@exemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                type="password"
+                id="password"
+                placeholder="********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <Input
+                type="password"
+                id="confirmPassword"
+                placeholder="********"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={registerMutation.isPending}
             >
-              Nome
-            </label>
-            <input
-              type="text"
-              id="name"
-              className="w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              placeholder="Seu nome completo"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+              {registerMutation.isPending ? 'Criando conta...' : 'Criar conta'}
+            </Button>
+          </form>
+          <div className="mt-4 text-center">
+            <a href="/login" className="text-sm text-primary hover:underline">
+              Já tem uma conta? Entrar
+            </a>
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-gray-600"
-            >
-              E-mail
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              placeholder="seuemail@exemplo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-gray-600"
-            >
-              Senha
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              htmlFor="confirmPassword"
-              className="mb-2 block text-sm font-medium text-gray-600"
-            >
-              Confirmar Senha
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              className="w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              placeholder="********"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={registerMutation.isPending}
-          >
-            {registerMutation.isPending ? 'Criando conta...' : 'Criar conta'}
-          </Button>
-        </form>
-        <div className="mt-4 text-center">
-          <a href="/login" className="text-sm text-blue-600 hover:underline">
-            Já tem uma conta? Entrar
-          </a>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

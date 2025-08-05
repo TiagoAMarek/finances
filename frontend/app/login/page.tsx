@@ -4,6 +4,10 @@ import { useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLogin } from '@/hooks/useAuth';
 
 const LoginPage: NextPage = () => {
@@ -29,62 +33,60 @@ const LoginPage: NextPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 py-8">
-      <div className="w-full max-w-md rounded-md bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-700">
-          Entrar na sua conta
-        </h1>
-        <form onSubmit={handleSubmit}>
-          {loginMutation.error && <p className="mb-4 text-center text-red-500">{loginMutation.error.message}</p>}
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-gray-600"
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background py-8">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl">
+            Entrar na sua conta
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {loginMutation.error && (
+              <Alert variant="destructive">
+                <AlertDescription>{loginMutation.error.message}</AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="seuemail@exemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                type="password"
+                id="password"
+                placeholder="********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loginMutation.isPending}
             >
-              E-mail
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              placeholder="seuemail@exemplo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+              {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
+            </Button>
+          </form>
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <a href="#" className="text-primary hover:underline">
+              Esqueceu a senha?
+            </a>
+            <a href="/register" className="text-primary hover:underline">
+              Criar uma conta
+            </a>
           </div>
-          <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-gray-600"
-            >
-              Senha
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loginMutation.isPending}
-          >
-            {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
-          </Button>
-        </form>
-        <div className="mt-4 flex items-center justify-between">
-          <a href="#" className="text-sm text-blue-600 hover:underline">
-            Esqueceu a senha?
-          </a>
-          <a href="/register" className="text-sm text-blue-600 hover:underline">
-            Criar uma conta
-          </a>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

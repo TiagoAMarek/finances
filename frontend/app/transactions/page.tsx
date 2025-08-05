@@ -3,6 +3,17 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   useTransactions,
   useCreateTransaction,
@@ -138,203 +149,214 @@ const TransactionsPage: NextPage = () => {
 
   const isLoading = isLoadingTransactions || isLoadingAccounts || isLoadingCreditCards;
   const isError = isErrorTransactions || isErrorAccounts || isErrorCreditCards;
-  const error = transactionsError || accountsError || creditCardsError; if (isLoading) {
-    return <div className="flex items-center justify-center py-8">Carregando dados...</div>;
+  const error = transactionsError || accountsError || creditCardsError;
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Carregando dados...</div>
+      </div>
+    );
   }
 
   if (isError) {
-    return <div className="flex items-center justify-center py-8 text-red-500">Erro: {error?.message}</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertDescription>Erro: {error?.message}</AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="mb-6 text-3xl font-bold text-gray-800">Minhas Transações</h1>
+    <div className="container mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold">Minhas Transações</h1>
 
-      {error && <p className="mb-4 text-red-500">{error.message}</p>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error.message}</AlertDescription>
+        </Alert>
+      )}
 
-      <div className="mb-8 rounded-md bg-white p-6 shadow-md">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-700">
-          {editingTransaction ? 'Editar Transação' : 'Adicionar Nova Transação'}
-        </h2>
-        <form onSubmit={editingTransaction ? handleUpdateTransaction : handleCreateTransaction}>
-          <div className="mb-4">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-600">
-              Descrição
-            </label>
-            <input
-              type="text"
-              id="description"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-600">
-              Valor (R$)
-            </label>
-            <input
-              type="number"
-              id="amount"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={amount}
-              onChange={(e) => setAmount(parseFloat(e.target.value))}
-              step="0.01"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="type" className="block text-sm font-medium text-gray-600">
-              Tipo
-            </label>
-            <select
-              id="type"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={type}
-              onChange={(e) => setType(e.target.value as 'income' | 'expense')}
-            >
-              <option value="expense">Despesa</option>
-              <option value="income">Receita</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="date" className="block text-sm font-medium text-gray-600">
-              Data
-            </label>
-            <input
-              type="date"
-              id="date"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="category" className="block text-sm font-medium text-gray-600">
-              Categoria
-            </label>
-            <input
-              type="text"
-              id="category"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="account" className="block text-sm font-medium text-gray-600">
-              Conta Bancária (Opcional)
-            </label>
-            <select
-              id="account"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={selectedAccount || ''}
-              onChange={(e) => setSelectedAccount(e.target.value ? parseInt(e.target.value) : null)}
-            >
-              <option value="">Nenhuma</option>
-              {accounts && accounts.map((acc) => (
-                <option key={acc.id} value={acc.id}>
-                  {acc.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mb-6">
-            <label htmlFor="creditCard" className="block text-sm font-medium text-gray-600">
-              Cartão de Crédito (Opcional)
-            </label>
-            <select
-              id="creditCard"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={selectedCreditCard || ''}
-              onChange={(e) => setSelectedCreditCard(e.target.value ? parseInt(e.target.value) : null)}
-            >
-              <option value="">Nenhum</option>
-              {creditCards && creditCards.map((card) => (
-                <option key={card.id} value={card.id}>
-                  {card.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex space-x-4">
-            <Button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {editingTransaction ? 'Salvar Alterações' : 'Adicionar Transação'}
-            </Button>
-            {editingTransaction && (
-              <Button
-                type="button"
-                onClick={() => {
-                  setEditingTransaction(null);
-                  setDescription('');
-                  setAmount(0);
-                  setType('expense');
-                  setDate(new Date().toISOString().split('T')[0]);
-                  setCategory('');
-                  setSelectedAccount(null);
-                  setSelectedCreditCard(null);
-                }}
-                className="bg-gray-400 hover:bg-gray-500"
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {editingTransaction ? 'Editar Transação' : 'Adicionar Nova Transação'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={editingTransaction ? handleUpdateTransaction : handleCreateTransaction} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="description">Descrição</Label>
+              <Input
+                type="text"
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="amount">Valor (R$)</Label>
+              <Input
+                type="number"
+                id="amount"
+                value={amount}
+                onChange={(e) => setAmount(parseFloat(e.target.value))}
+                step="0.01"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="type">Tipo</Label>
+              <Select value={type} onValueChange={(value) => setType(value as 'income' | 'expense')}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="expense">Despesa</SelectItem>
+                  <SelectItem value="income">Receita</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="date">Data</Label>
+              <Input
+                type="date"
+                id="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Categoria</Label>
+              <Input
+                type="text"
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="account">Conta Bancária (Opcional)</Label>
+              <Select 
+                value={selectedAccount?.toString() || ''} 
+                onValueChange={(value) => setSelectedAccount(value ? parseInt(value) : null)}
               >
-                Cancelar
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione uma conta" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Nenhuma</SelectItem>
+                  {accounts && accounts.map((acc) => (
+                    <SelectItem key={acc.id} value={acc.id.toString()}>
+                      {acc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="creditCard">Cartão de Crédito (Opcional)</Label>
+              <Select 
+                value={selectedCreditCard?.toString() || ''} 
+                onValueChange={(value) => setSelectedCreditCard(value ? parseInt(value) : null)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione um cartão" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Nenhum</SelectItem>
+                  {creditCards && creditCards.map((card) => (
+                    <SelectItem key={card.id} value={card.id.toString()}>
+                      {card.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex space-x-4">
+              <Button type="submit">
+                {editingTransaction ? 'Salvar Alterações' : 'Adicionar Transação'}
               </Button>
-            )}
-          </div>
-        </form>
-      </div>
+              {editingTransaction && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setEditingTransaction(null);
+                    setDescription('');
+                    setAmount(0);
+                    setType('expense');
+                    setDate(new Date().toISOString().split('T')[0]);
+                    setCategory('');
+                    setSelectedAccount(null);
+                    setSelectedCreditCard(null);
+                  }}
+                >
+                  Cancelar
+                </Button>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-md bg-white p-6 shadow-md">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-700">Transações Existentes</h2>
-        {transactions && transactions.length === 0 ? (
-          <p className="text-gray-500">Nenhuma transação cadastrada ainda.</p>
-        ) : (
-          <ul className="space-y-4">
-            {transactions?.map((transaction) => (
-              <li key={transaction.id} className="flex items-center justify-between rounded-md border border-gray-200 p-4">
-                <div>
-                  <p className="text-lg font-medium text-gray-900">{transaction.description}</p>
-                  <p className="text-sm text-gray-600">
-                    Valor: R$ {transaction.amount.toFixed(2)} ({transaction.type === 'income' ? 'Receita' : 'Despesa'})
-                  </p>
-                  <p className="text-sm text-gray-600">Data: {transaction.date}</p>
-                  <p className="text-sm text-gray-600">Categoria: {transaction.category}</p>
-                  {transaction.account_id && (
-                    <p className="text-sm text-gray-600">
-                      Conta: {accounts?.find(acc => acc.id === transaction.account_id)?.name || 'N/A'}
-                    </p>
-                  )}
-                  {transaction.credit_card_id && creditCards && (
-                    <p className="text-sm text-gray-600">
-                      Cartão: {creditCards.find(card => card.id === transaction.credit_card_id)?.name || 'N/A'}
-                    </p>
-                  )}
-                </div>
-                <div className="space-x-2">
-                  <Button
-                    onClick={() => handleEditClick(transaction)}
-                    className="bg-yellow-500 hover:bg-yellow-600"
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteTransaction(transaction.id)}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
-                    Excluir
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Transações Existentes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {transactions && transactions.length === 0 ? (
+            <p className="text-muted-foreground">Nenhuma transação cadastrada ainda.</p>
+          ) : (
+            <div className="space-y-4">
+              {transactions?.map((transaction) => (
+                <Card key={transaction.id}>
+                  <CardContent className="flex items-center justify-between p-4">
+                    <div className="space-y-1">
+                      <p className="text-lg font-medium">{transaction.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Valor: R$ {transaction.amount.toFixed(2)} ({transaction.type === 'income' ? 'Receita' : 'Despesa'})
+                      </p>
+                      <p className="text-sm text-muted-foreground">Data: {transaction.date}</p>
+                      <p className="text-sm text-muted-foreground">Categoria: {transaction.category}</p>
+                      {transaction.account_id && (
+                        <p className="text-sm text-muted-foreground">
+                          Conta: {accounts?.find(acc => acc.id === transaction.account_id)?.name || 'N/A'}
+                        </p>
+                      )}
+                      {transaction.credit_card_id && creditCards && (
+                        <p className="text-sm text-muted-foreground">
+                          Cartão: {creditCards.find(card => card.id === transaction.credit_card_id)?.name || 'N/A'}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-x-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditClick(transaction)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDeleteTransaction(transaction.id)}
+                      >
+                        Excluir
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

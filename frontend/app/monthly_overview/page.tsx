@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import { Bar } from 'react-chartjs-2';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useMonthlySummary } from '@/hooks/useReports';
 import {
   Chart as ChartJS,
@@ -34,12 +38,12 @@ const MonthlyOverviewPage: NextPage = () => {
   const { data: summary, error, isLoading } = useMonthlySummary(month, year);
 
 
-  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setMonth(parseInt(e.target.value));
+  const handleMonthChange = (value: string) => {
+    setMonth(parseInt(value));
   };
 
-  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setYear(parseInt(e.target.value));
+  const handleYearChange = (value: string) => {
+    setYear(parseInt(value));
   };
 
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -80,72 +84,92 @@ const MonthlyOverviewPage: NextPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="mb-6 text-3xl font-bold text-gray-800">Visão Geral Mensal</h1>
+    <div className="container mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold">Visão Geral Mensal</h1>
 
-      {error && <p className="mb-4 text-red-500">{error.message}</p>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error.message}</AlertDescription>
+        </Alert>
+      )}
 
-      <div className="mb-8 rounded-md bg-white p-6 shadow-md">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-700">Selecionar Período</h2>
-        <div className="flex space-x-4">
-          <div>
-            <label htmlFor="month" className="block text-sm font-medium text-gray-600">Mês</label>
-            <select
-              id="month"
-              className="mt-1 rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={month}
-              onChange={handleMonthChange}
-            >
-              {months.map((m) => (
-                <option key={m} value={m}>
-                  {new Date(currentYear, m - 1, 1).toLocaleString('pt-BR', { month: 'long' })}
-                </option>
-              ))}
-            </select>
+      <Card>
+        <CardHeader>
+          <CardTitle>Selecionar Período</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex space-x-4">
+            <div className="space-y-2">
+              <Label htmlFor="month">Mês</Label>
+              <Select value={month.toString()} onValueChange={handleMonthChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((m) => (
+                    <SelectItem key={m} value={m.toString()}>
+                      {new Date(currentYear, m - 1, 1).toLocaleString('pt-BR', { month: 'long' })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="year">Ano</Label>
+              <Select value={year.toString()} onValueChange={handleYearChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div>
-            <label htmlFor="year" className="block text-sm font-medium text-gray-600">Ano</label>
-            <select
-              id="year"
-              className="mt-1 rounded-md border border-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring"
-              value={year}
-              onChange={handleYearChange}
-            >
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-8">Carregando resumo...</div>
-      ) : summary ? (
-        <div className="rounded-md bg-white p-6 shadow-md">
-          <h2 className="mb-4 text-2xl font-semibold text-gray-700">Resumo Financeiro</h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="rounded-md bg-blue-50 p-4">
-              <p className="text-lg font-medium text-gray-700">Receitas Totais:</p>
-              <p className="text-2xl font-bold text-blue-600">R$ {summary.total_income.toFixed(2)}</p>
-            </div>
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-lg font-medium text-gray-700">Despesas Totais:</p>
-              <p className="text-2xl font-bold text-red-600">R$ {summary.total_expense.toFixed(2)}</p>
-            </div>
-            <div className="rounded-md bg-green-50 p-4">
-              <p className="text-lg font-medium text-gray-700">Saldo:</p>
-              <p className="text-2xl font-bold text-green-600">R$ {summary.balance.toFixed(2)}</p>
-            </div>
-          </div>
-          <div className="mt-8">
-            <Bar data={chartData} options={chartOptions} />
-          </div>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-lg">Carregando resumo...</div>
         </div>
+      ) : summary ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Resumo Financeiro</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-lg font-medium text-muted-foreground">Receitas Totais:</p>
+                  <p className="text-2xl font-bold text-blue-600">R$ {summary.total_income.toFixed(2)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-lg font-medium text-muted-foreground">Despesas Totais:</p>
+                  <p className="text-2xl font-bold text-red-600">R$ {summary.total_expense.toFixed(2)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-lg font-medium text-muted-foreground">Saldo:</p>
+                  <p className="text-2xl font-bold text-green-600">R$ {summary.balance.toFixed(2)}</p>
+                </CardContent>
+              </Card>
+            </div>
+            <div>
+              <Bar data={chartData} options={chartOptions} />
+            </div>
+          </CardContent>
+        </Card>
       ) : (
-        <p className="text-gray-500">Nenhum resumo disponível para o período selecionado.</p>
+        <p className="text-muted-foreground">Nenhum resumo disponível para o período selecionado.</p>
       )}
     </div>
   );
