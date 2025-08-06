@@ -2,7 +2,8 @@
 
 import '../styles/globals.css';
 import { QueryProvider } from '../lib/query-provider';
-import Navbar from '@/components/Navbar';
+import { Toaster } from '@/components/ui/sonner';
+import { AppLayout } from '@/components/AppLayout';
 
 export default function RootLayout({
   children,
@@ -13,8 +14,10 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <QueryProvider>
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">{children}</main>
+          <AppLayout>
+            {children}
+          </AppLayout>
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

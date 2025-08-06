@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useCreditCards, useCreateCreditCard, useUpdateCreditCard, useDeleteCreditCard } from '@/hooks/useCreditCards';
+import { toast } from 'sonner';
+import { PlusIcon, EditIcon, TrashIcon, CreditCard, Wallet } from 'lucide-react';
 
 type CreditCard = {
   id: number;
@@ -24,6 +28,8 @@ const CreditCardsPage: NextPage = () => {
   const [editedName, setEditedName] = useState('');
   const [editedLimit, setEditedLimit] = useState<number>(0);
   const [editedCurrentBill, setEditedCurrentBill] = useState<number>(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState<CreditCard | null>(null);
 
   const { data: creditCards = [], isLoading, error } = useCreditCards();
   const createCardMutation = useCreateCreditCard();
@@ -42,7 +48,7 @@ const CreditCardsPage: NextPage = () => {
       },
       {
         onSuccess: () => {
-          alert('Cartão de crédito criado com sucesso!');
+          toast.success('Cartão de crédito criado com sucesso!');
           setCardName('');
           setCardLimit(0);
         },
@@ -71,36 +77,65 @@ const CreditCardsPage: NextPage = () => {
       },
       {
         onSuccess: () => {
-          alert('Cartão de crédito atualizado com sucesso!');
+          toast.success('Cartão de crédito atualizado com sucesso!');
           setEditingCard(null);
         },
       }
     );
   };
 
-  const handleDeleteCreditCard = async (cardId: number) => {
-    if (!confirm('Tem certeza que deseja excluir este cartão de crédito?')) {
-      return;
-    }
+  const handleDeleteCreditCard = async () => {
+    if (!cardToDelete) return;
 
-    deleteCardMutation.mutate(cardId, {
+    deleteCardMutation.mutate(cardToDelete.id, {
       onSuccess: () => {
-        alert('Cartão de crédito excluído com sucesso!');
+        toast.success('Cartão de crédito excluído com sucesso!');
+        setDeleteDialogOpen(false);
+        setCardToDelete(null);
       },
     });
+  };
+
+  const openDeleteDialog = (card: CreditCard) => {
+    setCardToDelete(card);
+    setDeleteDialogOpen(true);
   };
 
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Carregando cartões de crédito...</div>
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-64" />
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-32" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold">Meus Cartões de Crédito</h1>
 
       {error && (
@@ -126,7 +161,10 @@ const CreditCardsPage: NextPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Adicionar Novo Cartão</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <PlusIcon className="h-5 w-5" />
+            Adicionar Novo Cartão
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleCreateCreditCard} className="space-y-4">
@@ -154,8 +192,16 @@ const CreditCardsPage: NextPage = () => {
             <Button
               type="submit"
               disabled={createCardMutation.isPending}
+              className="flex items-center gap-2"
             >
-              {createCardMutation.isPending ? 'Criando...' : 'Adicionar Cartão'}
+              {createCardMutation.isPending ? (
+                'Criando...'
+              ) : (
+                <>
+                  <PlusIcon className="h-4 w-4" />
+                  Adicionar Cartão
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
@@ -164,7 +210,10 @@ const CreditCardsPage: NextPage = () => {
       {editingCard && (
         <Card>
           <CardHeader>
-            <CardTitle>Editar Cartão</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <EditIcon className="h-5 w-5" />
+              Editar Cartão
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleUpdateCreditCard} className="space-y-4">
@@ -222,11 +271,27 @@ const CreditCardsPage: NextPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Cartões Existentes</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            Cartões Existentes
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {creditCards.length === 0 ? (
-            <p className="text-muted-foreground">Nenhum cartão de crédito cadastrado ainda.</p>
+            <div className="text-center py-8">
+              <Wallet className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Nenhum cartão encontrado</h3>
+              <p className="text-muted-foreground mb-4">
+                Você ainda não cadastrou nenhum cartão de crédito.
+              </p>
+              <Button
+                onClick={() => document.getElementById('cardName')?.focus()}
+                className="flex items-center gap-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                Criar primeiro cartão
+              </Button>
+            </div>
           ) : (
             <div className="space-y-4">
               {creditCards.map((card) => (
@@ -240,17 +305,54 @@ const CreditCardsPage: NextPage = () => {
                     <div className="space-x-2">
                       <Button
                         variant="outline"
+                        size="sm"
                         onClick={() => handleEditClick(card)}
+                        className="flex items-center gap-1"
                       >
+                        <EditIcon className="h-3 w-3" />
                         Editar
                       </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleDeleteCreditCard(card.id)}
-                        disabled={deleteCardMutation.isPending}
-                      >
-                        {deleteCardMutation.isPending ? 'Excluindo...' : 'Excluir'}
-                      </Button>
+                      <Dialog open={deleteDialogOpen && cardToDelete?.id === card.id} onOpenChange={setDeleteDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => openDeleteDialog(card)}
+                            className="flex items-center gap-1"
+                          >
+                            <TrashIcon className="h-3 w-3" />
+                            Excluir
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Confirmar exclusão</DialogTitle>
+                            <DialogDescription>
+                              Tem certeza que deseja excluir o cartão &ldquo;{card.name}&rdquo;? Esta ação não pode ser desfeita.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                              Cancelar
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={handleDeleteCreditCard}
+                              disabled={deleteCardMutation.isPending}
+                              className="flex items-center gap-2"
+                            >
+                              {deleteCardMutation.isPending ? (
+                                'Excluindo...'
+                              ) : (
+                                <>
+                                  <TrashIcon className="h-4 w-4" />
+                                  Excluir
+                                </>
+                              )}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </CardContent>
                 </Card>

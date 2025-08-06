@@ -7,7 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useMonthlySummary } from '@/hooks/useReports';
+import { BarChart, Calendar, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -84,8 +86,11 @@ const MonthlyOverviewPage: NextPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <h1 className="text-3xl font-bold">Visão Geral Mensal</h1>
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <BarChart className="h-8 w-8" />
+        <h1 className="text-3xl font-bold">Visão Geral Mensal</h1>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -95,7 +100,10 @@ const MonthlyOverviewPage: NextPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Selecionar Período</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Selecionar Período
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex space-x-4">
@@ -134,32 +142,71 @@ const MonthlyOverviewPage: NextPage = () => {
       </Card>
 
       {isLoading ? (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-lg">Carregando resumo...</div>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <Card>
+                  <CardContent className="p-4">
+                    <Skeleton className="h-5 w-32 mb-2" />
+                    <Skeleton className="h-8 w-28" />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <Skeleton className="h-5 w-32 mb-2" />
+                    <Skeleton className="h-8 w-28" />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <Skeleton className="h-5 w-20 mb-2" />
+                    <Skeleton className="h-8 w-28" />
+                  </CardContent>
+                </Card>
+              </div>
+              <Skeleton className="h-80 w-full" />
+            </CardContent>
+          </Card>
         </div>
       ) : summary ? (
         <Card>
           <CardHeader>
-            <CardTitle>Resumo Financeiro</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Resumo Financeiro
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <Card>
                 <CardContent className="p-4">
-                  <p className="text-lg font-medium text-muted-foreground">Receitas Totais:</p>
-                  <p className="text-2xl font-bold text-blue-600">R$ {summary.total_income.toFixed(2)}</p>
+                  <div className="flex items-center gap-2 text-lg font-medium text-muted-foreground mb-1">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    <span>Receitas Totais:</span>
+                  </div>
+                  <p className="text-2xl font-bold text-green-600">R$ {summary.total_income.toFixed(2)}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
-                  <p className="text-lg font-medium text-muted-foreground">Despesas Totais:</p>
+                  <div className="flex items-center gap-2 text-lg font-medium text-muted-foreground mb-1">
+                    <TrendingDown className="h-4 w-4 text-red-600" />
+                    <span>Despesas Totais:</span>
+                  </div>
                   <p className="text-2xl font-bold text-red-600">R$ {summary.total_expense.toFixed(2)}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
-                  <p className="text-lg font-medium text-muted-foreground">Saldo:</p>
-                  <p className="text-2xl font-bold text-green-600">R$ {summary.balance.toFixed(2)}</p>
+                  <div className="flex items-center gap-2 text-lg font-medium text-muted-foreground mb-1">
+                    <DollarSign className="h-4 w-4 text-blue-600" />
+                    <span>Saldo:</span>
+                  </div>
+                  <p className={`text-2xl font-bold ${summary.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>R$ {summary.balance.toFixed(2)}</p>
                 </CardContent>
               </Card>
             </div>
@@ -169,7 +216,16 @@ const MonthlyOverviewPage: NextPage = () => {
           </CardContent>
         </Card>
       ) : (
-        <p className="text-muted-foreground">Nenhum resumo disponível para o período selecionado.</p>
+        <div className="text-center py-12">
+          <BarChart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-xl font-medium mb-2">Nenhum resumo disponível</h3>
+          <p className="text-muted-foreground mb-6">
+            Não há dados financeiros para o período selecionado.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Tente selecionar um período diferente ou adicione algumas transações primeiro.
+          </p>
+        </div>
       )}
     </div>
   );

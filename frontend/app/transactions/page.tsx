@@ -7,6 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import { PlusIcon, EditIcon, TrashIcon, Receipt, TrendingUp, TrendingDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -46,6 +50,8 @@ const TransactionsPage: NextPage = () => {
   const [selectedAccount, setSelectedAccount] = useState<number | null>(null);
   const [selectedCreditCard, setSelectedCreditCard] = useState<number | null>(null);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
 
   const {
     data: transactions,
@@ -82,7 +88,7 @@ const TransactionsPage: NextPage = () => {
         account_id: selectedAccount,
         credit_card_id: selectedCreditCard,
       });
-      alert('Transação criada com sucesso!');
+      toast.success('Transação criada com sucesso!');
       setDescription('');
       setAmount(0);
       setType('expense');
@@ -91,7 +97,7 @@ const TransactionsPage: NextPage = () => {
       setSelectedAccount(null);
       setSelectedCreditCard(null);
     } catch (err: unknown) {
-      alert((err as Error).message || 'Erro ao criar transação.');
+      toast.error((err as Error).message || 'Erro ao criar transação.');
     }
   };
 
@@ -121,7 +127,7 @@ const TransactionsPage: NextPage = () => {
         account_id: selectedAccount,
         credit_card_id: selectedCreditCard,
       });
-      alert('Transação atualizada com sucesso!');
+      toast.success('Transação atualizada com sucesso!');
       setEditingTransaction(null);
       setDescription('');
       setAmount(0);
@@ -131,20 +137,26 @@ const TransactionsPage: NextPage = () => {
       setSelectedAccount(null);
       setSelectedCreditCard(null);
     } catch (err: unknown) {
-      alert((err as Error).message || 'Erro ao atualizar transação.');
+      toast.error((err as Error).message || 'Erro ao atualizar transação.');
     }
   };
 
-  const handleDeleteTransaction = async (transactionId: number) => {
-    if (!confirm('Tem certeza que deseja excluir esta transação?')) {
-      return;
-    }
+  const handleDeleteTransaction = async () => {
+    if (!transactionToDelete) return;
+
     try {
-      await deleteTransactionMutation.mutateAsync(transactionId);
-      alert('Transação excluída com sucesso!');
+      await deleteTransactionMutation.mutateAsync(transactionToDelete.id);
+      toast.success('Transação excluída com sucesso!');
+      setDeleteDialogOpen(false);
+      setTransactionToDelete(null);
     } catch (err: unknown) {
-      alert((err as Error).message || 'Erro ao excluir transação.');
+      toast.error((err as Error).message || 'Erro ao excluir transação.');
     }
+  };
+
+  const openDeleteDialog = (transaction: Transaction) => {
+    setTransactionToDelete(transaction);
+    setDeleteDialogOpen(true);
   };
 
   const isLoading = isLoadingTransactions || isLoadingAccounts || isLoadingCreditCards;
@@ -153,8 +165,37 @@ const TransactionsPage: NextPage = () => {
   
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Carregando dados...</div>
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-64" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-32" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -171,7 +212,7 @@ const TransactionsPage: NextPage = () => {
 
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold">Minhas Transações</h1>
 
       {error && (
@@ -182,8 +223,18 @@ const TransactionsPage: NextPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>
-            {editingTransaction ? 'Editar Transação' : 'Adicionar Nova Transação'}
+          <CardTitle className="flex items-center gap-2">
+            {editingTransaction ? (
+              <>
+                <EditIcon className="h-5 w-5" />
+                Editar Transação
+              </>
+            ) : (
+              <>
+                <PlusIcon className="h-5 w-5" />
+                Adicionar Nova Transação
+              </>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -280,8 +331,15 @@ const TransactionsPage: NextPage = () => {
               </Select>
             </div>
             <div className="flex space-x-4">
-              <Button type="submit">
-                {editingTransaction ? 'Salvar Alterações' : 'Adicionar Transação'}
+              <Button type="submit" className="flex items-center gap-2">
+                {editingTransaction ? (
+                  'Salvar Alterações'
+                ) : (
+                  <>
+                    <PlusIcon className="h-4 w-4" />
+                    Adicionar Transação
+                  </>
+                )}
               </Button>
               {editingTransaction && (
                 <Button
@@ -308,11 +366,27 @@ const TransactionsPage: NextPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Transações Existentes</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Receipt className="h-5 w-5" />
+            Transações Existentes
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {transactions && transactions.length === 0 ? (
-            <p className="text-muted-foreground">Nenhuma transação cadastrada ainda.</p>
+            <div className="text-center py-8">
+              <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Nenhuma transação encontrada</h3>
+              <p className="text-muted-foreground mb-4">
+                Você ainda não cadastrou nenhuma transação.
+              </p>
+              <Button
+                onClick={() => document.getElementById('description')?.focus()}
+                className="flex items-center gap-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                Criar primeira transação
+              </Button>
+            </div>
           ) : (
             <div className="space-y-4">
               {transactions?.map((transaction) => (
@@ -320,9 +394,14 @@ const TransactionsPage: NextPage = () => {
                   <CardContent className="flex items-center justify-between p-4">
                     <div className="space-y-1">
                       <p className="text-lg font-medium">{transaction.description}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Valor: R$ {transaction.amount.toFixed(2)} ({transaction.type === 'income' ? 'Receita' : 'Despesa'})
-                      </p>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        {transaction.type === 'income' ? (
+                          <TrendingUp className="h-3 w-3 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3 text-red-600" />
+                        )}
+                        <span>R$ {transaction.amount.toFixed(2)} ({transaction.type === 'income' ? 'Receita' : 'Despesa'})</span>
+                      </div>
                       <p className="text-sm text-muted-foreground">Data: {transaction.date}</p>
                       <p className="text-sm text-muted-foreground">Categoria: {transaction.category}</p>
                       {transaction.account_id && (
@@ -339,16 +418,54 @@ const TransactionsPage: NextPage = () => {
                     <div className="space-x-2">
                       <Button
                         variant="outline"
+                        size="sm"
                         onClick={() => handleEditClick(transaction)}
+                        className="flex items-center gap-1"
                       >
+                        <EditIcon className="h-3 w-3" />
                         Editar
                       </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleDeleteTransaction(transaction.id)}
-                      >
-                        Excluir
-                      </Button>
+                      <Dialog open={deleteDialogOpen && transactionToDelete?.id === transaction.id} onOpenChange={setDeleteDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => openDeleteDialog(transaction)}
+                            className="flex items-center gap-1"
+                          >
+                            <TrashIcon className="h-3 w-3" />
+                            Excluir
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Confirmar exclusão</DialogTitle>
+                            <DialogDescription>
+                              Tem certeza que deseja excluir a transação &ldquo;{transaction.description}&rdquo;? Esta ação não pode ser desfeita.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                              Cancelar
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={handleDeleteTransaction}
+                              disabled={deleteTransactionMutation.isPending}
+                              className="flex items-center gap-2"
+                            >
+                              {deleteTransactionMutation.isPending ? (
+                                'Excluindo...'
+                              ) : (
+                                <>
+                                  <TrashIcon className="h-4 w-4" />
+                                  Excluir
+                                </>
+                              )}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </CardContent>
                 </Card>

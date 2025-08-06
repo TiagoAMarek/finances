@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
+import { toast } from 'sonner';
+import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, Banknote } from 'lucide-react';
 
 type BankAccount = {
   id: number;
@@ -23,6 +27,8 @@ const AccountsPage: NextPage = () => {
   const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
   const [editedName, setEditedName] = useState('');
   const [editedBalance, setEditedBalance] = useState<number>(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState<BankAccount | null>(null);
 
   const { data: accounts = [], isLoading, error } = useAccounts();
   const createAccountMutation = useCreateAccount();
@@ -41,7 +47,7 @@ const AccountsPage: NextPage = () => {
       },
       {
         onSuccess: () => {
-          alert('Conta criada com sucesso!');
+          toast.success('Conta criada com sucesso!');
           setAccountName('');
           setAccountBalance(0);
         },
@@ -68,36 +74,65 @@ const AccountsPage: NextPage = () => {
       },
       {
         onSuccess: () => {
-          alert('Conta atualizada com sucesso!');
+          toast.success('Conta atualizada com sucesso!');
           setEditingAccount(null);
         },
       }
     );
   };
 
-  const handleDeleteAccount = async (accountId: number) => {
-    if (!confirm('Tem certeza que deseja excluir esta conta?')) {
-      return;
-    }
+  const handleDeleteAccount = async () => {
+    if (!accountToDelete) return;
 
-    deleteAccountMutation.mutate(accountId, {
+    deleteAccountMutation.mutate(accountToDelete.id, {
       onSuccess: () => {
-        alert('Conta excluída com sucesso!');
+        toast.success('Conta excluída com sucesso!');
+        setDeleteDialogOpen(false);
+        setAccountToDelete(null);
       },
     });
+  };
+
+  const openDeleteDialog = (account: BankAccount) => {
+    setAccountToDelete(account);
+    setDeleteDialogOpen(true);
   };
 
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Carregando contas...</div>
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-64" />
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-32" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold">Minhas Contas Bancárias</h1>
 
       {error && (
@@ -123,7 +158,10 @@ const AccountsPage: NextPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Adicionar Nova Conta</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <PlusIcon className="h-5 w-5" />
+            Adicionar Nova Conta
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleCreateAccount} className="space-y-4">
@@ -151,8 +189,16 @@ const AccountsPage: NextPage = () => {
             <Button
               type="submit"
               disabled={createAccountMutation.isPending}
+              className="flex items-center gap-2"
             >
-              {createAccountMutation.isPending ? 'Criando...' : 'Adicionar Conta'}
+              {createAccountMutation.isPending ? (
+                'Criando...'
+              ) : (
+                <>
+                  <PlusIcon className="h-4 w-4" />
+                  Adicionar Conta
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
@@ -161,7 +207,10 @@ const AccountsPage: NextPage = () => {
       {editingAccount && (
         <Card>
           <CardHeader>
-            <CardTitle>Editar Conta</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <EditIcon className="h-5 w-5" />
+              Editar Conta
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleUpdateAccount} className="space-y-4">
@@ -208,11 +257,27 @@ const AccountsPage: NextPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Contas Existentes</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCardIcon className="h-5 w-5" />
+            Contas Existentes
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {accounts.length === 0 ? (
-            <p className="text-muted-foreground">Nenhuma conta bancária cadastrada ainda.</p>
+            <div className="text-center py-8">
+              <Banknote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Nenhuma conta encontrada</h3>
+              <p className="text-muted-foreground mb-4">
+                Você ainda não cadastrou nenhuma conta bancária.
+              </p>
+              <Button
+                onClick={() => document.getElementById('accountName')?.focus()}
+                className="flex items-center gap-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                Criar primeira conta
+              </Button>
+            </div>
           ) : (
             <div className="space-y-4">
               {accounts.map((account) => (
@@ -225,17 +290,54 @@ const AccountsPage: NextPage = () => {
                     <div className="space-x-2">
                       <Button
                         variant="outline"
+                        size="sm"
                         onClick={() => handleEditClick(account)}
+                        className="flex items-center gap-1"
                       >
+                        <EditIcon className="h-3 w-3" />
                         Editar
                       </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleDeleteAccount(account.id)}
-                        disabled={deleteAccountMutation.isPending}
-                      >
-                        {deleteAccountMutation.isPending ? 'Excluindo...' : 'Excluir'}
-                      </Button>
+                      <Dialog open={deleteDialogOpen && accountToDelete?.id === account.id} onOpenChange={setDeleteDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => openDeleteDialog(account)}
+                            className="flex items-center gap-1"
+                          >
+                            <TrashIcon className="h-3 w-3" />
+                            Excluir
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Confirmar exclusão</DialogTitle>
+                            <DialogDescription>
+                              Tem certeza que deseja excluir a conta &ldquo;{account.name}&rdquo;? Esta ação não pode ser desfeita.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                              Cancelar
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={handleDeleteAccount}
+                              disabled={deleteAccountMutation.isPending}
+                              className="flex items-center gap-2"
+                            >
+                              {deleteAccountMutation.isPending ? (
+                                'Excluindo...'
+                              ) : (
+                                <>
+                                  <TrashIcon className="h-4 w-4" />
+                                  Excluir
+                                </>
+                              )}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </CardContent>
                 </Card>
