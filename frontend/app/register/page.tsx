@@ -33,7 +33,6 @@ const RegisterPage: NextPage = () => {
       { email, password },
       {
         onSuccess: () => {
-          alert('Usuário registrado com sucesso!');
           router.push('/login');
         },
       }

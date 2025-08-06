@@ -39,8 +39,6 @@ interface Transaction {
   credit_card_id: number | null;
 }
 
-
-
 const TransactionsPage: NextPage = () => {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState<number>(0);
@@ -162,7 +160,7 @@ const TransactionsPage: NextPage = () => {
   const isLoading = isLoadingTransactions || isLoadingAccounts || isLoadingCreditCards;
   const isError = isErrorTransactions || isErrorAccounts || isErrorCreditCards;
   const error = transactionsError || accountsError || creditCardsError;
-  
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -294,8 +292,8 @@ const TransactionsPage: NextPage = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="account">Conta Bancária (Opcional)</Label>
-              <Select 
-                value={selectedAccount?.toString() || 'none'} 
+              <Select
+                value={selectedAccount?.toString() || 'none'}
                 onValueChange={(value) => setSelectedAccount(value !== 'none' ? parseInt(value) : null)}
               >
                 <SelectTrigger className="w-full">
@@ -313,8 +311,8 @@ const TransactionsPage: NextPage = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="creditCard">Cartão de Crédito (Opcional)</Label>
-              <Select 
-                value={selectedCreditCard?.toString() || 'none'} 
+              <Select
+                value={selectedCreditCard?.toString() || 'none'}
                 onValueChange={(value) => setSelectedCreditCard(value !== 'none' ? parseInt(value) : null)}
               >
                 <SelectTrigger className="w-full">
