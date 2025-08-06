@@ -295,14 +295,14 @@ const TransactionsPage: NextPage = () => {
             <div className="space-y-2">
               <Label htmlFor="account">Conta Bancária (Opcional)</Label>
               <Select 
-                value={selectedAccount?.toString() || ''} 
-                onValueChange={(value) => setSelectedAccount(value ? parseInt(value) : null)}
+                value={selectedAccount?.toString() || 'none'} 
+                onValueChange={(value) => setSelectedAccount(value !== 'none' ? parseInt(value) : null)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecione uma conta" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
+                  <SelectItem value="none">Nenhuma</SelectItem>
                   {accounts && accounts.map((acc) => (
                     <SelectItem key={acc.id} value={acc.id.toString()}>
                       {acc.name}
@@ -314,14 +314,14 @@ const TransactionsPage: NextPage = () => {
             <div className="space-y-2">
               <Label htmlFor="creditCard">Cartão de Crédito (Opcional)</Label>
               <Select 
-                value={selectedCreditCard?.toString() || ''} 
-                onValueChange={(value) => setSelectedCreditCard(value ? parseInt(value) : null)}
+                value={selectedCreditCard?.toString() || 'none'} 
+                onValueChange={(value) => setSelectedCreditCard(value !== 'none' ? parseInt(value) : null)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecione um cartão" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="none">Nenhum</SelectItem>
                   {creditCards && creditCards.map((card) => (
                     <SelectItem key={card.id} value={card.id.toString()}>
                       {card.name}
