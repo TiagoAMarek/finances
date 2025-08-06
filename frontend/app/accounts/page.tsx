@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
 import { toast } from 'sonner';
@@ -24,6 +25,7 @@ type BankAccount = {
 const AccountsPage: NextPage = () => {
   const [accountName, setAccountName] = useState('');
   const [accountBalance, setAccountBalance] = useState<number>(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
   const [editedName, setEditedName] = useState('');
   const [editedBalance, setEditedBalance] = useState<number>(0);
@@ -50,6 +52,7 @@ const AccountsPage: NextPage = () => {
           toast.success('Conta criada com sucesso!');
           setAccountName('');
           setAccountBalance(0);
+          setDrawerOpen(false);
         },
       }
     );
@@ -133,7 +136,75 @@ const AccountsPage: NextPage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Minhas Contas Bancárias</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Minhas Contas Bancárias</h1>
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <DrawerTrigger asChild>
+            <Button className="flex items-center gap-2">
+              <PlusIcon className="h-4 w-4" />
+              Nova Conta
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Adicionar Nova Conta</DrawerTitle>
+              <DrawerDescription>
+                Cadastre uma nova conta bancária para controlar suas finanças.
+              </DrawerDescription>
+            </DrawerHeader>
+            <form onSubmit={handleCreateAccount} className="px-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="accountName">Nome da Conta</Label>
+                  <Input
+                    type="text"
+                    id="accountName"
+                    value={accountName}
+                    onChange={(e) => setAccountName(e.target.value)}
+                    placeholder="Ex: Conta Corrente Principal"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="accountBalance">Saldo Inicial (R$)</Label>
+                  <Input
+                    type="number"
+                    id="accountBalance"
+                    value={accountBalance || ''}
+                    onChange={(e) => setAccountBalance(parseFloat(e.target.value) || 0)}
+                    placeholder="0,00"
+                    step="0.01"
+                    required
+                  />
+                </div>
+              </div>
+              <DrawerFooter>
+                <Button
+                  type="submit"
+                  disabled={createAccountMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  {createAccountMutation.isPending ? (
+                    'Criando...'
+                  ) : (
+                    <>
+                      <PlusIcon className="h-4 w-4" />
+                      Criar Conta
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  Cancelar
+                </Button>
+              </DrawerFooter>
+            </form>
+          </DrawerContent>
+        </Drawer>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -155,54 +226,6 @@ const AccountsPage: NextPage = () => {
           <AlertDescription>{deleteAccountMutation.error.message}</AlertDescription>
         </Alert>
       )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <PlusIcon className="h-5 w-5" />
-            Adicionar Nova Conta
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreateAccount} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="accountName">Nome da Conta</Label>
-              <Input
-                type="text"
-                id="accountName"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="accountBalance">Saldo Inicial (R$)</Label>
-              <Input
-                type="number"
-                id="accountBalance"
-                value={accountBalance}
-                onChange={(e) => setAccountBalance(parseFloat(e.target.value))}
-                step="0.01"
-                required
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={createAccountMutation.isPending}
-              className="flex items-center gap-2"
-            >
-              {createAccountMutation.isPending ? (
-                'Criando...'
-              ) : (
-                <>
-                  <PlusIcon className="h-4 w-4" />
-                  Adicionar Conta
-                </>
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
 
       {editingAccount && (
         <Card>
@@ -267,16 +290,9 @@ const AccountsPage: NextPage = () => {
             <div className="text-center py-8">
               <Banknote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhuma conta encontrada</h3>
-              <p className="text-muted-foreground mb-4">
-                Você ainda não cadastrou nenhuma conta bancária.
+              <p className="text-muted-foreground">
+                {`Você ainda não cadastrou nenhuma conta bancária. Use o botão "Nova Conta" acima para começar.`}
               </p>
-              <Button
-                onClick={() => document.getElementById('accountName')?.focus()}
-                className="flex items-center gap-2"
-              >
-                <PlusIcon className="h-4 w-4" />
-                Criar primeira conta
-              </Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -313,7 +329,7 @@ const AccountsPage: NextPage = () => {
                           <DialogHeader>
                             <DialogTitle>Confirmar exclusão</DialogTitle>
                             <DialogDescription>
-                              Tem certeza que deseja excluir a conta &ldquo;{account.name}&rdquo;? Esta ação não pode ser desfeita.
+                              {`Tem certeza que deseja excluir a conta "${account.name}"? Esta ação não pode ser desfeita.`}
                             </DialogDescription>
                           </DialogHeader>
                           <DialogFooter>

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { PlusIcon, EditIcon, TrashIcon, Receipt, TrendingUp, TrendingDown } from 'lucide-react';
@@ -47,6 +48,7 @@ const TransactionsPage: NextPage = () => {
   const [category, setCategory] = useState('');
   const [selectedAccount, setSelectedAccount] = useState<number | null>(null);
   const [selectedCreditCard, setSelectedCreditCard] = useState<number | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
@@ -94,6 +96,7 @@ const TransactionsPage: NextPage = () => {
       setCategory('');
       setSelectedAccount(null);
       setSelectedCreditCard(null);
+      setDrawerOpen(false);
     } catch (err: unknown) {
       toast.error((err as Error).message || 'Erro ao criar transação.');
     }
@@ -211,7 +214,153 @@ const TransactionsPage: NextPage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Minhas Transações</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Minhas Transações</h1>
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <DrawerTrigger asChild>
+            <Button className="flex items-center gap-2">
+              <PlusIcon className="h-4 w-4" />
+              Nova Transação
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent className="max-h-[90vh]">
+            <DrawerHeader>
+              <DrawerTitle>Adicionar Nova Transação</DrawerTitle>
+              <DrawerDescription>
+                Registre uma nova receita ou despesa para controlar suas finanças.
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="overflow-y-auto px-4 pb-4">
+              <form onSubmit={handleCreateTransaction} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Descrição</Label>
+                    <Input
+                      type="text"
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Ex: Compra no supermercado"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="amount">Valor (R$)</Label>
+                    <Input
+                      type="number"
+                      id="amount"
+                      value={amount || ''}
+                      onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
+                      placeholder="0,00"
+                      step="0.01"
+                      min="0"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="type">Tipo</Label>
+                    <Select value={type} onValueChange={(value) => setType(value as 'income' | 'expense')}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="expense">💸 Despesa</SelectItem>
+                        <SelectItem value="income">💰 Receita</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="date">Data</Label>
+                    <Input
+                      type="date"
+                      id="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category">Categoria</Label>
+                  <Input
+                    type="text"
+                    id="category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    placeholder="Ex: Alimentação, Salário, etc."
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="account">Conta Bancária (Opcional)</Label>
+                    <Select
+                      value={selectedAccount?.toString() || 'none'}
+                      onValueChange={(value) => setSelectedAccount(value !== 'none' ? parseInt(value) : null)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione uma conta" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhuma</SelectItem>
+                        {accounts && accounts.map((acc) => (
+                          <SelectItem key={acc.id} value={acc.id.toString()}>
+                            {acc.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="creditCard">Cartão de Crédito (Opcional)</Label>
+                    <Select
+                      value={selectedCreditCard?.toString() || 'none'}
+                      onValueChange={(value) => setSelectedCreditCard(value !== 'none' ? parseInt(value) : null)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione um cartão" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {creditCards && creditCards.map((card) => (
+                          <SelectItem key={card.id} value={card.id.toString()}>
+                            {card.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DrawerFooter>
+                  <Button
+                    type="submit"
+                    disabled={createTransactionMutation.isPending}
+                    className="flex items-center gap-2"
+                  >
+                    {createTransactionMutation.isPending ? (
+                      'Criando...'
+                    ) : (
+                      <>
+                        <PlusIcon className="h-4 w-4" />
+                        Criar Transação
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setDrawerOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                </DrawerFooter>
+              </form>
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -219,127 +368,115 @@ const TransactionsPage: NextPage = () => {
         </Alert>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            {editingTransaction ? (
-              <>
-                <EditIcon className="h-5 w-5" />
-                Editar Transação
-              </>
-            ) : (
-              <>
-                <PlusIcon className="h-5 w-5" />
-                Adicionar Nova Transação
-              </>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={editingTransaction ? handleUpdateTransaction : handleCreateTransaction} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
-              <Input
-                type="text"
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="amount">Valor (R$)</Label>
-              <Input
-                type="number"
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(parseFloat(e.target.value))}
-                step="0.01"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="type">Tipo</Label>
-              <Select value={type} onValueChange={(value) => setType(value as 'income' | 'expense')}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="expense">Despesa</SelectItem>
-                  <SelectItem value="income">Receita</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="date">Data</Label>
-              <Input
-                type="date"
-                id="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="category">Categoria</Label>
-              <Input
-                type="text"
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="account">Conta Bancária (Opcional)</Label>
-              <Select
-                value={selectedAccount?.toString() || 'none'}
-                onValueChange={(value) => setSelectedAccount(value !== 'none' ? parseInt(value) : null)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione uma conta" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhuma</SelectItem>
-                  {accounts && accounts.map((acc) => (
-                    <SelectItem key={acc.id} value={acc.id.toString()}>
-                      {acc.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="creditCard">Cartão de Crédito (Opcional)</Label>
-              <Select
-                value={selectedCreditCard?.toString() || 'none'}
-                onValueChange={(value) => setSelectedCreditCard(value !== 'none' ? parseInt(value) : null)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione um cartão" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhum</SelectItem>
-                  {creditCards && creditCards.map((card) => (
-                    <SelectItem key={card.id} value={card.id.toString()}>
-                      {card.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex space-x-4">
-              <Button type="submit" className="flex items-center gap-2">
-                {editingTransaction ? (
-                  'Salvar Alterações'
-                ) : (
-                  <>
-                    <PlusIcon className="h-4 w-4" />
-                    Adicionar Transação
-                  </>
-                )}
-              </Button>
-              {editingTransaction && (
+      {editingTransaction && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <EditIcon className="h-5 w-5" />
+              Editar Transação
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdateTransaction} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="editDescription">Descrição</Label>
+                <Input
+                  type="text"
+                  id="editDescription"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editAmount">Valor (R$)</Label>
+                <Input
+                  type="number"
+                  id="editAmount"
+                  value={amount}
+                  onChange={(e) => setAmount(parseFloat(e.target.value))}
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editType">Tipo</Label>
+                <Select value={type} onValueChange={(value) => setType(value as 'income' | 'expense')}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="expense">Despesa</SelectItem>
+                    <SelectItem value="income">Receita</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editDate">Data</Label>
+                <Input
+                  type="date"
+                  id="editDate"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editCategory">Categoria</Label>
+                <Input
+                  type="text"
+                  id="editCategory"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editAccount">Conta Bancária (Opcional)</Label>
+                <Select
+                  value={selectedAccount?.toString() || 'none'}
+                  onValueChange={(value) => setSelectedAccount(value !== 'none' ? parseInt(value) : null)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione uma conta" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhuma</SelectItem>
+                    {accounts && accounts.map((acc) => (
+                      <SelectItem key={acc.id} value={acc.id.toString()}>
+                        {acc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editCreditCard">Cartão de Crédito (Opcional)</Label>
+                <Select
+                  value={selectedCreditCard?.toString() || 'none'}
+                  onValueChange={(value) => setSelectedCreditCard(value !== 'none' ? parseInt(value) : null)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione um cartão" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhum</SelectItem>
+                    {creditCards && creditCards.map((card) => (
+                      <SelectItem key={card.id} value={card.id.toString()}>
+                        {card.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex space-x-4">
+                <Button 
+                  type="submit" 
+                  disabled={updateTransactionMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  {updateTransactionMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
@@ -356,11 +493,11 @@ const TransactionsPage: NextPage = () => {
                 >
                   Cancelar
                 </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -374,16 +511,9 @@ const TransactionsPage: NextPage = () => {
             <div className="text-center py-8">
               <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhuma transação encontrada</h3>
-              <p className="text-muted-foreground mb-4">
-                Você ainda não cadastrou nenhuma transação.
+              <p className="text-muted-foreground">
+                {`Você ainda não cadastrou nenhuma transação. Use o botão "Nova Transação" acima para começar.`}
               </p>
-              <Button
-                onClick={() => document.getElementById('description')?.focus()}
-                className="flex items-center gap-2"
-              >
-                <PlusIcon className="h-4 w-4" />
-                Criar primeira transação
-              </Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -439,7 +569,7 @@ const TransactionsPage: NextPage = () => {
                           <DialogHeader>
                             <DialogTitle>Confirmar exclusão</DialogTitle>
                             <DialogDescription>
-                              Tem certeza que deseja excluir a transação &ldquo;{transaction.description}&rdquo;? Esta ação não pode ser desfeita.
+                              {`Tem certeza que deseja excluir a transação "${transaction.description}"? Esta ação não pode ser desfeita.`}
                             </DialogDescription>
                           </DialogHeader>
                           <DialogFooter>
