@@ -6,7 +6,7 @@ from app.database import create_tables
 from app.routes import auth_bp, accounts_bp, transactions_bp
 
 
-def create_app():
+def create_app(testing=False):
     app = Flask(__name__)
     
     # Configure Flask
@@ -24,8 +24,13 @@ def create_app():
     def user_identity_lookup(user_id):
         return str(user_id)
     
-    # Create database tables
-    create_tables()
+    # Create database tables - if testing, force recreation
+    if testing:
+        from app.database import Base, engine
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
+    else:
+        create_tables()
     
     # Register blueprints
     app.register_blueprint(auth_bp)

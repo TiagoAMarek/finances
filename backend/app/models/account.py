@@ -13,7 +13,7 @@ class BankAccount(Base):
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     owner = relationship("User", back_populates="accounts")
-    transactions = relationship("Transaction", back_populates="bank_account")
+    transactions = relationship("Transaction", back_populates="bank_account", foreign_keys="[Transaction.account_id]")
 
 
 class CreditCard(Base):

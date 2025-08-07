@@ -3,7 +3,7 @@ from datetime import date
 from sqlalchemy import extract
 from sqlalchemy.orm import Session
 from app.models import Transaction, BankAccount, CreditCard
-from app.schemas import TransactionCreate, TransactionUpdate, TransactionResponse, MonthlySummaryResponse
+from app.schemas import TransactionCreate, TransactionUpdate, TransactionResponse, TransferCreate, MonthlySummaryResponse
 from app.utils.exceptions import NotFoundError, ValidationError
 from app.services.account import AccountService
 
@@ -15,10 +15,23 @@ class TransactionService:
             AccountService.get_bank_account_by_id(db, user_id, transaction_data.account_id)
         elif transaction_data.credit_card_id:
             AccountService.get_credit_card_by_id(db, user_id, transaction_data.credit_card_id)
+        
+        # For transfers, validate destination account ownership
+        if hasattr(transaction_data, 'to_account_id') and transaction_data.to_account_id:
+            AccountService.get_bank_account_by_id(db, user_id, transaction_data.to_account_id)
     
     @staticmethod
     def _update_balances_for_new_transaction(db: Session, transaction: Transaction):
-        if transaction.account_id:
+        if transaction.type == 'transfer':
+            # For transfers, deduct from source account and add to destination
+            source_account = db.query(BankAccount).filter(BankAccount.id == transaction.account_id).first()
+            dest_account = db.query(BankAccount).filter(BankAccount.id == transaction.to_account_id).first()
+            
+            if source_account:
+                source_account.balance -= transaction.amount
+            if dest_account:
+                dest_account.balance += transaction.amount
+        elif transaction.account_id:
             account = db.query(BankAccount).filter(BankAccount.id == transaction.account_id).first()
             if account:
                 if transaction.type == 'income':
@@ -35,7 +48,16 @@ class TransactionService:
     
     @staticmethod
     def _revert_balances_for_transaction(db: Session, transaction: Transaction):
-        if transaction.account_id:
+        if transaction.type == 'transfer':
+            # For transfers, revert by adding back to source and deducting from destination
+            source_account = db.query(BankAccount).filter(BankAccount.id == transaction.account_id).first()
+            dest_account = db.query(BankAccount).filter(BankAccount.id == transaction.to_account_id).first()
+            
+            if source_account:
+                source_account.balance += transaction.amount
+            if dest_account:
+                dest_account.balance -= transaction.amount
+        elif transaction.account_id:
             account = db.query(BankAccount).filter(BankAccount.id == transaction.account_id).first()
             if account:
                 if transaction.type == 'income':
@@ -62,7 +84,8 @@ class TransactionService:
             category=transaction_data.category,
             owner_id=user_id,
             account_id=transaction_data.account_id,
-            credit_card_id=transaction_data.credit_card_id
+            credit_card_id=transaction_data.credit_card_id,
+            to_account_id=transaction_data.to_account_id if hasattr(transaction_data, 'to_account_id') else None
         )
         
         db.add(new_transaction)
@@ -70,6 +93,34 @@ class TransactionService:
         db.commit()
         db.refresh(new_transaction)
         return new_transaction
+    
+    @staticmethod
+    def create_transfer(db: Session, user_id: int, transfer_data: TransferCreate) -> Transaction:
+        # Validate both accounts belong to user
+        AccountService.get_bank_account_by_id(db, user_id, transfer_data.from_account_id)
+        AccountService.get_bank_account_by_id(db, user_id, transfer_data.to_account_id)
+        
+        # Check source account has sufficient balance
+        source_account = db.query(BankAccount).filter(BankAccount.id == transfer_data.from_account_id).first()
+        if source_account.balance < transfer_data.amount:
+            raise ValidationError("Insufficient balance in source account")
+        
+        new_transfer = Transaction(
+            description=transfer_data.description,
+            amount=transfer_data.amount,
+            type='transfer',
+            date=transfer_data.date,
+            category='Transfer',
+            owner_id=user_id,
+            account_id=transfer_data.from_account_id,
+            to_account_id=transfer_data.to_account_id
+        )
+        
+        db.add(new_transfer)
+        TransactionService._update_balances_for_new_transaction(db, new_transfer)
+        db.commit()
+        db.refresh(new_transfer)
+        return new_transfer
     
     @staticmethod
     def get_user_transactions(db: Session, user_id: int) -> List[Transaction]:

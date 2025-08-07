@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.schemas import TransactionCreate, TransactionUpdate, TransactionResponse
+from app.schemas import TransactionCreate, TransactionUpdate, TransactionResponse, TransferCreate
 from app.services import TransactionService
 from app.utils.decorators import require_auth
 
@@ -43,6 +43,24 @@ def update_transaction(db, user_id, transaction_id):
 def delete_transaction(db, user_id, transaction_id):
     TransactionService.delete_transaction(db, user_id, transaction_id)
     return jsonify({"message": "Transaction deleted successfully"}), 204
+
+
+@transactions_bp.route("/transfers", methods=["POST"])
+@require_auth
+def create_transfer(db, user_id):
+    try:
+        transfer_data = TransferCreate(**request.json)
+    except Exception as e:
+        error_msg = str(e)
+        if "same account" in error_msg.lower():
+            return jsonify({"detail": "Cannot transfer to the same account"}), 400
+        return jsonify({"detail": "Invalid input data"}), 400
+    
+    transfer = TransactionService.create_transfer(db, user_id, transfer_data)
+    return jsonify({
+        "message": "Transfer created successfully",
+        "transaction": TransactionResponse.model_validate(transfer).model_dump()
+    }), 201
 
 
 @transactions_bp.route("/monthly_summary", methods=["GET"])
