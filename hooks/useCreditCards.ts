@@ -14,7 +14,7 @@ export const useCreditCards = () => {
   return useQuery<CreditCard[]>({ 
     queryKey: ['creditCards'],
     queryFn: async () => {
-      const response = await fetchWithAuth('http://localhost:8000/credit_cards');
+      const response = await fetchWithAuth('/credit_cards');
       if (!response.ok) {
         throw new Error('Erro ao carregar cartões de crédito.');
       }
@@ -28,7 +28,7 @@ export const useCreateCreditCard = () => {
   const queryClient = useQueryClient();
   return useMutation<CreditCard, Error, Omit<CreditCard, 'id' | 'owner_id'>>({
     mutationFn: async (newCard) => {
-      const response = await fetchWithAuth('http://localhost:8000/credit_cards', {
+      const response = await fetchWithAuth('/credit_cards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export const useUpdateCreditCard = () => {
   const queryClient = useQueryClient();
   return useMutation<CreditCard, Error, CreditCard>({
     mutationFn: async (updatedCard) => {
-      const response = await fetchWithAuth(`http://localhost:8000/credit_cards/${updatedCard.id}`, {
+      const response = await fetchWithAuth(`/credit_cards/${updatedCard.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export const useDeleteCreditCard = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, number>({
     mutationFn: async (cardId) => {
-      const response = await fetchWithAuth(`http://localhost:8000/credit_cards/${cardId}`, {
+      const response = await fetchWithAuth(`/credit_cards/${cardId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

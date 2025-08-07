@@ -14,7 +14,7 @@ export const useAccounts = () => {
   return useQuery<BankAccount[]>({
     queryKey: ['accounts'],
     queryFn: async () => {
-      const response = await fetchWithAuth('http://localhost:8000/accounts');
+      const response = await fetchWithAuth('/accounts');
       if (!response.ok) {
         throw new Error('Erro ao carregar contas bancárias.');
       }
@@ -28,7 +28,7 @@ export const useCreateAccount = () => {
   const queryClient = useQueryClient();
   return useMutation<BankAccount, Error, Omit<BankAccount, 'id' | 'owner_id'>>({
     mutationFn: async (newAccount) => {
-      const response = await fetchWithAuth('http://localhost:8000/accounts', {
+      const response = await fetchWithAuth('/accounts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export const useUpdateAccount = () => {
   const queryClient = useQueryClient();
   return useMutation<BankAccount, Error, BankAccount>({
     mutationFn: async (updatedAccount) => {
-      const response = await fetchWithAuth(`http://localhost:8000/accounts/${updatedAccount.id}`, {
+      const response = await fetchWithAuth(`/accounts/${updatedAccount.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, number>({
     mutationFn: async (accountId) => {
-      const response = await fetchWithAuth(`http://localhost:8000/accounts/${accountId}`, {
+      const response = await fetchWithAuth(`/accounts/${accountId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

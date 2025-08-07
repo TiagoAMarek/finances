@@ -1,4 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
+import { fetchWithAuth } from '@/utils/api';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface LoginRequest {
   email: string;
@@ -18,7 +21,7 @@ interface LoginResponse {
 export const useLogin = () => {
   return useMutation<LoginResponse, Error, LoginRequest>({
     mutationFn: async (credentials) => {
-      const response = await fetch('http://localhost:8000/login', {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +41,7 @@ export const useLogin = () => {
 export const useRegister = () => {
   return useMutation<{ message: string }, Error, RegisterRequest>({
     mutationFn: async (userData) => {
-      const response = await fetch('http://localhost:8000/register', {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

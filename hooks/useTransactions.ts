@@ -20,7 +20,7 @@ export const useTransactions = () => {
   return useQuery<Transaction[]>({
     queryKey: ['transactions'],
     queryFn: async () => {
-      const response = await fetchWithAuth('http://localhost:8000/transactions');
+      const response = await fetchWithAuth('/transactions');
       if (!response.ok) {
         throw new Error('Erro ao carregar transações.');
       }
@@ -35,7 +35,7 @@ export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation<Transaction, Error, Omit<Transaction, 'id' | 'owner_id'>>({
     mutationFn: async (newTransaction) => {
-      const response = await fetchWithAuth('http://localhost:8000/transactions', {
+      const response = await fetchWithAuth('/transactions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ export const useUpdateTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation<Transaction, Error, Transaction>({
     mutationFn: async (updatedTransaction) => {
-      const response = await fetchWithAuth(`http://localhost:8000/transactions/${updatedTransaction.id}`, {
+      const response = await fetchWithAuth(`/transactions/${updatedTransaction.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export const useDeleteTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, number>({
     mutationFn: async (transactionId) => {
-      const response = await fetchWithAuth(`http://localhost:8000/transactions/${transactionId}`, {
+      const response = await fetchWithAuth(`/transactions/${transactionId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
