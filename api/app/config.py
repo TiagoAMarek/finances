@@ -6,9 +6,14 @@ class Config:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "super-secret-key")
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "super-secret-key")
     SQLALCHEMY_DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./financas.db")
-    DEBUG: bool = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
+    DEBUG: bool = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
     
-    CORS_ORIGINS: list = ["http://localhost:3000"]
+    # CORS origins - incluir domínio de produção
+    CORS_ORIGINS: list = [
+        "http://localhost:3000",
+        "https://finances-six-brown.vercel.app",  # Substituir pelo seu domínio
+        os.getenv("FRONTEND_URL", "http://localhost:3000")
+    ]
     
     JWT_ACCESS_TOKEN_EXPIRES: Optional[int] = None  # Token never expires by default
     
