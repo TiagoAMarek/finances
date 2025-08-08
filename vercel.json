@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/main.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/main.py": {
+      "runtime": "python3.11"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
@@ -18,10 +17,5 @@
   ],
   "env": {
     "PYTHONPATH": "api"
-  },
-  "functions": {
-    "api/main.py": {
-      "runtime": "python3.13"
-    }
   }
 }
