@@ -3,10 +3,10 @@ import { eq, and } from 'drizzle-orm';
 import { db } from '../../lib/db';
 import { bankAccounts } from '../../lib/schema';
 import { BankAccountUpdateSchema } from '../../lib/validation';
-import { getUserFromRequest, createErrorResponse, createSuccessResponse } from '../../lib/auth';
+import { getUserFromRequest, createErrorResponse, createSuccessResponse, handleZodError } from '../../lib/auth';
 
 // PUT /api/accounts/[id] - Update bank account
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(request);
   
   if (!user) {
@@ -14,7 +14,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 
   try {
-    const accountId = parseInt(params.id);
+    const resolvedParams = await params;
+    const accountId = parseInt(resolvedParams.id);
     if (isNaN(accountId)) {
       return createErrorResponse('Invalid account ID', 400);
     }
@@ -48,9 +49,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     });
 
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      return createErrorResponse('Invalid input data', 400);
-    }
+    const zodErrorResponse = handleZodError(error);
+    if (zodErrorResponse) return zodErrorResponse;
     
     console.error('Update account error:', error);
     return createErrorResponse('Internal server error', 500);
@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/accounts/[id] - Delete bank account
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(request);
   
   if (!user) {
@@ -66,7 +66,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const accountId = parseInt(params.id);
+    const resolvedParams = await params;
+    const accountId = parseInt(resolvedParams.id);
     if (isNaN(accountId)) {
       return createErrorResponse('Invalid account ID', 400);
     }

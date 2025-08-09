@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm';
 import { db } from '../lib/db';
 import { transactions, bankAccounts, creditCards } from '../lib/schema';
 import { TransactionCreateSchema } from '../lib/validation';
-import { getUserFromRequest, createErrorResponse, createSuccessResponse } from '../lib/auth';
+import { getUserFromRequest, createErrorResponse, createSuccessResponse, handleZodError } from '../lib/auth';
 
 // GET /api/transactions - List user's transactions
 export async function GET(request: NextRequest) {
@@ -116,9 +116,8 @@ export async function POST(request: NextRequest) {
     }, 201);
 
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      return createErrorResponse('Invalid input data', 400);
-    }
+    const zodErrorResponse = handleZodError(error);
+    if (zodErrorResponse) return zodErrorResponse;
     
     console.error('Create transaction error:', error);
     return createErrorResponse('Internal server error', 500);

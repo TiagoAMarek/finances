@@ -3,7 +3,7 @@ import { eq, and, gte, lte } from 'drizzle-orm';
 import { db } from '../lib/db';
 import { transactions } from '../lib/schema';
 import { MonthlySummarySchema } from '../lib/validation';
-import { getUserFromRequest, createErrorResponse, createSuccessResponse } from '../lib/auth';
+import { getUserFromRequest, createErrorResponse, createSuccessResponse, handleZodError } from '../lib/auth';
 
 // GET /api/monthly_summary?month=1&year=2024 - Get monthly financial summary
 export async function GET(request: NextRequest) {
@@ -58,9 +58,8 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      return createErrorResponse('Month and year are required', 400);
-    }
+    const zodErrorResponse = handleZodError(error);
+    if (zodErrorResponse) return zodErrorResponse;
     
     console.error('Monthly summary error:', error);
     return createErrorResponse('Internal server error', 500);

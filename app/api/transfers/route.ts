@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm';
 import { db } from '../lib/db';
 import { transactions, bankAccounts } from '../lib/schema';
 import { TransferCreateSchema } from '../lib/validation';
-import { getUserFromRequest, createErrorResponse, createSuccessResponse } from '../lib/auth';
+import { getUserFromRequest, createErrorResponse, createSuccessResponse, handleZodError } from '../lib/auth';
 
 // POST /api/transfers - Create transfer between accounts
 export async function POST(request: NextRequest) {
@@ -67,10 +67,8 @@ export async function POST(request: NextRequest) {
     }, 201);
 
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      const errorMessage = error.errors?.[0]?.message || 'Invalid input data';
-      return createErrorResponse(errorMessage, 400);
-    }
+    const zodErrorResponse = handleZodError(error);
+    if (zodErrorResponse) return zodErrorResponse;
     
     console.error('Create transfer error:', error);
     return createErrorResponse('Internal server error', 500);

@@ -3,10 +3,10 @@ import { eq, and } from 'drizzle-orm';
 import { db } from '../../lib/db';
 import { transactions } from '../../lib/schema';
 import { TransactionUpdateSchema } from '../../lib/validation';
-import { getUserFromRequest, createErrorResponse, createSuccessResponse } from '../../lib/auth';
+import { getUserFromRequest, createErrorResponse, createSuccessResponse, handleZodError } from '../../lib/auth';
 
 // PUT /api/transactions/[id] - Update transaction
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(request);
   
   if (!user) {
@@ -14,7 +14,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 
   try {
-    const transactionId = parseInt(params.id);
+    const resolvedParams = await params;
+    const transactionId = parseInt(resolvedParams.id);
     if (isNaN(transactionId)) {
       return createErrorResponse('Invalid transaction ID', 400);
     }
@@ -54,9 +55,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     });
 
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      return createErrorResponse('Invalid input data', 400);
-    }
+    const zodErrorResponse = handleZodError(error);
+    if (zodErrorResponse) return zodErrorResponse;
     
     console.error('Update transaction error:', error);
     return createErrorResponse('Internal server error', 500);
@@ -64,7 +64,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/transactions/[id] - Delete transaction
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(request);
   
   if (!user) {
@@ -72,7 +72,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const transactionId = parseInt(params.id);
+    const resolvedParams = await params;
+    const transactionId = parseInt(resolvedParams.id);
     if (isNaN(transactionId)) {
       return createErrorResponse('Invalid transaction ID', 400);
     }

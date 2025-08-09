@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../../lib/db';
 import { users } from '../../lib/schema';
 import { LoginSchema } from '../../lib/validation';
-import { verifyPassword, signToken, createErrorResponse, createSuccessResponse } from '../../lib/auth';
+import { verifyPassword, signToken, createErrorResponse, createSuccessResponse, handleZodError } from '../../lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,9 +35,8 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      return createErrorResponse('Invalid input data', 400);
-    }
+    const zodErrorResponse = handleZodError(error);
+    if (zodErrorResponse) return zodErrorResponse;
     
     console.error('Login error:', error);
     return createErrorResponse('Internal server error', 500);

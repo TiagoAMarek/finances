@@ -3,10 +3,10 @@ import { eq, and } from 'drizzle-orm';
 import { db } from '../../lib/db';
 import { creditCards } from '../../lib/schema';
 import { CreditCardUpdateSchema } from '../../lib/validation';
-import { getUserFromRequest, createErrorResponse, createSuccessResponse } from '../../lib/auth';
+import { getUserFromRequest, createErrorResponse, createSuccessResponse, handleZodError } from '../../lib/auth';
 
 // PUT /api/credit_cards/[id] - Update credit card
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(request);
   
   if (!user) {
@@ -14,7 +14,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 
   try {
-    const cardId = parseInt(params.id);
+    const resolvedParams = await params;
+    const cardId = parseInt(resolvedParams.id);
     if (isNaN(cardId)) {
       return createErrorResponse('Invalid card ID', 400);
     }
@@ -48,9 +49,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     });
 
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      return createErrorResponse('Invalid input data', 400);
-    }
+    const zodErrorResponse = handleZodError(error);
+    if (zodErrorResponse) return zodErrorResponse;
     
     console.error('Update credit card error:', error);
     return createErrorResponse('Internal server error', 500);
@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/credit_cards/[id] - Delete credit card
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(request);
   
   if (!user) {
@@ -66,7 +66,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const cardId = parseInt(params.id);
+    const resolvedParams = await params;
+    const cardId = parseInt(resolvedParams.id);
     if (isNaN(cardId)) {
       return createErrorResponse('Invalid card ID', 400);
     }

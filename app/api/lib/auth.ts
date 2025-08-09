@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { NextRequest } from 'next/server';
+import { ZodError } from 'zod';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key');
 
@@ -51,4 +52,12 @@ export function createSuccessResponse(data: unknown, status: number = 200) {
     status,
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+export function handleZodError(error: unknown): Response | null {
+  if (error instanceof ZodError) {
+    const errorMessage = error.errors[0]?.message || 'Invalid input data';
+    return createErrorResponse(errorMessage, 400);
+  }
+  return null;
 }
