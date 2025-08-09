@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function fetchWithAuth(url: string, options?: RequestInit) {
   const token = localStorage.getItem('access_token');
@@ -8,8 +8,10 @@ export async function fetchWithAuth(url: string, options?: RequestInit) {
     ...options?.headers,
   };
 
-  // Se a URL não começar com http, adicionar base URL
-  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}`;
+  // Se a URL não começar com http, adicionar base URL (ou usar rotas internas se API_BASE_URL for undefined)
+  const fullUrl = url.startsWith('http') ? url : 
+    API_BASE_URL ? `${API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}` : 
+    url.startsWith('/') ? url : `/${url}`;
 
   const response = await fetch(fullUrl, { ...options, headers });
 

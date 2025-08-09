@@ -11,16 +11,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
+import { BankAccount } from '@/types/api';
 import { toast } from 'sonner';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, Banknote } from 'lucide-react';
-
-type BankAccount = {
-  id: number;
-  name: string;
-  balance: number;
-  currency: string;
-  owner_id: number;
-};
 
 const AccountsPage: NextPage = () => {
   const [accountName, setAccountName] = useState('');
@@ -44,7 +37,7 @@ const AccountsPage: NextPage = () => {
     createAccountMutation.mutate(
       {
         name: accountName,
-        balance: accountBalance,
+        balance: accountBalance.toString(),
         currency: "BRL",
       },
       {
@@ -61,7 +54,7 @@ const AccountsPage: NextPage = () => {
   const handleEditClick = (account: BankAccount) => {
     setEditingAccount(account);
     setEditedName(account.name);
-    setEditedBalance(account.balance);
+    setEditedBalance(parseFloat(account.balance));
   };
 
   const handleUpdateAccount = async (e: React.FormEvent) => {
@@ -73,7 +66,7 @@ const AccountsPage: NextPage = () => {
       {
         ...editingAccount,
         name: editedName,
-        balance: editedBalance,
+        balance: editedBalance.toString(),
       },
       {
         onSuccess: () => {
@@ -301,7 +294,7 @@ const AccountsPage: NextPage = () => {
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
                       <p className="text-lg font-medium">{account.name}</p>
-                      <p className="text-sm text-muted-foreground">Saldo: R$ {account.balance.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">Saldo: R$ {parseFloat(account.balance).toFixed(2)}</p>
                     </div>
                     <div className="space-x-2">
                       <Button

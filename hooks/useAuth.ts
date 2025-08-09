@@ -1,31 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface RegisterRequest {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  access_token: string;
-}
+import { LoginResponse, RegisterResponse } from '@/types/api';
+import { LoginData, RegisterData } from '@/app/api/lib/validation';
 
 // Login
 export const useLogin = () => {
-  return useMutation<LoginResponse, Error, LoginRequest>({
+  return useMutation<LoginResponse, Error, LoginData>({
     mutationFn: async (credentials) => {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await fetchWithAuth('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(credentials),
       });
       if (!response.ok) {
@@ -39,13 +22,10 @@ export const useLogin = () => {
 
 // Register
 export const useRegister = () => {
-  return useMutation<{ message: string }, Error, RegisterRequest>({
+  return useMutation<RegisterResponse, Error, RegisterData>({
     mutationFn: async (userData) => {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await fetchWithAuth('/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(userData),
       });
       if (!response.ok) {

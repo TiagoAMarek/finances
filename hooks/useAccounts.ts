@@ -1,20 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
+import { BankAccount } from '@/types/api';
+import { BankAccountCreateData, BankAccountUpdateData } from '@/app/api/lib/validation';
 
-interface BankAccount {
-  id: number;
-  name: string;
-  balance: number;
-  currency: string;
-  owner_id: number;
-}
 
 // Fetch Accounts
 export const useAccounts = () => {
   return useQuery<BankAccount[]>({
     queryKey: ['accounts'],
     queryFn: async () => {
-      const response = await fetchWithAuth('/accounts');
+      const response = await fetchWithAuth('/api/accounts');
       if (!response.ok) {
         throw new Error('Erro ao carregar contas bancárias.');
       }
@@ -26,20 +21,18 @@ export const useAccounts = () => {
 // Create Account
 export const useCreateAccount = () => {
   const queryClient = useQueryClient();
-  return useMutation<BankAccount, Error, Omit<BankAccount, 'id' | 'owner_id'>>({
+  return useMutation<BankAccount, Error, Omit<BankAccount, 'id' | 'ownerId'>>({
     mutationFn: async (newAccount) => {
-      const response = await fetchWithAuth('/accounts', {
+      const response = await fetchWithAuth('/api/accounts', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(newAccount),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Erro ao criar conta.');
       }
-      return response.json();
+      const data = await response.json();
+      return data.account; // Extract account from response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
@@ -52,18 +45,16 @@ export const useUpdateAccount = () => {
   const queryClient = useQueryClient();
   return useMutation<BankAccount, Error, BankAccount>({
     mutationFn: async (updatedAccount) => {
-      const response = await fetchWithAuth(`/accounts/${updatedAccount.id}`, {
+      const response = await fetchWithAuth(`/api/accounts/${updatedAccount.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(updatedAccount),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Erro ao atualizar conta.');
       }
-      return response.json();
+      const data = await response.json();
+      return data.account; // Extract account from response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
@@ -76,7 +67,7 @@ export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, number>({
     mutationFn: async (accountId) => {
-      const response = await fetchWithAuth(`/accounts/${accountId}`, {
+      const response = await fetchWithAuth(`/api/accounts/${accountId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

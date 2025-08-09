@@ -26,17 +26,17 @@ const DashboardPage: NextPage = () => {
 
   const monthlyIncomes = monthlyTransactions
     .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
   const monthlyExpenses = monthlyTransactions
     .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
   const monthlyBalance = monthlyIncomes - monthlyExpenses;
 
   // Calcular saldo total de todas as contas
   const totalBalance = accounts.reduce(
-    (sum, account) => sum + account.balance,
+    (sum, account) => sum + parseFloat(account.balance),
     0,
   );
 

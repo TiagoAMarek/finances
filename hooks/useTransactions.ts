@@ -1,18 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
-
-interface Transaction {
-  id: number;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  date: string; // ISO format string
-  category: string;
-  owner_id: number;
-  account_id: number | null;
-  credit_card_id: number | null;
-}
+import { Transaction } from '@/types/api';
 
 
 // Fetch Transactions
@@ -20,7 +9,7 @@ export const useTransactions = () => {
   return useQuery<Transaction[]>({
     queryKey: ['transactions'],
     queryFn: async () => {
-      const response = await fetchWithAuth('/transactions');
+      const response = await fetchWithAuth('/api/transactions');
       if (!response.ok) {
         throw new Error('Erro ao carregar transações.');
       }
@@ -33,20 +22,18 @@ export const useTransactions = () => {
 // Create Transaction
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
-  return useMutation<Transaction, Error, Omit<Transaction, 'id' | 'owner_id'>>({
+  return useMutation<Transaction, Error, Omit<Transaction, 'id' | 'ownerId'>>({
     mutationFn: async (newTransaction) => {
-      const response = await fetchWithAuth('/transactions', {
+      const response = await fetchWithAuth('/api/transactions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(newTransaction),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Erro ao criar transação.');
       }
-      return response.json();
+      const data = await response.json();
+      return data.transaction; // Extract transaction from response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -61,18 +48,16 @@ export const useUpdateTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation<Transaction, Error, Transaction>({
     mutationFn: async (updatedTransaction) => {
-      const response = await fetchWithAuth(`/transactions/${updatedTransaction.id}`, {
+      const response = await fetchWithAuth(`/api/transactions/${updatedTransaction.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(updatedTransaction),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Erro ao atualizar transação.');
       }
-      return response.json();
+      const data = await response.json();
+      return data.transaction; // Extract transaction from response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -87,7 +72,7 @@ export const useDeleteTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, number>({
     mutationFn: async (transactionId) => {
-      const response = await fetchWithAuth(`/transactions/${transactionId}`, {
+      const response = await fetchWithAuth(`/api/transactions/${transactionId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

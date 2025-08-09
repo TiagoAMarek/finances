@@ -27,23 +27,12 @@ import {
 } from '@/hooks/useTransactions';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
-
-interface Transaction {
-  id: number;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  date: string; // ISO format string
-  category: string;
-  owner_id: number;
-  account_id: number | null;
-  credit_card_id: number | null;
-}
+import { Transaction } from '@/types/api';
 
 const TransactionsPage: NextPage = () => {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState<number>(0);
-  const [type, setType] = useState<'income' | 'expense'>('expense');
+  const [type, setType] = useState<'income' | 'expense' | 'transfer'>('expense');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [category, setCategory] = useState('');
   const [selectedAccount, setSelectedAccount] = useState<number | null>(null);
@@ -81,12 +70,12 @@ const TransactionsPage: NextPage = () => {
     try {
       await createTransactionMutation.mutateAsync({
         description,
-        amount: parseFloat(amount.toString()),
+        amount: amount.toString(),
         type,
         date,
         category,
-        account_id: selectedAccount,
-        credit_card_id: selectedCreditCard,
+        accountId: selectedAccount,
+        creditCardId: selectedCreditCard,
       });
       toast.success('Transação criada com sucesso!');
       setDescription('');
@@ -105,12 +94,12 @@ const TransactionsPage: NextPage = () => {
   const handleEditClick = (transaction: Transaction) => {
     setEditingTransaction(transaction);
     setDescription(transaction.description);
-    setAmount(transaction.amount);
+    setAmount(parseFloat(transaction.amount));
     setType(transaction.type);
     setDate(transaction.date);
     setCategory(transaction.category);
-    setSelectedAccount(transaction.account_id);
-    setSelectedCreditCard(transaction.credit_card_id);
+    setSelectedAccount(transaction.accountId);
+    setSelectedCreditCard(transaction.creditCardId);
   };
 
   const handleUpdateTransaction = async (e: React.FormEvent) => {
@@ -121,12 +110,12 @@ const TransactionsPage: NextPage = () => {
       await updateTransactionMutation.mutateAsync({
         ...editingTransaction,
         description,
-        amount: parseFloat(amount.toString()),
+        amount: amount.toString(),
         type,
         date,
         category,
-        account_id: selectedAccount,
-        credit_card_id: selectedCreditCard,
+        accountId: selectedAccount,
+        creditCardId: selectedCreditCard,
       });
       toast.success('Transação atualizada com sucesso!');
       setEditingTransaction(null);
@@ -528,18 +517,18 @@ const TransactionsPage: NextPage = () => {
                         ) : (
                           <TrendingDown className="h-3 w-3 text-red-600" />
                         )}
-                        <span>R$ {transaction.amount.toFixed(2)} ({transaction.type === 'income' ? 'Receita' : 'Despesa'})</span>
+                        <span>R$ {parseFloat(transaction.amount).toFixed(2)} ({transaction.type === 'income' ? 'Receita' : 'Despesa'})</span>
                       </div>
                       <p className="text-sm text-muted-foreground">Data: {transaction.date}</p>
                       <p className="text-sm text-muted-foreground">Categoria: {transaction.category}</p>
-                      {transaction.account_id && (
+                      {transaction.accountId && (
                         <p className="text-sm text-muted-foreground">
-                          Conta: {accounts?.find(acc => acc.id === transaction.account_id)?.name || 'N/A'}
+                          Conta: {accounts?.find(acc => acc.id === transaction.accountId)?.name || 'N/A'}
                         </p>
                       )}
-                      {transaction.credit_card_id && creditCards && (
+                      {transaction.creditCardId && creditCards && (
                         <p className="text-sm text-muted-foreground">
-                          Cartão: {creditCards.find(card => card.id === transaction.credit_card_id)?.name || 'N/A'}
+                          Cartão: {creditCards.find(card => card.id === transaction.creditCardId)?.name || 'N/A'}
                         </p>
                       )}
                     </div>

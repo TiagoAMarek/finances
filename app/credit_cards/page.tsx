@@ -11,16 +11,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCreditCards, useCreateCreditCard, useUpdateCreditCard, useDeleteCreditCard } from '@/hooks/useCreditCards';
+import { CreditCard } from '@/types/api';
 import { toast } from 'sonner';
-import { PlusIcon, EditIcon, TrashIcon, CreditCard, Wallet } from 'lucide-react';
-
-type CreditCard = {
-  id: number;
-  name: string;
-  limit: number;
-  current_bill: number;
-  owner_id: number;
-};
+import { PlusIcon, EditIcon, TrashIcon, CreditCard as CreditCardIcon, Wallet } from 'lucide-react';
 
 const CreditCardsPage: NextPage = () => {
   const [cardName, setCardName] = useState('');
@@ -45,8 +38,8 @@ const CreditCardsPage: NextPage = () => {
     createCardMutation.mutate(
       {
         name: cardName,
-        limit: cardLimit,
-        current_bill: 0,
+        limit: cardLimit.toString(),
+        currentBill: "0",
       },
       {
         onSuccess: () => {
@@ -62,8 +55,8 @@ const CreditCardsPage: NextPage = () => {
   const handleEditClick = (card: CreditCard) => {
     setEditingCard(card);
     setEditedName(card.name);
-    setEditedLimit(card.limit);
-    setEditedCurrentBill(card.current_bill);
+    setEditedLimit(parseFloat(card.limit));
+    setEditedCurrentBill(parseFloat(card.currentBill));
   };
 
   const handleUpdateCreditCard = async (e: React.FormEvent) => {
@@ -75,8 +68,8 @@ const CreditCardsPage: NextPage = () => {
       {
         ...editingCard,
         name: editedName,
-        limit: editedLimit,
-        current_bill: editedCurrentBill,
+        limit: editedLimit.toString(),
+        currentBill: editedCurrentBill.toString(),
       },
       {
         onSuccess: () => {
@@ -296,7 +289,7 @@ const CreditCardsPage: NextPage = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
+            <CreditCardIcon className="h-5 w-5" />
             Cartões Existentes
           </CardTitle>
         </CardHeader>
@@ -316,8 +309,8 @@ const CreditCardsPage: NextPage = () => {
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
                       <p className="text-lg font-medium">{card.name}</p>
-                      <p className="text-sm text-muted-foreground">Limite: R$ {card.limit.toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground">Fatura Atual: R$ {card.current_bill.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">Limite: R$ {parseFloat(card.limit).toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">Fatura Atual: R$ {parseFloat(card.currentBill).toFixed(2)}</p>
                     </div>
                     <div className="space-x-2">
                       <Button
