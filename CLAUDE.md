@@ -4,113 +4,91 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-### Backend (Flask API)
-```bash
-# Navigate to backend directory
-cd backend
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run development server
-python main.py
-# Server runs on http://localhost:8000
-```
-
 ### Frontend (Next.js)
-```bash
-# Navigate to frontend directory
-cd frontend
+- `pnpm dev` - Start development server on port 3000
+- `pnpm build` - Build for production
+- `pnpm lint` - Run ESLint with Next.js, TypeScript, and Prettier rules
+- No test framework configured
 
-# Install dependencies
-pnpm install
-
-# Run development server
-pnpm dev
-# Development server runs on http://localhost:3000
-
-# Build for production
-pnpm build
-
-# Start production server
-pnpm start
-
-# Run linting
-pnpm lint
-```
+### Database
+- `pnpm drizzle-kit generate` - Generate database migrations
+- `pnpm drizzle-kit push` - Push schema changes to database
+- Database schema is located at `app/api/lib/schema.ts`
 
 ## Architecture Overview
 
-This is a financial management application with a Flask backend and Next.js frontend.
-
-### Backend Architecture
-- **Framework**: Flask with SQLAlchemy ORM
-- **Database**: SQLite (`financas.db`)
-- **Authentication**: JWT tokens with Flask-JWT-Extended
-- **Password Hashing**: bcrypt via passlib
-- **CORS**: Enabled for frontend on localhost:3000
-
-#### Core Models
-- **User**: Email/password authentication, owns accounts, cards, and transactions
-- **BankAccount**: Has balance, currency (default BRL), linked to transactions
-- **CreditCard**: Has limit and current bill, linked to transactions
-- **Transaction**: Income/expense with amount, date, category, linked to either account or credit card
-
-#### Key Backend Patterns
-- All protected routes use `@jwt_required()` decorator
-- Database sessions use context manager pattern with `get_db()`
-- Transaction operations automatically update account balances and credit card bills
-- User identity retrieved via `get_jwt_identity()` for data isolation
-
 ### Frontend Architecture
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript with strict mode
-- **Styling**: Tailwind CSS v4 with PostCSS
-- **State Management**: TanStack Query (React Query) for server state
-- **UI Components**: Custom components with Radix UI primitives
-- **Charts**: Chart.js with react-chartjs-2
+- **Framework**: Next.js 15 with App Router in TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components (New York style, stone base color)
+- **Icons**: Lucide React
+- **State Management**: TanStack Query for server state, localStorage for authentication tokens
+- **Authentication**: JWT tokens stored in localStorage, handled via `fetchWithAuth` utility
+- **Validation**: Zod schemas serve as single source of truth for all types and validation
 
-#### Key Frontend Patterns
-- All API calls use `fetchWithAuth()` utility that handles JWT tokens and 401 redirects
-- React Query hooks in `useTransactions.ts` provide CRUD operations with automatic cache invalidation
-- Layout includes global Navbar with navigation and logout
-- Authentication token stored in localStorage, removed on 401 or logout
-- TypeScript interfaces match backend models for type safety
+### Database & Backend
+- **Database**: PostgreSQL with Drizzle ORM
+- **API**: Next.js API routes following RESTful patterns
+- **Authentication**: JWT with Bearer tokens, 24h expiration
+- **Schema**: Centralized in `app/api/lib/schema.ts` with proper relations
 
-#### API Integration
-- Base URL: `http://localhost:8000`
-- Authorization: Bearer token in headers
-- Automatic cache invalidation on mutations (transactions invalidate accounts/cards)
-- Error handling with Portuguese messages
+### Key Architectural Patterns
 
-## File Structure Notes
+#### Type Safety with Zod
+- All types are inferred from Zod schemas in `lib/schemas.ts`
+- API validation reuses frontend schemas via `app/api/lib/validation.ts`
+- Error messages are in Portuguese (`pt-br`)
 
-### Backend Key Files
-- `main.py`: Main Flask application with all routes and models
-- `database.py`: Database configuration (minimal, mainly duplicated in main.py)
-- `requirements.txt`: Python dependencies
+#### API Layer
+- Custom `fetchWithAuth()` utility handles authentication and error responses
+- Automatic 401 handling redirects to login page
+- All API routes follow pattern: `/api/[resource]/route.ts` and `/api/[resource]/[id]/route.ts`
 
-### Frontend Key Files
-- `app/layout.tsx`: Root layout with QueryProvider and Navbar
-- `hooks/useTransactions.ts`: React Query hooks for all API operations
-- `utils/api.ts`: Authentication wrapper for fetch requests
-- `components/Navbar.tsx`: Navigation with logout functionality
-- `lib/query-provider.tsx`: TanStack Query setup
+#### Component Structure
+- Pages in `app/[route]/page.tsx`
+- Reusable components in `components/`
+- shadcn/ui components in `components/ui/`
+- Custom hooks for API operations in `hooks/`
 
-### Pages Structure
-All pages are in `app/` directory using Next.js App Router:
-- `dashboard/`: Main dashboard view
-- `accounts/`: Bank account management
-- `credit_cards/`: Credit card management  
-- `transactions/`: Transaction management
-- `monthly_overview/`: Monthly financial summary
-- `login/` and `register/`: Authentication pages
+#### Data Flow
+1. Forms use Zod schemas for validation
+2. Custom hooks (`useAccounts`, `useTransactions`, etc.) handle API calls
+3. TanStack Query manages caching and state
+4. `fetchWithAuth` handles authentication and errors
 
-## Development Notes
+### Database Schema Structure
+- **users**: Basic authentication (id, email, hashedPassword)
+- **bankAccounts**: User bank accounts with balance tracking
+- **creditCards**: Credit cards with limits and current bill tracking
+- **transactions**: All financial transactions (income, expense, transfer) with references to accounts/cards
 
-- Backend serves API on port 8000, frontend on port 3000
-- JWT secret key is hardcoded (change for production)
-- Database auto-creates tables on startup via SQLAlchemy
-- Frontend uses Portuguese language for user-facing content
-- All routes except login/register require authentication
-- Transaction updates automatically sync account/card balances
+### Import Patterns
+- Use `@/` alias for root imports
+- Schemas imported from `@/lib/schemas`
+- API utilities from `@/utils/api`
+- Components use absolute imports with `@/components/`
+- shadcn/ui components from `@/components/ui`
+
+### Error Handling
+- Portuguese error messages throughout the application
+- Zod validation errors are caught and displayed with specific messages
+- API errors follow consistent format: `{ detail: "error message" }`
+- 401 responses automatically clear tokens and redirect to login
+
+### Authentication Flow
+1. Login/Register via `/api/auth/[action]/route.ts`
+2. JWT token stored in localStorage as `access_token`
+3. `fetchWithAuth` includes Bearer token in all requests
+4. Middleware can be used for route protection (configured in `middleware.ts`)
+
+### Financial Transaction Logic
+- Transactions can be linked to bank accounts OR credit cards (not both)
+- Transfers require `fromAccount` and `toAccount` and create two related transactions
+- Balance calculations are handled server-side
+- All monetary values are stored as decimal strings for precision
+
+### shadcn/ui Configuration
+- Style: New York variant
+- Base color: Stone
+- CSS variables enabled
+- Icons: Lucide React
+- All UI components follow shadcn/ui patterns and conventions
