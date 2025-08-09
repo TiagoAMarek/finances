@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
-import { BankAccount } from '@/types/api';
+import { BankAccount } from '@/lib/schemas';
 import { toast } from 'sonner';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, Banknote } from 'lucide-react';
 

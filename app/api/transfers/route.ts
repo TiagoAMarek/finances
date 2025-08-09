@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Check if source account has sufficient balance
     const currentBalance = parseFloat(fromAccount.balance);
-    if (currentBalance < validatedData.amount) {
+    if (currentBalance < parseFloat(validatedData.amount)) {
       return createErrorResponse('Insufficient balance in source account', 400);
     }
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       description: validatedData.description,
       amount: validatedData.amount.toString(),
       type: 'transfer',
-      date: validatedData.date.toISOString().split('T')[0],
+      date: validatedData.date, // Already a string in ISO format
       category: 'Transfer',
       ownerId: user.userId,
       accountId: validatedData.fromAccountId,

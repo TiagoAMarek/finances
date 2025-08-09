@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCreditCards, useCreateCreditCard, useUpdateCreditCard, useDeleteCreditCard } from '@/hooks/useCreditCards';
-import { CreditCard } from '@/types/api';
+import { CreditCard } from '@/lib/schemas';
 import { toast } from 'sonner';
 import { PlusIcon, EditIcon, TrashIcon, CreditCard as CreditCardIcon, Wallet } from 'lucide-react';
 

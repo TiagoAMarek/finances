@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
-import { Transaction } from '@/types/api';
+import { Transaction, TransactionCreateInput } from '@/lib/schemas';
 
 
 // Fetch Transactions
@@ -22,7 +22,7 @@ export const useTransactions = () => {
 // Create Transaction
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
-  return useMutation<Transaction, Error, Omit<Transaction, 'id' | 'ownerId'>>({
+  return useMutation<Transaction, Error, TransactionCreateInput>({
     mutationFn: async (newTransaction) => {
       const response = await fetchWithAuth('/api/transactions', {
         method: 'POST',

@@ -1,11 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
-import { LoginResponse, RegisterResponse } from '@/types/api';
-import { LoginData, RegisterData } from '@/app/api/lib/validation';
+import { LoginResponse, RegisterResponse, LoginInput, RegisterInput } from '@/lib/schemas';
 
 // Login
 export const useLogin = () => {
-  return useMutation<LoginResponse, Error, LoginData>({
+  return useMutation<LoginResponse, Error, LoginInput>({
     mutationFn: async (credentials) => {
       const response = await fetchWithAuth('/api/auth/login', {
         method: 'POST',
@@ -22,7 +21,7 @@ export const useLogin = () => {
 
 // Register
 export const useRegister = () => {
-  return useMutation<RegisterResponse, Error, RegisterData>({
+  return useMutation<RegisterResponse, Error, RegisterInput>({
     mutationFn: async (userData) => {
       const response = await fetchWithAuth('/api/auth/register', {
         method: 'POST',

@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       description: validatedData.description,
       amount: validatedData.amount.toString(),
       type: validatedData.type,
-      date: validatedData.date.toISOString().split('T')[0], // Convert to date string
+      date: validatedData.date, // Already a string in ISO format
       category: validatedData.category,
       ownerId: user.userId,
       accountId: validatedData.accountId || null,

@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
-import { BankAccount } from '@/types/api';
-import { BankAccountCreateData, BankAccountUpdateData } from '@/app/api/lib/validation';
+import { BankAccount, BankAccountCreateInput } from '@/lib/schemas';
 
 
 // Fetch Accounts
@@ -21,7 +20,7 @@ export const useAccounts = () => {
 // Create Account
 export const useCreateAccount = () => {
   const queryClient = useQueryClient();
-  return useMutation<BankAccount, Error, Omit<BankAccount, 'id' | 'ownerId'>>({
+  return useMutation<BankAccount, Error, BankAccountCreateInput>({
     mutationFn: async (newAccount) => {
       const response = await fetchWithAuth('/api/accounts', {
         method: 'POST',

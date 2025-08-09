@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
-import { CreditCard } from '@/types/api';
+import { CreditCard, CreditCardCreateInput } from '@/lib/schemas';
 
 // Fetch Credit Cards
 export const useCreditCards = () => {
@@ -19,7 +19,7 @@ export const useCreditCards = () => {
 // Create Credit Card
 export const useCreateCreditCard = () => {
   const queryClient = useQueryClient();
-  return useMutation<CreditCard, Error, Omit<CreditCard, 'id' | 'ownerId'>>({
+  return useMutation<CreditCard, Error, CreditCardCreateInput>({
     mutationFn: async (newCard) => {
       const response = await fetchWithAuth('/api/credit_cards', {
         method: 'POST',

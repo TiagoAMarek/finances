@@ -27,7 +27,7 @@ import {
 } from '@/hooks/useTransactions';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
-import { Transaction } from '@/types/api';
+import { Transaction } from '@/lib/schemas';
 
 const TransactionsPage: NextPage = () => {
   const [description, setDescription] = useState('');
@@ -74,8 +74,8 @@ const TransactionsPage: NextPage = () => {
         type,
         date,
         category,
-        accountId: selectedAccount,
-        creditCardId: selectedCreditCard,
+        accountId: selectedAccount || undefined,
+        creditCardId: selectedCreditCard || undefined,
       });
       toast.success('Transação criada com sucesso!');
       setDescription('');

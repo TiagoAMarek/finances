@@ -1,19 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWithAuth } from '@/utils/api';
-import { Transaction } from '@/types/api';
-
-interface TransferRequest {
-  description: string;
-  amount: number;
-  date: string; // ISO format string
-  fromAccountId: number;
-  toAccountId: number;
-}
+import { Transaction, TransferCreateInput } from '@/lib/schemas';
 
 // Create Transfer
 export const useCreateTransfer = () => {
   const queryClient = useQueryClient();
-  return useMutation<Transaction, Error, TransferRequest>({
+  return useMutation<Transaction, Error, TransferCreateInput>({
     mutationFn: async (transferData) => {
       const response = await fetchWithAuth('/api/transfers', {
         method: 'POST',

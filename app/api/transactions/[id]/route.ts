@@ -37,7 +37,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (validatedData.description !== undefined) updateData.description = validatedData.description;
     if (validatedData.amount !== undefined) updateData.amount = validatedData.amount.toString();
     if (validatedData.type !== undefined) updateData.type = validatedData.type;
-    if (validatedData.date !== undefined) updateData.date = validatedData.date.toISOString().split('T')[0];
+    if (validatedData.date !== undefined) updateData.date = validatedData.date;
     if (validatedData.category !== undefined) updateData.category = validatedData.category;
     if (validatedData.accountId !== undefined) updateData.accountId = validatedData.accountId;
     if (validatedData.creditCardId !== undefined) updateData.creditCardId = validatedData.creditCardId;
