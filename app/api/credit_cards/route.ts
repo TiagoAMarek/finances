@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       card: newCard,
     }, 201);
 
-  } catch (error: any) {
-    if (error.name === 'ZodError') {
+  } catch (error) {
+    if (error instanceof Error && error.name === 'ZodError') {
       return createErrorResponse('Invalid input data', 400);
     }
     

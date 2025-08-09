@@ -66,8 +66,8 @@ export async function POST(request: NextRequest) {
       transaction: newTransfer,
     }, 201);
 
-  } catch (error: any) {
-    if (error.name === 'ZodError') {
+  } catch (error) {
+    if (error instanceof Error && error.name === 'ZodError') {
       const errorMessage = error.errors?.[0]?.message || 'Invalid input data';
       return createErrorResponse(errorMessage, 400);
     }

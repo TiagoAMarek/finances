@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Update card
-    const updateData: any = {};
+    const updateData: Record<string, string | number> = {};
     if (validatedData.name !== undefined) updateData.name = validatedData.name;
     if (validatedData.limit !== undefined) updateData.limit = validatedData.limit.toString();
     if (validatedData.currentBill !== undefined) updateData.currentBill = validatedData.currentBill.toString();
@@ -47,8 +47,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       card: updatedCard,
     });
 
-  } catch (error: any) {
-    if (error.name === 'ZodError') {
+  } catch (error) {
+    if (error instanceof Error && error.name === 'ZodError') {
       return createErrorResponse('Invalid input data', 400);
     }
     

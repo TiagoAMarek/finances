@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Update account
-    const updateData: any = {};
+    const updateData: Record<string, string | number> = {};
     if (validatedData.name !== undefined) updateData.name = validatedData.name;
     if (validatedData.balance !== undefined) updateData.balance = validatedData.balance.toString();
     if (validatedData.currency !== undefined) updateData.currency = validatedData.currency;
@@ -47,8 +47,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       account: updatedAccount,
     });
 
-  } catch (error: any) {
-    if (error.name === 'ZodError') {
+  } catch (error) {
+    if (error instanceof Error && error.name === 'ZodError') {
       return createErrorResponse('Invalid input data', 400);
     }
     

@@ -46,7 +46,7 @@ export function createErrorResponse(message: string, status: number = 400) {
   });
 }
 
-export function createSuccessResponse(data: any, status: number = 200) {
+export function createSuccessResponse(data: unknown, status: number = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: { 'Content-Type': 'application/json' },

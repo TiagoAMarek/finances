@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { eq, and, gte, lte, sum } from 'drizzle-orm';
+import { eq, and, gte, lte } from 'drizzle-orm';
 import { db } from '../lib/db';
 import { transactions } from '../lib/schema';
 import { MonthlySummarySchema } from '../lib/validation';
@@ -57,8 +57,8 @@ export async function GET(request: NextRequest) {
       balance: balance,
     });
 
-  } catch (error: any) {
-    if (error.name === 'ZodError') {
+  } catch (error) {
+    if (error instanceof Error && error.name === 'ZodError') {
       return createErrorResponse('Month and year are required', 400);
     }
     
