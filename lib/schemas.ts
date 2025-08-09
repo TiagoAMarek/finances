@@ -2,13 +2,13 @@ import { z } from 'zod';
 
 // Auth schemas
 export const LoginSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email('Formato de email inválido'),
+  password: z.string().min(1, 'Senha é obrigatória'),
 });
 
 export const RegisterSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email('Formato de email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
 });
 
 // Bank account schemas - reflecting API structure
@@ -21,13 +21,13 @@ export const BankAccountSchema = z.object({
 });
 
 export const BankAccountCreateSchema = z.object({
-  name: z.string().min(1, 'Account name is required'),
+  name: z.string().min(1, 'Nome da conta é obrigatório'),
   balance: z.string().default('0'),
   currency: z.string().default('BRL'),
 });
 
 export const BankAccountUpdateSchema = z.object({
-  name: z.string().min(1, 'Account name is required').optional(),
+  name: z.string().min(1, 'Nome da conta é obrigatório').optional(),
   balance: z.string().optional(),
   currency: z.string().optional(),
 });
@@ -42,13 +42,13 @@ export const CreditCardSchema = z.object({
 });
 
 export const CreditCardCreateSchema = z.object({
-  name: z.string().min(1, 'Card name is required'),
+  name: z.string().min(1, 'Nome do cartão é obrigatório'),
   limit: z.string().default('0'),
   currentBill: z.string().default('0'),
 });
 
 export const CreditCardUpdateSchema = z.object({
-  name: z.string().min(1, 'Card name is required').optional(),
+  name: z.string().min(1, 'Nome do cartão é obrigatório').optional(),
   limit: z.string().optional(),
   currentBill: z.string().optional(),
 });
@@ -68,11 +68,11 @@ export const TransactionSchema = z.object({
 });
 
 export const TransactionCreateSchema = z.object({
-  description: z.string().min(1, 'Description is required'),
-  amount: z.string().min(1, 'Amount is required'),
+  description: z.string().min(1, 'Descrição é obrigatória'),
+  amount: z.string().min(1, 'Valor é obrigatório'),
   type: z.enum(['income', 'expense', 'transfer']),
-  date: z.string().min(1, 'Date is required'),
-  category: z.string().min(1, 'Category is required'),
+  date: z.string().min(1, 'Data é obrigatória'),
+  category: z.string().min(1, 'Categoria é obrigatória'),
   accountId: z.number().optional(),
   creditCardId: z.number().optional(),
   toAccountId: z.number().optional(), // For transfers
@@ -82,16 +82,16 @@ export const TransactionCreateSchema = z.object({
   }
   return !!(data.accountId || data.creditCardId) && !(data.accountId && data.creditCardId);
 }, {
-  message: 'Invalid transaction configuration',
+  message: 'Configuração de transação inválida',
 });
 
 export const TransactionUpdateSchema = z.object({
   id: z.number(),
-  description: z.string().min(1, 'Description is required').optional(),
+  description: z.string().min(1, 'Descrição é obrigatória').optional(),
   amount: z.string().optional(),
   type: z.enum(['income', 'expense', 'transfer']).optional(),
   date: z.string().optional(),
-  category: z.string().min(1, 'Category is required').optional(),
+  category: z.string().min(1, 'Categoria é obrigatória').optional(),
   accountId: z.number().optional(),
   creditCardId: z.number().optional(),
   toAccountId: z.number().optional(),
@@ -99,13 +99,13 @@ export const TransactionUpdateSchema = z.object({
 
 // Transfer schema
 export const TransferCreateSchema = z.object({
-  description: z.string().min(1, 'Description is required'),
-  amount: z.string().min(1, 'Amount is required'),
-  date: z.string().min(1, 'Date is required'),
+  description: z.string().min(1, 'Descrição é obrigatória'),
+  amount: z.string().min(1, 'Valor é obrigatório'),
+  date: z.string().min(1, 'Data é obrigatória'),
   fromAccountId: z.number(),
   toAccountId: z.number(),
 }).refine((data) => data.fromAccountId !== data.toAccountId, {
-  message: 'Cannot transfer to the same account',
+  message: 'Não é possível transferir para a mesma conta',
 });
 
 // Monthly summary schema - reflecting API structure
