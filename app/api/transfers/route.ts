@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../lib/db';
 import { transactions, bankAccounts } from '../lib/schema';
 import { TransferCreateSchema } from '../lib/validation';
@@ -54,11 +54,11 @@ export async function POST(request: NextRequest) {
 
     // Update account balances
     await db.update(bankAccounts)
-      .set({ balance: `CAST(balance AS DECIMAL) - ${validatedData.amount}` })
+      .set({ balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}` })
       .where(eq(bankAccounts.id, validatedData.fromAccountId));
       
     await db.update(bankAccounts)
-      .set({ balance: `CAST(balance AS DECIMAL) + ${validatedData.amount}` })
+      .set({ balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}` })
       .where(eq(bankAccounts.id, validatedData.toAccountId));
 
     return createSuccessResponse({

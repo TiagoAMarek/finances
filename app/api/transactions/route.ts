@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../lib/db';
 import { transactions, bankAccounts, creditCards } from '../lib/schema';
 import { TransactionCreateSchema } from '../lib/validation';
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       if (validatedData.accountId) {
         const balanceChange = validatedData.type === 'income' ? validatedData.amount : -validatedData.amount;
         await db.update(bankAccounts)
-          .set({ balance: `CAST(balance AS DECIMAL) + ${balanceChange}` })
+          .set({ balance: sql`CAST(balance AS DECIMAL) + ${balanceChange}` })
           .where(eq(bankAccounts.id, validatedData.accountId));
       }
       
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         // For credit card, only expenses increase the bill
         if (validatedData.type === 'expense') {
           await db.update(creditCards)
-            .set({ currentBill: `CAST(current_bill AS DECIMAL) + ${validatedData.amount}` })
+            .set({ currentBill: sql`CAST(current_bill AS DECIMAL) + ${validatedData.amount}` })
             .where(eq(creditCards.id, validatedData.creditCardId));
         }
       }
@@ -101,11 +101,11 @@ export async function POST(request: NextRequest) {
       // Handle transfer: decrease from account, increase to account
       if (validatedData.accountId && validatedData.toAccountId) {
         await db.update(bankAccounts)
-          .set({ balance: `CAST(balance AS DECIMAL) - ${validatedData.amount}` })
+          .set({ balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}` })
           .where(eq(bankAccounts.id, validatedData.accountId));
           
         await db.update(bankAccounts)
-          .set({ balance: `CAST(balance AS DECIMAL) + ${validatedData.amount}` })
+          .set({ balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}` })
           .where(eq(bankAccounts.id, validatedData.toAccountId));
       }
     }
