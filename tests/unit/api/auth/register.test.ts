@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from '@/app/api/auth/register/route';
-import { createMockRequest } from '../../helpers/auth-helpers';
+import { createMockRequest } from '../../../helpers/auth-helpers';
 
 // Mock database responses
 let mockDbSelect: any;
@@ -162,7 +162,7 @@ describe('POST /api/auth/register', () => {
 
   it('rejeita request com JSON inválido', async () => {
     // Act: Try to send invalid JSON
-    const request = new Request('http://localhost/api/auth/register', {
+    const request = createMockRequest('http://localhost/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: 'invalid-json',

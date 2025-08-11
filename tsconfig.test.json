@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "tests/**/*",
+    "**/*.test.ts", 
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    // Specific configurations for tests
+    "types": ["vitest/globals", "node", "@types/better-sqlite3"],
+    // Allow more flexible types in tests
+    "strict": true,
+    "noImplicitAny": true
+  }
+}

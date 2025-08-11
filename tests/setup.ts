@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi, beforeAll, beforeEach, afterEach, afterAll } from 'vitest'
 
 // Mock environment variables for testing
 vi.stubEnv('JWT_SECRET', 'test-jwt-secret-key')
