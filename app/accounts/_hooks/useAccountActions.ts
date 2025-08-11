@@ -5,6 +5,8 @@ import { BankAccount } from "@/lib/schemas";
 
 export function useAccountActions() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
 
   const createAccountMutation = useCreateAccount();
   const updateAccountMutation = useUpdateAccount();
@@ -19,10 +21,17 @@ export function useAccountActions() {
     });
   };
 
+  const handleEdit = (account: BankAccount) => {
+    setEditingAccount(account);
+    setEditModalOpen(true);
+  };
+
   const handleUpdate = async (account: BankAccount) => {
     updateAccountMutation.mutate(account, {
       onSuccess: () => {
         toast.success("Conta atualizada com sucesso!");
+        setEditModalOpen(false);
+        setEditingAccount(null);
       },
     });
   };
@@ -49,11 +58,15 @@ export function useAccountActions() {
 
   return {
     handleCreate,
+    handleEdit,
     handleUpdate,
     handleDelete,
     errors,
     isLoading,
     createModalOpen,
     setCreateModalOpen,
+    editModalOpen,
+    setEditModalOpen,
+    editingAccount,
   };
 }

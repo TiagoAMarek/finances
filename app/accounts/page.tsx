@@ -1,29 +1,29 @@
 "use client";
 
-import { useState } from "react";
 import type { NextPage } from "next";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAccounts } from "@/hooks/useAccounts";
-import { BankAccount } from "@/lib/schemas";
 import { PageHeader } from "@/components/PageHeader";
 import { CreateAccountModal } from "./_components/CreateAccountModal";
-import { EditAccountCard } from "./_components/EditAccountCard";
+import { EditAccountModal } from "./_components/EditAccountModal";
 import { AccountsList } from "./_components/AccountsList";
 import { ErrorAlerts } from "./_components/ErrorAlerts";
 import { useAccountActions } from "./_hooks/useAccountActions";
 
 const AccountsPage: NextPage = () => {
-  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
-
   const { data: accounts = [], isLoading, error } = useAccounts();
   const {
     handleCreate,
+    handleEdit,
     handleUpdate,
     handleDelete,
     errors,
     isLoading: actionLoading,
     createModalOpen,
     setCreateModalOpen,
+    editModalOpen,
+    setEditModalOpen,
+    editingAccount,
   } = useAccountActions();
 
   if (isLoading) {
@@ -38,8 +38,8 @@ const AccountsPage: NextPage = () => {
           <AccountsList
             accounts={[]}
             isLoading={true}
-            onEdit={() => {}}
-            onDelete={() => {}}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
             isDeleting={false}
           />
         </div>
@@ -65,24 +65,20 @@ const AccountsPage: NextPage = () => {
       <div className="space-y-6 p-4 lg:p-6">
         <ErrorAlerts errors={{ ...errors, general: error }} />
 
-        {editingAccount && (
-          <EditAccountCard
-            account={editingAccount}
-            onSave={(account) => {
-              handleUpdate(account);
-              setEditingAccount(null);
-            }}
-            onCancel={() => setEditingAccount(null)}
-            isLoading={actionLoading.update}
-          />
-        )}
-
         <AccountsList
           accounts={accounts}
           isLoading={false}
-          onEdit={setEditingAccount}
+          onEdit={handleEdit}
           onDelete={handleDelete}
           isDeleting={actionLoading.delete}
+        />
+
+        <EditAccountModal
+          account={editingAccount}
+          open={editModalOpen}
+          onOpenChange={setEditModalOpen}
+          onSave={handleUpdate}
+          isLoading={actionLoading.update}
         />
       </div>
     </>
