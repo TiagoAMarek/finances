@@ -2,16 +2,21 @@
 
 import type { NextPage } from "next";
 import { useAccounts } from "@/hooks/useAccounts";
+import { useCreditCards } from "@/hooks/useCreditCards";
 import { useTransactions } from "@/hooks/useTransactions";
 import { ExpensesCard } from "./_components/ExpensesCard";
 import { IncomesCard } from "./_components/IncomesCard";
 import { TotalBalanceCard } from "./_components/TotalBalanceCard";
 import { MonthlyBalanceCard } from "./_components/MonthlyBalanceCard";
+import { AccountsOverview } from "./_components/AccountsOverview";
+import { CreditCardsOverview } from "./_components/CreditCardsOverview";
 import { PageHeader } from "@/components/PageHeader";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
+import { Separator } from "@/components/ui/separator";
 
 const DashboardPage: NextPage = () => {
   const { data: accounts = [] } = useAccounts();
+  const { data: creditCards = [] } = useCreditCards();
   const { data: transactions = [] } = useTransactions();
 
   // Calcular receitas e despesas do mês atual
@@ -60,18 +65,28 @@ const DashboardPage: NextPage = () => {
       />
 
       <div className="space-y-6 p-4 lg:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1: Receitas do Mês */}
-          <IncomesCard monthlyIncomes={monthlyIncomes} />
+        {/* Cards de Resumo */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 divide-y md:divide-y-0 md:divide-x divide-border">
+          <div className="py-2 md:py-0">
+            <IncomesCard monthlyIncomes={monthlyIncomes} />
+          </div>
+          <div className="py-2 md:py-0 md:px-8">
+            <ExpensesCard monthlyExpenses={monthlyExpenses} />
+          </div>
+          <div className="py-2 md:py-0 md:px-8">
+            <MonthlyBalanceCard monthlyBalance={monthlyBalance} />
+          </div>
+          <div className="py-2 md:py-0 md:px-8">
+            <TotalBalanceCard totalBalance={totalBalance} />
+          </div>
+        </div>
 
-          {/* Card 2: Despesas do Mês */}
-          <ExpensesCard monthlyExpenses={monthlyExpenses} />
+        <Separator />
 
-          {/* Card 3: Balanço Mensal */}
-          <MonthlyBalanceCard monthlyBalance={monthlyBalance} />
-
-          {/* Card 4: Saldo Total com Gráfico */}
-          <TotalBalanceCard totalBalance={totalBalance} />
+        {/* Visão Geral de Contas e Cartões */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AccountsOverview accounts={accounts} />
+          <CreditCardsOverview creditCards={creditCards} />
         </div>
       </div>
     </>

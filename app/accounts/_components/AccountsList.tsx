@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { CreditCardIcon, Banknote, TrendingUpIcon, TrendingDownIcon, PiggyBankIcon } from "lucide-react";
+import { CreditCardIcon, Banknote, TrendingUpIcon, TrendingDownIcon } from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 import { AccountItem } from "./AccountItem";
 
@@ -144,8 +144,17 @@ export function AccountsList({
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-border">
         {/* Saldo Total */}
-        <div className="text-center md:text-left py-2 md:py-0">
-          <p className="text-sm font-medium text-muted-foreground mb-1">Saldo Total</p>
+        <div className="text-center py-2 md:py-0">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+              totalBalance >= 0 ? 'bg-primary/10' : 'bg-gray-500/10'
+            }`}>
+              <CreditCardIcon className={`h-4 w-4 ${
+                totalBalance >= 0 ? 'text-primary' : 'text-gray-500'
+              }`} />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Saldo Total</p>
+          </div>
           <p className={`text-2xl font-bold ${
             totalBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
           }`}>
@@ -154,25 +163,29 @@ export function AccountsList({
         </div>
 
         {/* Contas Positivas */}
-        <div className="text-center md:text-left py-2 md:py-0 md:px-8">
-          <p className="text-sm font-medium text-muted-foreground mb-1">Contas Positivas</p>
-          <div className="flex items-center justify-center md:justify-start gap-2">
-            <TrendingUpIcon className="h-5 w-5 text-green-500" />
-            <p className="text-2xl font-bold text-foreground">
-              {positiveAccounts.length}
-            </p>
+        <div className="text-center py-2 md:py-0 md:px-8">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10">
+              <TrendingUpIcon className="h-4 w-4 text-green-500" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Contas Positivas</p>
           </div>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            {positiveAccounts.length}
+          </p>
         </div>
 
         {/* Contas Negativas */}
-        <div className="text-center md:text-left py-2 md:py-0 md:px-8">
-          <p className="text-sm font-medium text-muted-foreground mb-1">Contas Negativas</p>
-          <div className="flex items-center justify-center md:justify-start gap-2">
-            <TrendingDownIcon className="h-5 w-5 text-red-500" />
-            <p className="text-2xl font-bold text-foreground">
-              {negativeAccounts.length}
-            </p>
+        <div className="text-center py-2 md:py-0 md:px-8">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
+              <TrendingDownIcon className="h-4 w-4 text-red-500" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Contas Negativas</p>
           </div>
+          <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+            {negativeAccounts.length}
+          </p>
         </div>
       </div>
 
