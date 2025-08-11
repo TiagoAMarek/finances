@@ -14,6 +14,8 @@ import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } fro
 import { BankAccount } from '@/lib/schemas';
 import { toast } from 'sonner';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, Banknote } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
+import { QuickCreateButton } from '@/components/QuickCreateButton';
 
 const AccountsPage: NextPage = () => {
   const [accountName, setAccountName] = useState('');
@@ -97,47 +99,54 @@ const AccountsPage: NextPage = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-48" />
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-32" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            </CardContent>
-          </Card>
+      <>
+        <PageHeader
+          title="Minhas Contas Bancárias"
+          description="Gerencie suas contas bancárias e saldos"
+          action={<Skeleton className="h-9 w-28" />}
+        />
+        <div className="space-y-6 p-4 lg:p-6">
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-48" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-32" />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-40" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Minhas Contas Bancárias</h1>
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <PlusIcon className="h-4 w-4" />
-              Nova Conta
-            </Button>
-          </DrawerTrigger>
+    <>
+      <PageHeader
+        title="Minhas Contas Bancárias"
+        description="Gerencie suas contas bancárias e saldos"
+        action={
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <DrawerTrigger asChild>
+              <QuickCreateButton onClick={() => setDrawerOpen(true)}>
+                Nova Conta
+              </QuickCreateButton>
+            </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>Adicionar Nova Conta</DrawerTitle>
@@ -197,9 +206,11 @@ const AccountsPage: NextPage = () => {
             </form>
           </DrawerContent>
         </Drawer>
-      </div>
+        }
+      />
 
-      {error && (
+      <div className="space-y-6 p-4 lg:p-6">
+        {error && (
         <Alert variant="destructive">
           <AlertDescription>{error.message}</AlertDescription>
         </Alert>
@@ -355,7 +366,8 @@ const AccountsPage: NextPage = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 

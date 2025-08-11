@@ -7,6 +7,8 @@ import { ExpensesCard } from "./_components/ExpensesCard";
 import { IncomesCard } from "./_components/IncomesCard";
 import { TotalBalanceCard } from "./_components/TotalBalanceCard";
 import { MonthlyBalanceCard } from "./_components/MonthlyBalanceCard";
+import { PageHeader } from "@/components/PageHeader";
+import { QuickCreateButton } from "@/components/QuickCreateButton";
 
 const DashboardPage: NextPage = () => {
   const { data: accounts = [] } = useAccounts();
@@ -40,24 +42,39 @@ const DashboardPage: NextPage = () => {
     0,
   );
 
+  const handleCreateTransaction = () => {
+    // TODO: Implementar modal/dialog para criar transação
+    console.log("Criar nova transação");
+  };
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard Financeiro</h1>
+    <>
+      <PageHeader
+        title="Dashboard"
+        description="Visão geral das suas finanças e transações recentes"
+        action={
+          <QuickCreateButton onClick={handleCreateTransaction}>
+            Criar Transação
+          </QuickCreateButton>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Card 1: Receitas do Mês */}
-        <IncomesCard monthlyIncomes={monthlyIncomes} />
+      <div className="space-y-6 p-4 lg:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Card 1: Receitas do Mês */}
+          <IncomesCard monthlyIncomes={monthlyIncomes} />
 
-        {/* Card 2: Despesas do Mês */}
-        <ExpensesCard monthlyExpenses={monthlyExpenses} />
+          {/* Card 2: Despesas do Mês */}
+          <ExpensesCard monthlyExpenses={monthlyExpenses} />
 
-        {/* Card 3: Balanço Mensal */}
-        <MonthlyBalanceCard monthlyBalance={monthlyBalance} />
+          {/* Card 3: Balanço Mensal */}
+          <MonthlyBalanceCard monthlyBalance={monthlyBalance} />
 
-        {/* Card 4: Saldo Total com Gráfico */}
-        <TotalBalanceCard totalBalance={totalBalance} />
+          {/* Card 4: Saldo Total com Gráfico */}
+          <TotalBalanceCard totalBalance={totalBalance} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

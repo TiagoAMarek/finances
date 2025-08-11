@@ -28,6 +28,8 @@ import {
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { Transaction } from '@/lib/schemas';
+import { PageHeader } from '@/components/PageHeader';
+import { QuickCreateButton } from '@/components/QuickCreateButton';
 
 const TransactionsPage: NextPage = () => {
   const [description, setDescription] = useState('');
@@ -155,8 +157,14 @@ const TransactionsPage: NextPage = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
+      <>
+        <PageHeader
+          title="Transações"
+          description="Gerencie suas receitas, despesas e transferências"
+          action={<Skeleton className="h-9 w-28" />}
+        />
+        <div className="space-y-6 p-4 lg:p-6">
+          <Skeleton className="h-8 w-48" />
         <div className="space-y-4">
           <Card>
             <CardHeader>
@@ -186,32 +194,41 @@ const TransactionsPage: NextPage = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertDescription>Erro: {error?.message}</AlertDescription>
-        </Alert>
-      </div>
+      <>
+        <PageHeader
+          title="Transações"
+          description="Gerencie suas receitas, despesas e transferências"
+          action={null}
+        />
+        <div className="flex items-center justify-center min-h-screen p-4 lg:p-6">
+          <Alert variant="destructive" className="max-w-md">
+            <AlertDescription>Erro: {error?.message}</AlertDescription>
+          </Alert>
+        </div>
+      </>
     );
   }
 
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Minhas Transações</h1>
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <PlusIcon className="h-4 w-4" />
-              Nova Transação
-            </Button>
-          </DrawerTrigger>
+    <>
+      <PageHeader
+        title="Transações"
+        description="Gerencie suas receitas, despesas e transferências"
+        action={
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <DrawerTrigger asChild>
+              <QuickCreateButton onClick={() => setDrawerOpen(true)}>
+                Nova Transação
+              </QuickCreateButton>
+            </DrawerTrigger>
           <DrawerContent className="max-h-[90vh]">
             <DrawerHeader>
               <DrawerTitle>Adicionar Nova Transação</DrawerTitle>
@@ -349,7 +366,9 @@ const TransactionsPage: NextPage = () => {
             </div>
           </DrawerContent>
         </Drawer>
-      </div>
+        }
+      />
+      <div className="space-y-6 p-4 lg:p-6">
 
       {error && (
         <Alert variant="destructive">
@@ -591,7 +610,8 @@ const TransactionsPage: NextPage = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 

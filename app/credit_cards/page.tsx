@@ -14,6 +14,8 @@ import { useCreditCards, useCreateCreditCard, useUpdateCreditCard, useDeleteCred
 import { CreditCard } from '@/lib/schemas';
 import { toast } from 'sonner';
 import { PlusIcon, EditIcon, TrashIcon, CreditCard as CreditCardIcon, Wallet } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
+import { QuickCreateButton } from '@/components/QuickCreateButton';
 
 const CreditCardsPage: NextPage = () => {
   const [cardName, setCardName] = useState('');
@@ -100,8 +102,14 @@ const CreditCardsPage: NextPage = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
+      <>
+        <PageHeader
+          title="Meus Cartões de Crédito"
+          description="Gerencie seus cartões de crédito e limites"
+          action={<Skeleton className="h-9 w-28" />}
+        />
+        <div className="space-y-6 p-4 lg:p-6">
+          <Skeleton className="h-8 w-64" />
         <div className="space-y-4">
           <Card>
             <CardHeader>
@@ -126,21 +134,23 @@ const CreditCardsPage: NextPage = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Meus Cartões de Crédito</h1>
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <PlusIcon className="h-4 w-4" />
-              Novo Cartão
-            </Button>
-          </DrawerTrigger>
+    <>
+      <PageHeader
+        title="Meus Cartões de Crédito"
+        description="Gerencie seus cartões de crédito e limites"
+        action={
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <DrawerTrigger asChild>
+              <QuickCreateButton onClick={() => setDrawerOpen(true)}>
+                Novo Cartão
+              </QuickCreateButton>
+            </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>Adicionar Novo Cartão</DrawerTitle>
@@ -201,7 +211,9 @@ const CreditCardsPage: NextPage = () => {
             </form>
           </DrawerContent>
         </Drawer>
-      </div>
+        }
+      />
+      <div className="space-y-6 p-4 lg:p-6">
 
       {error && (
         <Alert variant="destructive">
@@ -371,7 +383,8 @@ const CreditCardsPage: NextPage = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMonthlySummary } from '@/hooks/useReports';
 import { BarChart, Calendar, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -86,11 +87,12 @@ const MonthlyOverviewPage: NextPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <BarChart className="h-8 w-8" />
-        <h1 className="text-3xl font-bold">Visão Geral Mensal</h1>
-      </div>
+    <>
+      <PageHeader
+        title="Visão Mensal"
+        description="Análise detalhada das suas finanças por mês"
+      />
+      <div className="space-y-6 p-4 lg:p-6">
 
       {error && (
         <Alert variant="destructive">
@@ -227,7 +229,8 @@ const MonthlyOverviewPage: NextPage = () => {
           </p>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
