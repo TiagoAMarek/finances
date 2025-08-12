@@ -46,7 +46,7 @@ const Sidebar = () => {
       icon: CreditCard
     },
     { 
-      name: 'Transações', 
+      name: 'Lançamentos', 
       href: '/transactions',
       icon: Receipt
     },
