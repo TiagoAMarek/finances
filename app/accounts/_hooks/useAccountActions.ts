@@ -12,8 +12,11 @@ export function useAccountActions() {
   const updateAccountMutation = useUpdateAccount();
   const deleteAccountMutation = useDeleteAccount();
 
-  const handleCreate = async (data: { name: string; balance: string; currency: string }) => {
-    createAccountMutation.mutate(data, {
+  const handleCreate = async (data: { name: string; balance: string }) => {
+    createAccountMutation.mutate({
+      ...data,
+      currency: "BRL"
+    }, {
       onSuccess: () => {
         toast.success("Conta criada com sucesso!");
         setCreateModalOpen(false);

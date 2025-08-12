@@ -13,12 +13,11 @@ import {
 import { QuickCreateButton } from "@/components/QuickCreateButton";
 import { PlusIcon, CreditCardIcon, DollarSignIcon, Loader2Icon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 interface CreateAccountModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { name: string; balance: string; currency: string }) => void;
+  onSubmit: (data: { name: string; balance: string }) => void;
   isLoading: boolean;
 }
 
@@ -36,7 +35,6 @@ export function CreateAccountModal({
     onSubmit({
       name,
       balance: balance.toString(),
-      currency: "BRL",
     });
     setName("");
     setBalance(0);
@@ -121,16 +119,6 @@ export function CreateAccountModal({
                 </p>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-3 border">
-                <div className="flex items-center gap-2 text-sm">
-                  <Badge variant="secondary" className="text-xs">
-                    BRL
-                  </Badge>
-                  <span className="text-muted-foreground">
-                    Moeda: Real Brasileiro
-                  </span>
-                </div>
-              </div>
 
               <div className="flex gap-3 pt-4">
                 <Button

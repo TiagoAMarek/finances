@@ -64,9 +64,6 @@ export function AccountsOverview({ accounts }: AccountsOverviewProps) {
                 </div>
                 <div>
                   <p className="font-medium text-sm">{account.name}</p>
-                  <Badge variant="outline" className="text-xs mt-1">
-                    BRL
-                  </Badge>
                 </div>
               </div>
               

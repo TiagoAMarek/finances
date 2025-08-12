@@ -58,9 +58,6 @@ export function AccountItem({
                 <h3 className="text-lg font-semibold text-foreground truncate">
                   {account.name}
                 </h3>
-                <Badge variant="secondary" className="text-xs font-medium">
-                  BRL
-                </Badge>
               </div>
               
               <div className="flex items-center gap-2">

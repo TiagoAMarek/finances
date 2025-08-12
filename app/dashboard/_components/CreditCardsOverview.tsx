@@ -69,19 +69,14 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
                   </div>
                   <div>
                     <p className="font-medium text-sm">{card.name}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className="text-xs">
-                        BRL
-                      </Badge>
-                      {isHighUsage && (
-                        <div className="flex items-center gap-1">
-                          <AlertTriangleIcon className="h-3 w-3 text-amber-500" />
-                          <span className="text-xs text-amber-600 dark:text-amber-400">
-                            Alto uso
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                    {isHighUsage && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <AlertTriangleIcon className="h-3 w-3 text-amber-500" />
+                        <span className="text-xs text-amber-600 dark:text-amber-400">
+                          Alto uso
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 

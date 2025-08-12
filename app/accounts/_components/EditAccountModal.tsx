@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { EditIcon, CreditCardIcon, DollarSignIcon, Loader2Icon, SaveIcon } from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 
@@ -149,16 +148,6 @@ export function EditAccountModal({
                 </p>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-3 border">
-                <div className="flex items-center gap-2 text-sm">
-                  <Badge variant="secondary" className="text-xs">
-                    BRL
-                  </Badge>
-                  <span className="text-muted-foreground">
-                    Moeda: Real Brasileiro
-                  </span>
-                </div>
-              </div>
 
               <div className="flex gap-3 pt-4">
                 <Button
