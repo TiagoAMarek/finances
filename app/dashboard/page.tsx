@@ -85,7 +85,7 @@ const DashboardPage: NextPage = () => {
 
         {/* Visão Geral de Contas e Cartões */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <AccountsOverview accounts={accounts} />
+          <AccountsOverview accounts={accounts} totalBalance={totalBalance} />
           <CreditCardsOverview creditCards={creditCards} />
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CreditCardIcon, AlertTriangleIcon, Wallet } from "lucide-react";
+import { CreditCardIcon, AlertTriangleIcon, Wallet, TrendingDownIcon } from "lucide-react";
 import { CreditCard } from "@/lib/schemas";
 
 interface CreditCardsOverviewProps {
@@ -14,6 +14,9 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
       currency: 'BRL'
     }).format(value);
   };
+
+  // Calcular total das faturas
+  const totalBills = creditCards.reduce((sum, card) => sum + parseFloat(card.currentBill), 0);
 
   if (creditCards.length === 0) {
     return (
@@ -39,17 +42,34 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <CreditCardIcon className="h-5 w-5 text-foreground" />
-          <h2 className="text-xl font-semibold text-foreground">Cartões de Crédito</h2>
+      {/* Cabeçalho com título e total das faturas */}
+      <div className="flex flex-col space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CreditCardIcon className="h-5 w-5 text-foreground" />
+            <h2 className="text-xl font-semibold text-foreground">Cartões de Crédito</h2>
+          </div>
+          <Badge variant="secondary" className="text-xs">
+            {creditCards.length} {creditCards.length === 1 ? 'cartão' : 'cartões'}
+          </Badge>
         </div>
-        <Badge variant="secondary" className="text-xs">
-          {creditCards.length} {creditCards.length === 1 ? 'cartão' : 'cartões'}
-        </Badge>
+        
+        {/* Total das Faturas */}
+        <div className="flex items-center justify-between py-2 px-3 bg-muted/30 rounded-lg border border-dashed">
+          <span className="text-sm font-medium text-muted-foreground">
+            Total das Faturas
+          </span>
+          <div className="flex items-center gap-2">
+            <TrendingDownIcon className="h-4 w-4 text-red-500" />
+            <span className="text-lg font-bold text-red-600 dark:text-red-400">
+              {formatCurrency(totalBills)}
+            </span>
+          </div>
+        </div>
       </div>
       
-      <div className="space-y-3">
+      {/* Lista de cartões individuais */}
+      <div className="space-y-2">
         {creditCards.map((card) => {
           const limit = parseFloat(card.limit);
           const currentBill = parseFloat(card.currentBill);
@@ -60,54 +80,46 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
           return (
             <div
               key={card.id}
-              className="p-4 rounded-lg border space-y-3"
+              className="p-3 rounded-lg border space-y-3 hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
-                    <CreditCardIcon className="h-4 w-4 text-blue-500" />
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 flex-shrink-0">
+                    <CreditCardIcon className="h-3.5 w-3.5 text-blue-500" />
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">{card.name}</p>
-                    {isHighUsage && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <AlertTriangleIcon className="h-3 w-3 text-amber-500" />
-                        <span className="text-xs text-amber-600 dark:text-amber-400">
-                          Alto uso
-                        </span>
-                      </div>
-                    )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm text-foreground truncate">{card.name}</p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>Limite: {formatCurrency(limit)}</span>
+                      {isHighUsage && (
+                        <div className="flex items-center gap-1">
+                          <AlertTriangleIcon className="h-3 w-3 text-amber-500" />
+                          <span className="text-amber-600 dark:text-amber-400">Alto uso</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-foreground">
+                <div className="text-right flex-shrink-0">
+                  <p className="text-sm font-semibold text-red-600 dark:text-red-400">
                     {formatCurrency(currentBill)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    de {formatCurrency(limit)}
+                    {usagePercentage.toFixed(1)}% usado
                   </p>
                 </div>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">
                     Disponível: {formatCurrency(availableCredit)}
                   </span>
-                  <span className={`font-medium ${
-                    isHighUsage 
-                      ? 'text-amber-600 dark:text-amber-400' 
-                      : usagePercentage > 50 
-                        ? 'text-orange-600 dark:text-orange-400'
-                        : 'text-green-600 dark:text-green-400'
-                  }`}>
-                    {usagePercentage.toFixed(1)}%
-                  </span>
                 </div>
                 <Progress 
                   value={usagePercentage} 
-                  className={`h-2 ${
+                  className={`h-1.5 ${
                     isHighUsage 
                       ? '[&>div]:bg-amber-500' 
                       : usagePercentage > 50 
