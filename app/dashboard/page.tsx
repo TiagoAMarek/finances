@@ -10,6 +10,7 @@ import { TotalBalanceCard } from "./_components/TotalBalanceCard";
 import { MonthlyBalanceCard } from "./_components/MonthlyBalanceCard";
 import { AccountsOverview } from "./_components/AccountsOverview";
 import { CreditCardsOverview } from "./_components/CreditCardsOverview";
+import { BalanceEvolutionChart } from "./_components/BalanceEvolutionChart";
 import { PageHeader } from "@/components/PageHeader";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
 import { Separator } from "@/components/ui/separator";
@@ -80,6 +81,11 @@ const DashboardPage: NextPage = () => {
             <TotalBalanceCard totalBalance={totalBalance} />
           </div>
         </div>
+
+        <Separator />
+
+        {/* Gráfico de Evolução do Saldo */}
+        <BalanceEvolutionChart totalBalance={totalBalance} />
 
         <Separator />
 
