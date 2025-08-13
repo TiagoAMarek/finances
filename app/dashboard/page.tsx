@@ -11,11 +11,15 @@ import { TotalBalanceCard } from "./_components/TotalBalanceCard";
 import { MonthlyBalanceCard } from "./_components/MonthlyBalanceCard";
 import { AccountsOverview } from "./_components/AccountsOverview";
 import { CreditCardsOverview } from "./_components/CreditCardsOverview";
-import { BalanceEvolutionChart } from "./_components/BalanceEvolutionChart";
+import { FinancialInsights } from "./_components/FinancialInsights";
+import { IncomeVsExpenseChart } from "./_components/IncomeVsExpenseChart";
 import { PageHeader } from "@/components/PageHeader";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
 import { CreateTransactionModal } from "../transactions/_components/CreateTransactionModal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { BarChart3 } from "lucide-react";
+import Link from "next/link";
 import { useTransactionActions } from "../transactions/_hooks/useTransactionActions";
 
 const DashboardPage: NextPage = () => {
@@ -96,18 +100,35 @@ const DashboardPage: NextPage = () => {
             ))}
           </div>
 
-          {/* Loading Chart */}
+          {/* Loading Insights e Gráfico */}
           <div className="space-y-4">
             <Skeleton className="h-6 w-40" />
-            <div className="rounded-lg border bg-card p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-48" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <div className="rounded-lg border bg-card p-6 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((j) => (
+                      <div key={j} className="border rounded p-3">
+                        <Skeleton className="h-4 w-full mb-2" />
+                        <Skeleton className="h-3 w-3/4" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <Skeleton className="h-6 w-16" />
               </div>
-              <Skeleton className="h-24 w-full" />
+              <div>
+                <div className="rounded-lg border bg-card p-6 space-y-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-48" />
+                  </div>
+                  <Skeleton className="h-48 w-full" />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -168,18 +189,44 @@ const DashboardPage: NextPage = () => {
           <TotalBalanceCard totalBalance={totalBalance} />
         </div>
 
-        {/* Gráfico de Evolução do Saldo */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Evolução Financeira</h2>
-          <BalanceEvolutionChart totalBalance={totalBalance} />
-        </div>
-
         {/* Visão Geral de Contas e Cartões */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Resumo de Contas</h2>
+        <div className="space-y-4 py-6">
+          <h2 className="text-lg font-semibold">Recursos</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <AccountsOverview accounts={accounts} totalBalance={totalBalance} />
             <CreditCardsOverview creditCards={creditCards} />
+          </div>
+        </div>
+
+        {/* Insights Financeiros e Gráfico */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Relatórios</h2>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/reports" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Ver Relatórios Completos
+              </Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <FinancialInsights
+                transactions={transactions}
+                monthlyIncomes={monthlyIncomes}
+                monthlyExpenses={monthlyExpenses}
+                monthlyBalance={monthlyBalance}
+              />
+            </div>
+            <div>
+              <IncomeVsExpenseChart
+                transactions={transactions}
+                selectedMonth={currentMonth}
+                selectedYear={currentYear}
+                selectedAccountId={null}
+                selectedCreditCardId={null}
+              />
+            </div>
           </div>
         </div>
       </div>

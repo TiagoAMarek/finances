@@ -8,7 +8,8 @@ import {
   Receipt,
   Banknote,
   LogOut,
-  User
+  User,
+  TrendingUp
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -44,6 +45,11 @@ const navLinks = [
     name: 'Lançamentos',
     href: '/transactions',
     icon: Receipt
+  },
+  {
+    name: 'Relatórios',
+    href: '/reports',
+    icon: TrendingUp
   },
 ];
 

@@ -22,6 +22,7 @@ const routeMapping: Record<string, string> = {
   '/accounts': 'Contas Bancárias',
   '/credit_cards': 'Cartões de Crédito',
   '/transactions': 'Lançamentos',
+  '/reports': 'Relatórios',
 };
 
 export function AppLayout({ children }: AppLayoutProps) {
