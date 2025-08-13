@@ -53,7 +53,7 @@ const TransactionsPage: NextPage = () => {
           description="Gerencie suas receitas, despesas e transferências"
           action={<Skeleton className="h-9 w-32" />}
         />
-        <div className="p-4 lg:p-6">
+        <div className="px-4 lg:px-6 pb-4 lg:pb-6">
           <TransactionsList
             transactions={[]}
             isLoading={true}
@@ -99,7 +99,7 @@ const TransactionsPage: NextPage = () => {
           </QuickCreateButton>
         }
       />
-      <div className="p-4 lg:p-6">
+      <div className="px-4 lg:px-6 pb-4 lg:pb-6">
         {pageError && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{pageError.message}</AlertDescription>

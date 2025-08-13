@@ -34,7 +34,7 @@ const CreditCardsPage: NextPage = () => {
           description="Gerencie seus cartões de crédito e limites"
           action={<Skeleton className="h-9 w-28" />}
         />
-        <div className="space-y-6 p-4 lg:p-6">
+        <div className="space-y-6 px-4 lg:px-6 pb-4 lg:pb-6">
           <CreditCardsList
             cards={[]}
             isLoading={true}
@@ -62,7 +62,7 @@ const CreditCardsPage: NextPage = () => {
         }
       />
       
-      <div className="space-y-6 p-4 lg:p-6">
+      <div className="space-y-6 px-4 lg:px-6 pb-4 lg:pb-6">
         {/* Error Alerts */}
         {error && (
           <Alert variant="destructive">

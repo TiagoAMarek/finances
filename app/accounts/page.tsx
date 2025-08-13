@@ -34,7 +34,7 @@ const AccountsPage: NextPage = () => {
           description="Gerencie suas contas bancárias e saldos"
           action={<Skeleton className="h-9 w-28" />}
         />
-        <div className="space-y-6 p-4 lg:p-6">
+        <div className="space-y-6 px-4 lg:px-6 pb-4 lg:pb-6">
           <AccountsList
             accounts={[]}
             isLoading={true}
@@ -62,7 +62,7 @@ const AccountsPage: NextPage = () => {
         }
       />
 
-      <div className="space-y-6 p-4 lg:p-6">
+      <div className="space-y-6 px-4 lg:px-6 pb-4 lg:pb-6">
         <ErrorAlerts errors={{ ...errors, general: error }} />
 
         <AccountsList

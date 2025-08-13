@@ -82,7 +82,7 @@ const DashboardPage: NextPage = () => {
         }
       />
 
-      <div className="space-y-6 p-4 lg:p-6">
+      <div className="space-y-6">
         {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 divide-y md:divide-y-0 md:divide-x divide-border">
           <div className="py-2 md:py-0">
