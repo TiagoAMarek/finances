@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CreditCardIcon, TrendingUpIcon, TrendingDownIcon, Banknote, Settings } from "lucide-react";
+import { Banknote, Settings, Plus } from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 
 interface AccountsOverviewProps {
@@ -19,110 +20,106 @@ export function AccountsOverview({ accounts, totalBalance }: AccountsOverviewPro
 
   if (accounts.length === 0) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CreditCardIcon className="h-5 w-5 text-foreground" />
-            <h2 className="text-xl font-semibold text-foreground">Contas Bancárias</h2>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-base font-medium">
+            Contas Bancárias
+          </CardTitle>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
+            <Banknote className="h-4 w-4 text-blue-500" />
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">0 contas</Badge>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted/30 mb-3">
+              <Plus className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Nenhuma conta cadastrada
+            </p>
             <Button asChild variant="outline" size="sm">
-              <Link href="/accounts" className="flex items-center gap-1">
-                <Settings className="h-3 w-3" />
-                Gerenciar
+              <Link href="/accounts">
+                Adicionar Conta
               </Link>
             </Button>
           </div>
-        </div>
-        <div className="text-center py-8">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted/50 mb-4">
-            <Banknote className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <p className="text-muted-foreground text-sm">
-            Nenhuma conta cadastrada
-          </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Cabeçalho com título e saldo total */}
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CreditCardIcon className="h-5 w-5 text-foreground" />
-            <h2 className="text-xl font-semibold text-foreground">Contas Bancárias</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">
-              {accounts.length} {accounts.length === 1 ? 'conta' : 'contas'}
-            </Badge>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/accounts" className="flex items-center gap-1">
-                <Settings className="h-3 w-3" />
-                Gerenciar
-              </Link>
-            </Button>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-base font-medium">
+          Contas Bancárias
+        </CardTitle>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-xs">
+            {accounts.length}
+          </Badge>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
+            <Banknote className="h-4 w-4 text-blue-500" />
           </div>
         </div>
-        
+      </CardHeader>
+      <CardContent className="flex flex-col h-full space-y-4">
         {/* Saldo Total */}
-        <div className="flex items-center justify-between py-2 px-3 bg-muted/30 rounded-lg border border-dashed">
-          <span className="text-sm font-medium text-muted-foreground">
-            Saldo Total
-          </span>
-          <div className="flex items-center gap-2">
-            {totalBalance >= 0 ? (
-              <TrendingUpIcon className="h-4 w-4 text-green-500" />
-            ) : (
-              <TrendingDownIcon className="h-4 w-4 text-red-500" />
-            )}
-            <span className={`text-lg font-bold ${
+        <div className="p-3 rounded-lg bg-muted/30">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-muted-foreground">
+              Saldo Total
+            </span>
+            <span className={`text-xl font-bold ${
               totalBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
             }`}>
               {formatCurrency(totalBalance)}
             </span>
           </div>
         </div>
-      </div>
-      
-      {/* Lista de contas individuais */}
-      <div className="space-y-2">
-        {accounts.map((account) => {
-          const balance = parseFloat(account.balance);
-          const isPositive = balance >= 0;
-          
-          return (
-            <div
-              key={account.id}
-              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                  <CreditCardIcon className="h-3.5 w-3.5 text-primary" />
+        
+        {/* Lista de contas */}
+        <div className="space-y-2 flex-1">
+          {accounts.map((account) => {
+            const balance = parseFloat(account.balance);
+            const isPositive = balance >= 0;
+            
+            return (
+              <div
+                key={account.id}
+                className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors border"
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/10 flex-shrink-0">
+                    <Banknote className="h-3 w-3 text-blue-500" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">{account.name}</p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-sm text-foreground truncate">{account.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {isPositive ? 'Saldo positivo' : 'Saldo negativo'}
-                  </p>
+                
+                <div className="text-right flex-shrink-0">
+                  <span className={`font-semibold text-sm ${
+                    isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                  }`}>
+                    {formatCurrency(balance)}
+                  </span>
                 </div>
               </div>
-              
-              <div className="text-right flex-shrink-0">
-                <span className={`font-semibold text-sm ${
-                  isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                }`}>
-                  {formatCurrency(Math.abs(balance))}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+            );
+          })}
+        </div>
+
+        {/* Botão de gerenciar */}
+        <div className="mt-auto pt-4">
+          <Button asChild variant="outline" size="sm" className="w-full">
+            <Link href="/accounts" className="flex items-center gap-2">
+              <Settings className="h-3 w-3" />
+              Gerenciar Contas
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
