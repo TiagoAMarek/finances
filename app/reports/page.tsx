@@ -12,10 +12,9 @@ import { FinancialPerformanceCards } from "../dashboard/_components/FinancialPer
 import { PeriodSelector } from "./_components/PeriodSelector";
 import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, TrendingUp, AlertCircle, PieChart, Activity } from "lucide-react";
+import { BarChart3, TrendingUp, AlertCircle, Wallet, CreditCard } from "lucide-react";
 
 const ReportsPage: NextPage = () => {
   const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
@@ -57,7 +56,6 @@ const ReportsPage: NextPage = () => {
     0,
   );
 
-
   // Filtrar dados específicos para contas
   const getAccountData = () => {
     return filteredTransactions.filter(t => t.accountId !== null);
@@ -74,24 +72,22 @@ const ReportsPage: NextPage = () => {
         <PageHeader
           title="Relatórios"
           description="Análises detalhadas e gráficos das suas finanças"
+          action={<Skeleton className="h-9 w-32" />}
         />
 
         <div className="space-y-8 px-4 lg:px-6 pb-8">
           {/* Loading Performance Cards */}
-          <div className="space-y-4">
-            <Skeleton className="h-6 w-40" />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="rounded-lg border bg-card p-6 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-8 w-8 rounded-lg" />
-                  </div>
-                  <Skeleton className="h-8 w-20" />
-                  <Skeleton className="h-3 w-16" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="rounded-lg border bg-card p-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-8 rounded-lg" />
                 </div>
-              ))}
-            </div>
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            ))}
           </div>
 
           {/* Loading Accordions */}
@@ -132,256 +128,135 @@ const ReportsPage: NextPage = () => {
 
   return (
     <>
-      <div className="space-y-6 px-4 lg:px-6 pb-8">
-        {/* Header com Filtro de Período */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Relatórios</h1>
-            <p className="text-muted-foreground mt-2 text-sm sm:text-base">Análises detalhadas e gráficos das suas finanças</p>
-          </div>
-          <div className="flex justify-center sm:justify-end">
-            <PeriodSelector
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-              onMonthChange={setSelectedMonth}
-              onYearChange={setSelectedYear}
-            />
-          </div>
+      <PageHeader
+        title="Relatórios"
+        description="Análises detalhadas e gráficos das suas finanças"
+        action={
+          <PeriodSelector
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+          />
+        }
+      />
+
+      <div className="space-y-8 px-4 lg:px-6 pb-8">
+        {/* Cards de Performance */}
+        <FinancialPerformanceCards 
+          transactions={transactions}
+          monthlyIncomes={monthlyIncomes}
+          monthlyExpenses={monthlyExpenses}
+          monthlyBalance={monthlyBalance}
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          selectedAccountId={null}
+          selectedCreditCardId={null}
+        />
+
+        {/* Gráficos Principais */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <BalanceEvolutionChart totalBalance={totalBalance} />
+          <IncomeVsExpenseChart 
+            transactions={transactions}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            selectedAccountId={null}
+            selectedCreditCardId={null}
+          />
+          <ExpenseCategoriesChart 
+            transactions={transactions}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            selectedAccountId={null}
+            selectedCreditCardId={null}
+          />
         </div>
 
-        {/* Tabs para Relatórios */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto">
-            <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2 sm:px-4">
-              Visão Geral
-            </TabsTrigger>
-            <TabsTrigger value="accounts" className="text-xs sm:text-sm py-2 px-2 sm:px-4">
-              Contas Bancárias
-            </TabsTrigger>
-            <TabsTrigger value="cards" className="text-xs sm:text-sm py-2 px-2 sm:px-4">
-              Cartões de Crédito
-            </TabsTrigger>
-          </TabsList>
 
-          {/* Visão Geral */}
-          <TabsContent value="overview" className="space-y-6">
-            {/* Performance Financeira Accordion */}
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="performance">
-                <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
-                  <div className="flex items-center justify-between w-full mr-2">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <Activity className="h-5 w-5 text-purple-500" />
-                        <span>Performance Financeira</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge 
-                        variant={monthlyBalance >= 0 ? "default" : "destructive"} 
-                        className="text-xs"
-                      >
-                        {monthlyBalance >= 0 ? <TrendingUp className="h-3 w-3 mr-1" /> : <AlertCircle className="h-3 w-3 mr-1" />}
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0
-                        }).format(Math.abs(monthlyBalance))}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs hidden sm:inline-flex">
-                        {filteredTransactions.length} transações
-                      </Badge>
-                    </div>
+        {/* Análise por Contas Bancárias (resumida) */}
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="accounts-analysis">
+            <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
+              <div className="flex items-center justify-between w-full mr-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-green-500" />
+                    <span>Visão Geral - Contas Bancárias</span>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="pt-4">
-                    <FinancialPerformanceCards 
-                      transactions={transactions}
-                      monthlyIncomes={monthlyIncomes}
-                      monthlyExpenses={monthlyExpenses}
-                      monthlyBalance={monthlyBalance}
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedAccountId={null}
-                      selectedCreditCardId={null}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="text-xs">
+                    {getAccountData().length} transações
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                    {accounts.length} contas
+                  </Badge>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-4">
+                <IncomeVsExpenseChart 
+                  transactions={getAccountData()}
+                  selectedMonth={selectedMonth}
+                  selectedYear={selectedYear}
+                  selectedAccountId={null}
+                  selectedCreditCardId={null}
+                />
+                <ExpenseCategoriesChart 
+                  transactions={getAccountData()}
+                  selectedMonth={selectedMonth}
+                  selectedYear={selectedYear}
+                  selectedAccountId={null}
+                  selectedCreditCardId={null}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
-            {/* Evolução Financeira Accordion */}
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="evolution">
-                <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
-                  <div className="flex items-center justify-between w-full mr-2">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="h-5 w-5 text-blue-500" />
-                        <span>Evolução Financeira</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className="text-xs">
-                        Saldo: {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0
-                        }).format(totalBalance)}
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                        2 gráficos
-                      </Badge>
-                    </div>
+        {/* Análise por Cartões de Crédito (resumida) */}
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="cards-analysis">
+            <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
+              <div className="flex items-center justify-between w-full mr-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-purple-500" />
+                    <span>Visão Geral - Cartões de Crédito</span>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-4">
-                    <BalanceEvolutionChart totalBalance={totalBalance} />
-                    <IncomeVsExpenseChart 
-                      transactions={transactions}
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedAccountId={null}
-                      selectedCreditCardId={null}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-
-            {/* Análise de Gastos Accordion */}
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="expenses">
-                <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
-                  <div className="flex items-center justify-between w-full mr-2">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <PieChart className="h-5 w-5 text-orange-500" />
-                        <span>Análise de Gastos</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className="text-xs">
-                        Despesas: {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0
-                        }).format(monthlyExpenses)}
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                        Por categoria
-                      </Badge>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="w-full max-w-4xl pt-4">
-                    <ExpenseCategoriesChart 
-                      transactions={transactions}
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedAccountId={null}
-                      selectedCreditCardId={null}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </TabsContent>
-
-          {/* Relatórios de Contas */}
-          <TabsContent value="accounts" className="space-y-6">
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="accounts-analysis">
-                <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
-                  <div className="flex items-center justify-between w-full mr-2">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="h-5 w-5 text-blue-500" />
-                        <span>Relatórios de Contas Bancárias</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className="text-xs">
-                        {getAccountData().length} transações
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                        {accounts.length} contas
-                      </Badge>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-4">
-                    <IncomeVsExpenseChart 
-                      transactions={getAccountData()}
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedAccountId={null}
-                      selectedCreditCardId={null}
-                    />
-                    <ExpenseCategoriesChart 
-                      transactions={getAccountData()}
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedAccountId={null}
-                      selectedCreditCardId={null}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </TabsContent>
-
-          {/* Relatórios de Cartões */}
-          <TabsContent value="cards" className="space-y-6">
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="cards-analysis">
-                <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
-                  <div className="flex items-center justify-between w-full mr-2">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="h-5 w-5 text-purple-500" />
-                        <span>Relatórios de Cartões de Crédito</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className="text-xs">
-                        {getCreditCardData().length} transações
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                        {creditCards.length} cartões
-                      </Badge>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-4">
-                    <IncomeVsExpenseChart 
-                      transactions={getCreditCardData()}
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedAccountId={null}
-                      selectedCreditCardId={null}
-                    />
-                    <ExpenseCategoriesChart 
-                      transactions={getCreditCardData()}
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedAccountId={null}
-                      selectedCreditCardId={null}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </TabsContent>
-        </Tabs>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="text-xs">
+                    {getCreditCardData().length} transações
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                    {creditCards.length} cartões
+                  </Badge>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-4">
+                <IncomeVsExpenseChart 
+                  transactions={getCreditCardData()}
+                  selectedMonth={selectedMonth}
+                  selectedYear={selectedYear}
+                  selectedAccountId={null}
+                  selectedCreditCardId={null}
+                />
+                <ExpenseCategoriesChart 
+                  transactions={getCreditCardData()}
+                  selectedMonth={selectedMonth}
+                  selectedYear={selectedYear}
+                  selectedAccountId={null}
+                  selectedCreditCardId={null}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </>
   );

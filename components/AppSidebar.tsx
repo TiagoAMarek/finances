@@ -9,7 +9,10 @@ import {
   Banknote,
   LogOut,
   User,
-  TrendingUp
+  TrendingUp,
+  PieChart,
+  Wallet,
+  Activity
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -46,10 +49,33 @@ const navLinks = [
     href: '/transactions',
     icon: Receipt
   },
+];
+
+const reportLinks = [
   {
     name: 'Relatórios',
     href: '/reports',
     icon: TrendingUp
+  },
+  {
+    name: 'Performance Financeira',
+    href: '/reports/performance',
+    icon: Activity
+  },
+  {
+    name: 'Análise de Gastos',
+    href: '/reports/expense-analysis',
+    icon: PieChart
+  },
+  {
+    name: 'Análise por Contas',
+    href: '/reports/accounts',
+    icon: Wallet
+  },
+  {
+    name: 'Análise por Cartões',
+    href: '/reports/credit-cards',
+    icon: CreditCard
   },
 ];
 
@@ -88,6 +114,33 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href;
+
+                return (
+                  <SidebarMenuItem key={link.name}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={link.name}
+                    >
+                      <Link href={link.href}>
+                        <Icon className="size-4" />
+                        <span>{link.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Relatórios</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {reportLinks.map((link) => {
                 const Icon = link.icon;
                 const isActive = pathname === link.href;
 

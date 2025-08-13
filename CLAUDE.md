@@ -8,7 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm dev` - Start development server on port 3000
 - `pnpm build` - Build for production
 - `pnpm lint` - Run ESLint with Next.js, TypeScript, and Prettier rules
-- No test framework configured
+- `pnpm typecheck` - Run TypeScript compiler check
+- `pnpm test` - Run Vitest tests
+- `pnpm test:watch` - Run Vitest in watch mode
+- `pnpm test:coverage` - Run tests with coverage report
 
 ### Database
 - `pnpm drizzle-kit generate` - Generate database migrations
@@ -24,6 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **State Management**: TanStack Query for server state, localStorage for authentication tokens
 - **Authentication**: JWT tokens stored in localStorage, handled via `fetchWithAuth` utility
 - **Validation**: Zod schemas serve as single source of truth for all types and validation
+- **Testing**: Vitest for unit testing with coverage support and UI mode
 
 ### Database & Backend
 - **Database**: PostgreSQL with Drizzle ORM
