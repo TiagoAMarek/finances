@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { CreditCardIcon, TrendingUpIcon, TrendingDownIcon, Banknote } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CreditCardIcon, TrendingUpIcon, TrendingDownIcon, Banknote, Settings } from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 
 interface AccountsOverviewProps {
@@ -23,7 +25,15 @@ export function AccountsOverview({ accounts, totalBalance }: AccountsOverviewPro
             <CreditCardIcon className="h-5 w-5 text-foreground" />
             <h2 className="text-xl font-semibold text-foreground">Contas Bancárias</h2>
           </div>
-          <Badge variant="secondary" className="text-xs">0 contas</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">0 contas</Badge>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/accounts" className="flex items-center gap-1">
+                <Settings className="h-3 w-3" />
+                Gerenciar
+              </Link>
+            </Button>
+          </div>
         </div>
         <div className="text-center py-8">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted/50 mb-4">
@@ -46,9 +56,17 @@ export function AccountsOverview({ accounts, totalBalance }: AccountsOverviewPro
             <CreditCardIcon className="h-5 w-5 text-foreground" />
             <h2 className="text-xl font-semibold text-foreground">Contas Bancárias</h2>
           </div>
-          <Badge variant="secondary" className="text-xs">
-            {accounts.length} {accounts.length === 1 ? 'conta' : 'contas'}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              {accounts.length} {accounts.length === 1 ? 'conta' : 'contas'}
+            </Badge>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/accounts" className="flex items-center gap-1">
+                <Settings className="h-3 w-3" />
+                Gerenciar
+              </Link>
+            </Button>
+          </div>
         </div>
         
         {/* Saldo Total */}

@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CreditCardIcon, AlertTriangleIcon, Wallet, TrendingDownIcon } from "lucide-react";
+import { CreditCardIcon, AlertTriangleIcon, Wallet, TrendingDownIcon, Settings } from "lucide-react";
 import { CreditCard } from "@/lib/schemas";
 
 interface CreditCardsOverviewProps {
@@ -26,7 +28,15 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
             <CreditCardIcon className="h-5 w-5 text-foreground" />
             <h2 className="text-xl font-semibold text-foreground">Cartões de Crédito</h2>
           </div>
-          <Badge variant="secondary" className="text-xs">0 cartões</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">0 cartões</Badge>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/credit-cards" className="flex items-center gap-1">
+                <Settings className="h-3 w-3" />
+                Gerenciar
+              </Link>
+            </Button>
+          </div>
         </div>
         <div className="text-center py-8">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted/50 mb-4">
@@ -49,9 +59,17 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
             <CreditCardIcon className="h-5 w-5 text-foreground" />
             <h2 className="text-xl font-semibold text-foreground">Cartões de Crédito</h2>
           </div>
-          <Badge variant="secondary" className="text-xs">
-            {creditCards.length} {creditCards.length === 1 ? 'cartão' : 'cartões'}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              {creditCards.length} {creditCards.length === 1 ? 'cartão' : 'cartões'}
+            </Badge>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/credit-cards" className="flex items-center gap-1">
+                <Settings className="h-3 w-3" />
+                Gerenciar
+              </Link>
+            </Button>
+          </div>
         </div>
         
         {/* Total das Faturas */}

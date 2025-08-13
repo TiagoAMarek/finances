@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { QuickCreateButton } from "@/components/QuickCreateButton";
 import { PlusIcon, Receipt, DollarSignIcon, Loader2Icon, CalendarIcon, TagIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAccounts } from "@/hooks/useAccounts";
@@ -101,11 +100,6 @@ export function CreateTransactionModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <QuickCreateButton onClick={() => onOpenChange(true)}>
-          Novo Lançamento
-        </QuickCreateButton>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-center space-y-3 pb-4">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">

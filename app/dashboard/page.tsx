@@ -1,6 +1,7 @@
 "use client";
 
 import type { NextPage } from "next";
+import { useState } from "react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useCreditCards } from "@/hooks/useCreditCards";
 import { useTransactions } from "@/hooks/useTransactions";
@@ -13,12 +14,16 @@ import { CreditCardsOverview } from "./_components/CreditCardsOverview";
 import { BalanceEvolutionChart } from "./_components/BalanceEvolutionChart";
 import { PageHeader } from "@/components/PageHeader";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
+import { CreateTransactionModal } from "../transactions/_components/CreateTransactionModal";
 import { Separator } from "@/components/ui/separator";
+import { useTransactionActions } from "../transactions/_hooks/useTransactionActions";
 
 const DashboardPage: NextPage = () => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { data: accounts = [] } = useAccounts();
   const { data: creditCards = [] } = useCreditCards();
   const { data: transactions = [] } = useTransactions();
+  const { createTransaction, isCreating } = useTransactionActions();
 
   // Calcular receitas e despesas do mês atual
   const currentMonth = new Date().getMonth();
@@ -49,8 +54,20 @@ const DashboardPage: NextPage = () => {
   );
 
   const handleCreateTransaction = () => {
-    // TODO: Implementar modal/dialog para criar transação
-    console.log("Criar nova transação");
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateTransactionSubmit = async (data: {
+    description: string;
+    amount: string;
+    type: 'income' | 'expense' | 'transfer';
+    date: string;
+    category: string;
+    accountId?: number;
+    creditCardId?: number;
+  }) => {
+    await createTransaction(data);
+    setIsCreateModalOpen(false);
   };
 
   return (
@@ -60,7 +77,7 @@ const DashboardPage: NextPage = () => {
         description="Visão geral das suas finanças e transações recentes"
         action={
           <QuickCreateButton onClick={handleCreateTransaction}>
-            Criar Transação
+            Novo Lançamento
           </QuickCreateButton>
         }
       />
@@ -95,6 +112,13 @@ const DashboardPage: NextPage = () => {
           <CreditCardsOverview creditCards={creditCards} />
         </div>
       </div>
+
+      <CreateTransactionModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSubmit={handleCreateTransactionSubmit}
+        isLoading={isCreating}
+      />
     </>
   );
 };

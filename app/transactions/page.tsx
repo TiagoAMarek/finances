@@ -7,6 +7,7 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { PageHeader } from '@/components/PageHeader';
+import { QuickCreateButton } from '@/components/QuickCreateButton';
 import { CreateTransactionModal } from './_components/CreateTransactionModal';
 import { EditTransactionModal } from './_components/EditTransactionModal';
 import { TransactionsList } from './_components/TransactionsList';
@@ -71,7 +72,11 @@ const TransactionsPage: NextPage = () => {
         <PageHeader
           title="Lançamentos"
           description="Gerencie suas receitas, despesas e transferências"
-          action={null}
+          action={
+            <QuickCreateButton onClick={() => setCreateModalOpen(true)}>
+              Novo Lançamento
+            </QuickCreateButton>
+          }
         />
         <div className="flex items-center justify-center min-h-screen p-4 lg:p-6">
           <Alert variant="destructive" className="max-w-md">
@@ -89,12 +94,9 @@ const TransactionsPage: NextPage = () => {
         title="Lançamentos"
         description="Gerencie suas receitas, despesas e transferências"
         action={
-          <CreateTransactionModal
-            open={createModalOpen}
-            onOpenChange={setCreateModalOpen}
-            onSubmit={handleCreate}
-            isLoading={isLoading.create}
-          />
+          <QuickCreateButton onClick={() => setCreateModalOpen(true)}>
+            Novo Lançamento
+          </QuickCreateButton>
         }
       />
       <div className="p-4 lg:p-6">
@@ -121,6 +123,13 @@ const TransactionsPage: NextPage = () => {
             totalCount={transactions.length}
           />
         </div>
+
+        <CreateTransactionModal
+          open={createModalOpen}
+          onOpenChange={setCreateModalOpen}
+          onSubmit={handleCreate}
+          isLoading={isLoading.create}
+        />
 
         <EditTransactionModal
           transaction={editingTransaction}

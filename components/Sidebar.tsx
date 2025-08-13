@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  Menu, 
+import {
+  Menu,
   Home,
-  CreditCard, 
-  Receipt, 
-  TrendingUp, 
+  CreditCard,
+  Receipt,
+  TrendingUp,
   Banknote,
   LogOut,
   User
@@ -30,30 +30,25 @@ const Sidebar = () => {
   };
 
   const navLinks = [
-    { 
-      name: 'Dashboard', 
+    {
+      name: 'Dashboard',
       href: '/dashboard',
       icon: Home
     },
-    { 
-      name: 'Contas Bancárias', 
+    {
+      name: 'Contas Bancárias',
       href: '/accounts',
       icon: Banknote
     },
-    { 
-      name: 'Cartões de Crédito', 
+    {
+      name: 'Cartões de Crédito',
       href: '/credit_cards',
       icon: CreditCard
     },
-    { 
-      name: 'Lançamentos', 
+    {
+      name: 'Lançamentos',
       href: '/transactions',
       icon: Receipt
-    },
-    { 
-      name: 'Visão Mensal', 
-      href: '/monthly_overview',
-      icon: TrendingUp
     },
   ];
 
@@ -66,16 +61,16 @@ const Sidebar = () => {
           <span>Finanças Pessoais</span>
         </Link>
       </div>
-      
+
       <Separator />
-      
+
       {/* Navigation */}
       <div className="flex-1 overflow-auto p-4">
         <nav className="space-y-2">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
-            
+
             return (
               <Link
                 key={link.name}
@@ -83,8 +78,8 @@ const Sidebar = () => {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  isActive 
-                    ? "bg-primary text-primary-foreground" 
+                  isActive
+                    ? "bg-primary text-primary-foreground"
                     : "hover:bg-accent hover:text-accent-foreground"
                 )}
               >
@@ -95,9 +90,9 @@ const Sidebar = () => {
           })}
         </nav>
       </div>
-      
+
       <Separator />
-      
+
       {/* User Section */}
       <div className="p-4">
         <div className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-accent">
@@ -113,7 +108,7 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-        
+
         <Button
           variant="ghost"
           className="mt-2 w-full justify-start gap-3 text-sm font-medium"
@@ -140,7 +135,7 @@ const Sidebar = () => {
             <Banknote className="h-6 w-6 text-primary" />
             <span>Finanças</span>
           </Link>
-          
+
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="sm">

@@ -70,12 +70,14 @@ export function useTransactionActions() {
   };
 
   return {
+    createTransaction: handleCreate,
     handleCreate,
     handleEdit,
     handleUpdate,
     handleDelete,
     errors,
     isLoading,
+    isCreating: createTransactionMutation.isPending,
     createModalOpen,
     setCreateModalOpen,
     editModalOpen,
