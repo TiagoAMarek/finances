@@ -1,5 +1,6 @@
 import { formatCurrency } from "@/lib/utils";
 import { BarChart3 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export interface MonthlyBalanceCardProps {
   monthlyBalance: number;
@@ -11,8 +12,11 @@ export function MonthlyBalanceCard({
   const isPositive = monthlyBalance >= 0;
   
   return (
-    <div className="text-center">
-      <div className="flex items-center justify-center gap-2 mb-2">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          Balanço Mensal
+        </CardTitle>
         <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
           isPositive ? 'bg-blue-500/10' : 'bg-orange-500/10'
         }`}>
@@ -20,20 +24,19 @@ export function MonthlyBalanceCard({
             isPositive ? 'text-blue-500' : 'text-orange-500'
           }`} />
         </div>
-        <p className="text-sm font-medium text-muted-foreground">
-          Balanço Mensal
+      </CardHeader>
+      <CardContent>
+        <div className={`text-2xl font-bold ${
+          isPositive 
+            ? 'text-blue-600 dark:text-blue-400' 
+            : 'text-orange-600 dark:text-orange-400'
+        }`}>
+          {formatCurrency(monthlyBalance)}
+        </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          {monthlyBalance >= 0 ? "Superávit" : "Déficit"} no mês
         </p>
-      </div>
-      <p className={`text-2xl font-bold ${
-        isPositive 
-          ? 'text-blue-600 dark:text-blue-400' 
-          : 'text-orange-600 dark:text-orange-400'
-      }`}>
-        {formatCurrency(monthlyBalance)}
-      </p>
-      <p className="text-xs text-muted-foreground mt-1">
-        {monthlyBalance >= 0 ? "Superávit" : "Déficit"} no mês
-      </p>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

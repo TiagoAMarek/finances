@@ -15,15 +15,17 @@ import { BalanceEvolutionChart } from "./_components/BalanceEvolutionChart";
 import { PageHeader } from "@/components/PageHeader";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
 import { CreateTransactionModal } from "../transactions/_components/CreateTransactionModal";
-import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useTransactionActions } from "../transactions/_hooks/useTransactionActions";
 
 const DashboardPage: NextPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const { data: accounts = [] } = useAccounts();
-  const { data: creditCards = [] } = useCreditCards();
-  const { data: transactions = [] } = useTransactions();
+  const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
+  const { data: creditCards = [], isLoading: isLoadingCreditCards } = useCreditCards();
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
   const { createTransaction, isCreating } = useTransactionActions();
+
+  const isLoading = isLoadingAccounts || isLoadingCreditCards || isLoadingTransactions;
 
   // Calcular receitas e despesas do mês atual
   const currentMonth = new Date().getMonth();
@@ -70,6 +72,81 @@ const DashboardPage: NextPage = () => {
     setIsCreateModalOpen(false);
   };
 
+  if (isLoading) {
+    return (
+      <>
+        <PageHeader
+          title="Dashboard"
+          description="Visão geral das suas finanças e transações recentes"
+          action={<Skeleton className="h-9 w-32" />}
+        />
+
+        <div className="space-y-8 px-4 lg:px-6 pb-8">
+          {/* Loading Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-lg border bg-card p-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                </div>
+                <Skeleton className="h-8 w-32" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            ))}
+          </div>
+
+          {/* Loading Chart */}
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-40" />
+            <div className="rounded-lg border bg-card p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+                <Skeleton className="h-6 w-16" />
+              </div>
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </div>
+
+          {/* Loading Overview */}
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-32" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {[1, 2].map((i) => (
+                <div key={i} className="rounded-lg border bg-card p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-5 w-5" />
+                      <Skeleton className="h-5 w-32" />
+                    </div>
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((j) => (
+                      <div key={j} className="flex items-center justify-between p-3 rounded border">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-7 w-7 rounded-lg" />
+                          <div className="space-y-1">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-3 w-16" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <PageHeader
@@ -82,34 +159,28 @@ const DashboardPage: NextPage = () => {
         }
       />
 
-      <div className="space-y-6">
+      <div className="space-y-8 px-4 lg:px-6 pb-8">
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 divide-y md:divide-y-0 md:divide-x divide-border">
-          <div className="py-2 md:py-0">
-            <IncomesCard monthlyIncomes={monthlyIncomes} />
-          </div>
-          <div className="py-2 md:py-0 md:px-8">
-            <ExpensesCard monthlyExpenses={monthlyExpenses} />
-          </div>
-          <div className="py-2 md:py-0 md:px-8">
-            <MonthlyBalanceCard monthlyBalance={monthlyBalance} />
-          </div>
-          <div className="py-2 md:py-0 md:px-8">
-            <TotalBalanceCard totalBalance={totalBalance} />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <IncomesCard monthlyIncomes={monthlyIncomes} />
+          <ExpensesCard monthlyExpenses={monthlyExpenses} />
+          <MonthlyBalanceCard monthlyBalance={monthlyBalance} />
+          <TotalBalanceCard totalBalance={totalBalance} />
         </div>
 
-        <Separator />
-
         {/* Gráfico de Evolução do Saldo */}
-        <BalanceEvolutionChart totalBalance={totalBalance} />
-
-        <Separator />
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Evolução Financeira</h2>
+          <BalanceEvolutionChart totalBalance={totalBalance} />
+        </div>
 
         {/* Visão Geral de Contas e Cartões */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <AccountsOverview accounts={accounts} totalBalance={totalBalance} />
-          <CreditCardsOverview creditCards={creditCards} />
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Resumo de Contas</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AccountsOverview accounts={accounts} totalBalance={totalBalance} />
+            <CreditCardsOverview creditCards={creditCards} />
+          </div>
         </div>
       </div>
 
