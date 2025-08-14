@@ -1,6 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Transaction } from "@/lib/schemas";
+
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: {
+      period: string;
+      saldo: number;
+      receitas: number;
+      despesas: number;
+      variacao: number;
+      transactions: number;
+    };
+  }>;
+  label?: string;
+}
 
 interface WeeklyBalanceChartProps {
   transactions: Transaction[];
@@ -45,7 +60,6 @@ export function WeeklyBalanceChart({
     const weeklyData = [];
     let weekStart = new Date(firstDay);
     let weekNumber = 1;
-    let runningBalance = totalBalance;
 
     // Calcular saldo inicial (subtraindo todas as transações do mês do saldo atual)
     const monthlyChange = monthTransactions.reduce((sum, t) => {
@@ -107,24 +121,40 @@ export function WeeklyBalanceChart({
     ? new Date(selectedYear, selectedMonth).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
     : new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-  const customTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-background border rounded-lg p-3 shadow-lg">
-          <p className="font-medium">{`${label} (${data.period})`}</p>
-          <p className={`font-bold ${data.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {`Saldo: ${formatCurrency(data.saldo)}`}
-          </p>
-          <p className="text-green-600">
-            {`Receitas: ${formatCurrency(data.receitas)}`}
-          </p>
-          <p className="text-red-600">
-            {`Despesas: ${formatCurrency(data.despesas)}`}
-          </p>
-          <p className={`text-sm ${data.variacao >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {`Variação: ${data.variacao >= 0 ? '+' : ''}${formatCurrency(data.variacao)}`}
-          </p>
+        <div className="bg-background border rounded-lg p-4 shadow-lg border-blue-200">
+          <div className="space-y-2">
+            <p className="font-medium text-foreground">{`${label} (${data.period})`}</p>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <p className={`text-sm font-bold ${
+                data.saldo >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              }`}>
+                Saldo: {formatCurrency(data.saldo)}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-green-600 dark:text-green-400">
+                📈 Receitas: {formatCurrency(data.receitas)}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400">
+                📉 Despesas: {formatCurrency(data.despesas)}
+              </p>
+              <p className={`text-xs ${
+                data.variacao >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              }`}>
+                💰 Variação: {data.variacao >= 0 ? '+' : ''}{formatCurrency(data.variacao)}
+              </p>
+              {data.transactions && (
+                <p className="text-xs text-muted-foreground">
+                  📊 {data.transactions} transação{data.transactions !== 1 ? 's' : ''}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       );
     }
@@ -154,6 +184,7 @@ export function WeeklyBalanceChart({
                 tick={{ fontSize: 12 }}
                 tickLine={{ stroke: '#374151' }}
               />
+              <Tooltip content={<CustomTooltip />} />
               <Line 
                 type="monotone" 
                 dataKey="saldo" 
@@ -162,7 +193,8 @@ export function WeeklyBalanceChart({
                 dot={{ 
                   fill: '#3b82f6', 
                   strokeWidth: 2, 
-                  r: 6 
+                  r: 6,
+                  className: 'transition-all duration-200 hover:r-8'
                 }}
                 activeDot={{ 
                   r: 8, 

@@ -28,7 +28,7 @@ const AccountsAnalysisPage: NextPage = () => {
   const getAccountData = () => {
     return transactions.filter(t => {
       if (t.accountId === null) return false;
-      
+
       const transactionDate = new Date(t.date);
       return (
         transactionDate.getMonth() === selectedMonth &&
@@ -46,6 +46,8 @@ const AccountsAnalysisPage: NextPage = () => {
           title="Análise por Contas Bancárias"
           description="Performance detalhada das suas contas bancárias"
           action={<Skeleton className="h-9 w-32" />}
+          iconColor="text-blue-500"
+          icon={Wallet}
         />
 
         <div className="space-y-8 px-4 lg:px-6 pb-8">
@@ -80,12 +82,6 @@ const AccountsAnalysisPage: NextPage = () => {
         description="Performance detalhada das suas contas bancárias"
         action={
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/reports" className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Relatórios
-              </Link>
-            </Button>
             <PeriodSelector
               selectedMonth={selectedMonth}
               selectedYear={selectedYear}
@@ -94,48 +90,37 @@ const AccountsAnalysisPage: NextPage = () => {
             />
           </div>
         }
+        iconColor="text-blue-500"
+        icon={Wallet}
       />
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">
-        {/* Header da seção */}
-        <div className="flex items-center gap-3">
-          <Wallet className="h-6 w-6 text-blue-500" />
-          <div>
-            <h2 className="text-xl font-semibold">
-              Movimento das Contas Bancárias
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {accountTransactions.length} transações em {accounts.length} contas no período selecionado
-            </p>
-          </div>
-        </div>
-
-        {/* Gráficos de Análise */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <IncomeVsExpenseChart 
-            transactions={accountTransactions}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            selectedAccountId={null}
-            selectedCreditCardId={null}
-          />
-          <ExpenseCategoriesChart 
-            transactions={accountTransactions}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            selectedAccountId={null}
-            selectedCreditCardId={null}
-          />
-        </div>
-
         {/* Análise Avançada */}
-        <AdvancedExpenseAnalysis 
+        <AdvancedExpenseAnalysis
           transactions={accountTransactions}
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
           selectedAccountId={null}
           selectedCreditCardId={null}
         />
+
+        {/* Gráficos de Análise */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <IncomeVsExpenseChart
+            transactions={accountTransactions}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            selectedAccountId={null}
+            selectedCreditCardId={null}
+          />
+          <ExpenseCategoriesChart
+            transactions={accountTransactions}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            selectedAccountId={null}
+            selectedCreditCardId={null}
+          />
+        </div>
       </div>
     </>
   );

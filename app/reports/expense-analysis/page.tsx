@@ -2,9 +2,13 @@
 
 import type { NextPage } from "next";
 import { useState } from "react";
+import { useAccounts } from "@/hooks/useAccounts";
+import { useCreditCards } from "@/hooks/useCreditCards";
 import { useTransactions } from "@/hooks/useTransactions";
 import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExpenseAnalysis";
 import { PageHeader } from "@/components/PageHeader";
+import { AccountCardFilter } from "@/components/AccountCardFilter";
+import { FilterState } from "@/hooks/useAccountCardFilters";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
@@ -12,31 +16,45 @@ import { ArrowLeft, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ExpenseAnalysisPage: NextPage = () => {
+  const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
+  const { data: creditCards = [], isLoading: isLoadingCreditCards } = useCreditCards();
   const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
+
+  const isLoading = isLoadingAccounts || isLoadingCreditCards || isLoadingTransactions;
 
   // Estados dos filtros
   const [periodFilter, setPeriodFilter] = useState<"7days" | "currentMonth" | "3months">("currentMonth");
   const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
+  const [accountCardFilters, setAccountCardFilters] = useState<FilterState>({
+    accounts: [],
+    creditCards: []
+  });
 
-  if (isLoadingTransactions) {
+  // Filtrar transações com base nos filtros
+  const getFilteredTransactions = () => {
+    return transactions.filter((t) => {
+      // Aplicar filtros de conta/cartão
+      const accountMatch = t.accountId ? accountCardFilters.accounts.includes(t.accountId) : true;
+      const cardMatch = t.creditCardId ? accountCardFilters.creditCards.includes(t.creditCardId) : true;
+      
+      return accountMatch || cardMatch;
+    });
+  };
+
+  const filteredTransactions = getFilteredTransactions();
+
+  if (isLoading) {
     return (
       <>
         <PageHeader
           title="Análise Detalhada de Gastos"
           description="Insights avançados sobre seus padrões de consumo"
+          icon={PieChart}
           action={<Skeleton className="h-9 w-32" />}
         />
 
         <div className="space-y-8 px-4 lg:px-6 pb-8">
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-6 w-6" />
-              <div className="space-y-1">
-                <Skeleton className="h-6 w-64" />
-                <Skeleton className="h-4 w-96" />
-              </div>
-            </div>
-
             <Skeleton className="h-12 w-full" />
 
             <div className="space-y-6">
@@ -57,35 +75,34 @@ const ExpenseAnalysisPage: NextPage = () => {
       <PageHeader
         title="Análise Detalhada de Gastos"
         description="Insights avançados sobre seus padrões de consumo"
+        icon={PieChart}
         action={
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/reports" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Relatórios
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <AccountCardFilter
+              accounts={accounts}
+              creditCards={creditCards}
+              onFiltersChange={setAccountCardFilters}
+            />
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/reports" className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Relatórios
+              </Link>
+            </Button>
+          </div>
         }
       />
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">
         {/* Análise Detalhada de Gastos */}
         <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <PieChart className="h-6 w-6 text-orange-500" />
-            <div>
-              <h2 className="text-xl font-semibold">Padrões de Consumo</h2>
-              <p className="text-sm text-muted-foreground">
-                Análise inteligente dos seus gastos em diferentes períodos
-              </p>
-            </div>
-          </div>
-
           <Tabs
             value={periodFilter}
-            onValueChange={(value: "7days" | "currentMonth" | "3months") => {
+            onValueChange={(value: string) => {
+              const typedValue = value as "7days" | "currentMonth" | "3months";
               setIsAnalysisLoading(true);
               setTimeout(() => {
-                setPeriodFilter(value);
+                setPeriodFilter(typedValue);
                 setIsAnalysisLoading(false);
               }, 300);
             }}
@@ -105,8 +122,8 @@ const ExpenseAnalysisPage: NextPage = () => {
 
             <TabsContent value="7days">
               <div className={`transition-opacity duration-300 ${isAnalysisLoading ? 'opacity-50' : 'opacity-100'}`}>
-                <AdvancedExpenseAnalysis 
-                  transactions={transactions}
+                <AdvancedExpenseAnalysis
+                  transactions={filteredTransactions}
                   selectedMonth={new Date().getMonth()}
                   selectedYear={new Date().getFullYear()}
                   selectedAccountId={null}
@@ -119,8 +136,8 @@ const ExpenseAnalysisPage: NextPage = () => {
 
             <TabsContent value="currentMonth">
               <div className={`transition-opacity duration-300 ${isAnalysisLoading ? 'opacity-50' : 'opacity-100'}`}>
-                <AdvancedExpenseAnalysis 
-                  transactions={transactions}
+                <AdvancedExpenseAnalysis
+                  transactions={filteredTransactions}
                   selectedMonth={new Date().getMonth()}
                   selectedYear={new Date().getFullYear()}
                   selectedAccountId={null}
@@ -133,8 +150,8 @@ const ExpenseAnalysisPage: NextPage = () => {
 
             <TabsContent value="3months">
               <div className={`transition-opacity duration-300 ${isAnalysisLoading ? 'opacity-50' : 'opacity-100'}`}>
-                <AdvancedExpenseAnalysis 
-                  transactions={transactions}
+                <AdvancedExpenseAnalysis
+                  transactions={filteredTransactions}
                   selectedMonth={new Date().getMonth()}
                   selectedYear={new Date().getFullYear()}
                   selectedAccountId={null}

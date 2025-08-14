@@ -203,7 +203,7 @@ const DashboardPage: NextPage = () => {
         </div>
 
         {/* Visão Geral de Contas e Cartões */}
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible className="w-full" defaultValue="resources">
           <AccordionItem value="resources">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
               <div className="flex items-center justify-between w-full mr-2">
@@ -244,7 +244,7 @@ const DashboardPage: NextPage = () => {
         </Accordion>
 
         {/* Insights Financeiros e Gráfico */}
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible className="w-full" defaultValue="reports">
           <AccordionItem value="reports">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline hover:bg-muted/50 rounded-lg transition-colors p-4">
               <div className="flex items-center justify-between w-full mr-2">

@@ -11,10 +11,12 @@ import { ExpenseCategoriesChart } from "../dashboard/_components/ExpenseCategori
 import { FinancialPerformanceCards } from "../dashboard/_components/FinancialPerformanceCards";
 import { PeriodSelector } from "./_components/PeriodSelector";
 import { PageHeader } from "@/components/PageHeader";
+import { AccountCardFilter } from "@/components/AccountCardFilter";
+import { FilterState } from "@/hooks/useAccountCardFilters";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, TrendingUp, AlertCircle, Wallet, CreditCard } from "lucide-react";
+import { Wallet, CreditCard } from "lucide-react";
 
 const ReportsPage: NextPage = () => {
   const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
@@ -26,15 +28,25 @@ const ReportsPage: NextPage = () => {
   // Estados dos filtros
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [accountCardFilters, setAccountCardFilters] = useState<FilterState>({
+    accounts: [],
+    creditCards: []
+  });
 
   // Calcular dados filtrados
   const getFilteredTransactions = () => {
     return transactions.filter((t) => {
       const transactionDate = new Date(t.date);
-      return (
+      const dateMatch = (
         transactionDate.getMonth() === selectedMonth &&
         transactionDate.getFullYear() === selectedYear
       );
+      
+      // Aplicar filtros de conta/cartão
+      const accountMatch = t.accountId ? accountCardFilters.accounts.includes(t.accountId) : true;
+      const cardMatch = t.creditCardId ? accountCardFilters.creditCards.includes(t.creditCardId) : true;
+      
+      return dateMatch && (accountMatch || cardMatch);
     });
   };
 
@@ -132,12 +144,19 @@ const ReportsPage: NextPage = () => {
         title="Relatórios"
         description="Análises detalhadas e gráficos das suas finanças"
         action={
-          <PeriodSelector
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-          />
+          <div className="flex items-center gap-2">
+            <AccountCardFilter
+              accounts={accounts}
+              creditCards={creditCards}
+              onFiltersChange={setAccountCardFilters}
+            />
+            <PeriodSelector
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
+              onMonthChange={setSelectedMonth}
+              onYearChange={setSelectedYear}
+            />
+          </div>
         }
       />
 

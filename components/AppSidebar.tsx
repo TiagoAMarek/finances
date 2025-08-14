@@ -58,7 +58,7 @@ const reportLinks = [
     icon: TrendingUp
   },
   {
-    name: 'Performance Financeira',
+    name: 'Performance Mensal',
     href: '/reports/performance',
     icon: Activity
   },

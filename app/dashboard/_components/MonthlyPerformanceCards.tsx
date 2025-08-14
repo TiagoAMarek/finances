@@ -159,53 +159,82 @@ export function MonthlyPerformanceCards({
           <CardTitle className="text-base">Insights do Mês Selecionado</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {savingsRate >= 30 && (
-            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <PiggyBank className="h-4 w-4" />
-              <span>Excelente taxa de economia ({savingsRate.toFixed(1)}%)</span>
+          {/* Verificar se há dados suficientes para insights */}
+          {monthlyTransactions.length === 0 ? (
+            <div className="flex items-center justify-center py-4 text-muted-foreground">
+              <div className="text-center">
+                <AlertCircle className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Nenhum insight disponível para este período</p>
+                <p className="text-xs mt-1">Adicione transações para ver análises detalhadas</p>
+              </div>
             </div>
-          )}
-          
-          {savingsRate < 0 && (
-            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
-              <AlertCircle className="h-4 w-4" />
-              <span>Gastos superiores às receitas neste mês</span>
-            </div>
-          )}
+          ) : (
+            <>
+              {savingsRate >= 30 && (
+                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                  <PiggyBank className="h-4 w-4" />
+                  <span>Excelente taxa de economia ({savingsRate.toFixed(1)}%)</span>
+                </div>
+              )}
+              
+              {savingsRate < 0 && (
+                <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>Gastos superiores às receitas neste mês</span>
+                </div>
+              )}
 
-          {expenseChange > 20 && (
-            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
-              <TrendingUp className="h-4 w-4" />
-              <span>Gastos aumentaram {Math.abs(expenseChange).toFixed(1)}% vs mês anterior</span>
-            </div>
-          )}
-          
-          {expenseChange < -15 && (
-            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <TrendingDown className="h-4 w-4" />
-              <span>Redução significativa de gastos ({Math.abs(expenseChange).toFixed(1)}%)</span>
-            </div>
-          )}
+              {expenseChange > 20 && (
+                <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                  <TrendingUp className="h-4 w-4" />
+                  <span>Gastos aumentaram {Math.abs(expenseChange).toFixed(1)}% vs mês anterior</span>
+                </div>
+              )}
+              
+              {expenseChange < -15 && (
+                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                  <TrendingDown className="h-4 w-4" />
+                  <span>Redução significativa de gastos ({Math.abs(expenseChange).toFixed(1)}%)</span>
+                </div>
+              )}
 
-          {highestExpense > monthlyExpenses * 0.3 && (
-            <div className="flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
-              <TrendingDown className="h-4 w-4" />
-              <span>Maior despesa representa {((highestExpense / monthlyExpenses) * 100).toFixed(1)}% do total</span>
-            </div>
-          )}
+              {highestExpense > monthlyExpenses * 0.3 && (
+                <div className="flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
+                  <TrendingDown className="h-4 w-4" />
+                  <span>Maior despesa representa {((highestExpense / monthlyExpenses) * 100).toFixed(1)}% do total</span>
+                </div>
+              )}
 
-          {monthlyIncomes > 0 && (monthlyExpenses / monthlyIncomes) > 0.9 && (
-            <div className="flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
-              <Target className="h-4 w-4" />
-              <span>Usando {((monthlyExpenses / monthlyIncomes) * 100).toFixed(1)}% do orçamento</span>
-            </div>
-          )}
+              {monthlyIncomes > 0 && (monthlyExpenses / monthlyIncomes) > 0.9 && (
+                <div className="flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
+                  <Target className="h-4 w-4" />
+                  <span>Usando {((monthlyExpenses / monthlyIncomes) * 100).toFixed(1)}% do orçamento</span>
+                </div>
+              )}
 
-          {dailyAverageExpense > 100 && (
-            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-              <Calendar className="h-4 w-4" />
-              <span>Média diária de {formatCurrency(dailyAverageExpense)} neste mês</span>
-            </div>
+              {dailyAverageExpense > 100 && (
+                <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                  <Calendar className="h-4 w-4" />
+                  <span>Média diária de {formatCurrency(dailyAverageExpense)} neste mês</span>
+                </div>
+              )}
+
+              {/* Mostrar mensagem quando nenhum insight é gerado */}
+              {!(savingsRate >= 30) && 
+               !(savingsRate < 0) && 
+               !(expenseChange > 20) && 
+               !(expenseChange < -15) && 
+               !(highestExpense > monthlyExpenses * 0.3) && 
+               !(monthlyIncomes > 0 && (monthlyExpenses / monthlyIncomes) > 0.9) && 
+               !(dailyAverageExpense > 100) && (
+                <div className="flex items-center justify-center py-2 text-muted-foreground">
+                  <div className="text-center">
+                    <div className="text-sm">✅ Comportamento financeiro estável</div>
+                    <div className="text-xs mt-1">Nenhuma anomalia detectada neste período</div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

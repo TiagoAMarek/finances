@@ -6,6 +6,8 @@ interface PageHeaderProps {
   description?: string;
   action?: React.ReactNode;
   className?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  iconColor?: string;
 }
 
 export function PageHeader({
@@ -13,6 +15,8 @@ export function PageHeader({
   description,
   action,
   className,
+  icon: Icon,
+  iconColor,
 }: PageHeaderProps) {
   return (
     <div
@@ -23,7 +27,10 @@ export function PageHeader({
     >
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          <div className="flex items-center gap-3 ">
+            {Icon && <Icon className={`h-6 w-6 ${iconColor ?? 'text-orange-500'}`} />}
+            <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          </div>
           {description && (
             <p className="text-muted-foreground">{description}</p>
           )}
