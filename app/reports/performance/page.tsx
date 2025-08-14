@@ -3,14 +3,12 @@
 import { PageHeader } from "@/components/PageHeader";
 import { AccountCardFilter } from "@/components/AccountCardFilter";
 import { FilterState } from "@/hooks/useAccountCardFilters";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useCreditCards } from "@/hooks/useCreditCards";
 import { useTransactions } from "@/hooks/useTransactions";
-import { ArrowLeft, ChartLine } from "lucide-react";
+import { ChartLine } from "lucide-react";
 import type { NextPage } from "next";
-import Link from "next/link";
 import { useState } from "react";
 import { MonthlyPerformanceCards } from "../../dashboard/_components/MonthlyPerformanceCards";
 import { WeeklyBalanceChart } from "../../dashboard/_components/WeeklyBalanceChart";
@@ -43,8 +41,32 @@ const PerformancePage: NextPage = () => {
       );
       
       // Aplicar filtros de conta/cartão
-      const accountMatch = t.accountId ? accountCardFilters.accounts.includes(t.accountId) : true;
-      const cardMatch = t.creditCardId ? accountCardFilters.creditCards.includes(t.creditCardId) : true;
+      const hasAccounts = accounts.length > 0;
+      const hasCreditCards = creditCards.length > 0;
+      const noAccountsSelected = accountCardFilters.accounts.length === 0;
+      const noCardsSelected = accountCardFilters.creditCards.length === 0;
+      
+      // Se nenhum filtro foi selecionado e existem opções, não mostrar nada
+      if (hasAccounts && hasCreditCards && noAccountsSelected && noCardsSelected) {
+        return false;
+      }
+      
+      // Se só tem contas e nenhuma está selecionada, não mostrar nada
+      if (hasAccounts && !hasCreditCards && noAccountsSelected) {
+        return false;
+      }
+      
+      // Se só tem cartões e nenhum está selecionado, não mostrar nada
+      if (!hasAccounts && hasCreditCards && noCardsSelected) {
+        return false;
+      }
+      
+      const accountMatch = t.accountId ? 
+        accountCardFilters.accounts.includes(t.accountId) : 
+        noAccountsSelected;
+      const cardMatch = t.creditCardId ? 
+        accountCardFilters.creditCards.includes(t.creditCardId) : 
+        noCardsSelected;
       
       return dateMatch && (accountMatch || cardMatch);
     });

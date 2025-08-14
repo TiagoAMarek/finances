@@ -14,41 +14,39 @@ interface UseAccountCardFiltersProps {
 const STORAGE_KEY = 'account-card-filters';
 
 export function useAccountCardFilters({ accounts, creditCards }: UseAccountCardFiltersProps) {
-  const [filters, setFilters] = useState<FilterState>({
-    accounts: [],
-    creditCards: []
+  const [filters, setFilters] = useState<FilterState>(() => {
+    // Inicializar com todos selecionados imediatamente
+    return {
+      accounts: accounts.map(a => a.id),
+      creditCards: creditCards.map(c => c.id)
+    };
   });
 
-  // Inicializar filtros do localStorage ou com todos habilitados
+  // Carregar do localStorage quando disponível
   useEffect(() => {
+    if (accounts.length === 0 && creditCards.length === 0) return;
+    
     const savedFilters = localStorage.getItem(STORAGE_KEY);
     
     if (savedFilters) {
       try {
         const parsed = JSON.parse(savedFilters) as FilterState;
         setFilters(parsed);
+        return;
       } catch {
-        // Se erro ao fazer parse, usar todos habilitados
-        const allAccountIds = accounts.map(a => a.id);
-        const allCreditCardIds = creditCards.map(c => c.id);
-        const defaultFilters = {
-          accounts: allAccountIds,
-          creditCards: allCreditCardIds
-        };
-        setFilters(defaultFilters);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultFilters));
+        // Se erro ao fazer parse, continua com estado inicial
       }
-    } else {
-      // Primeira vez, habilitar todos
-      const allAccountIds = accounts.map(a => a.id);
-      const allCreditCardIds = creditCards.map(c => c.id);
-      const defaultFilters = {
-        accounts: allAccountIds,
-        creditCards: allCreditCardIds
-      };
-      setFilters(defaultFilters);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultFilters));
     }
+    
+    // Se não há filtros salvos ou houve erro, usar todos habilitados
+    const allAccountIds = accounts.map(a => a.id);
+    const allCreditCardIds = creditCards.map(c => c.id);
+    const defaultFilters = {
+      accounts: allAccountIds,
+      creditCards: allCreditCardIds
+    };
+    setFilters(defaultFilters);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultFilters));
   }, [accounts, creditCards]);
 
   // Salvar no localStorage sempre que filtros mudarem

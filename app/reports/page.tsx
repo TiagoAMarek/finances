@@ -43,8 +43,33 @@ const ReportsPage: NextPage = () => {
       );
       
       // Aplicar filtros de conta/cartão
-      const accountMatch = t.accountId ? accountCardFilters.accounts.includes(t.accountId) : true;
-      const cardMatch = t.creditCardId ? accountCardFilters.creditCards.includes(t.creditCardId) : true;
+      // Se ambos os arrays estão vazios E existem contas/cartões, não mostrar nada
+      const hasAccounts = accounts.length > 0;
+      const hasCreditCards = creditCards.length > 0;
+      const noAccountsSelected = accountCardFilters.accounts.length === 0;
+      const noCardsSelected = accountCardFilters.creditCards.length === 0;
+      
+      // Se nenhum filtro foi selecionado e existem opções, não mostrar nada
+      if (hasAccounts && hasCreditCards && noAccountsSelected && noCardsSelected) {
+        return false;
+      }
+      
+      // Se só tem contas e nenhuma está selecionada, não mostrar nada
+      if (hasAccounts && !hasCreditCards && noAccountsSelected) {
+        return false;
+      }
+      
+      // Se só tem cartões e nenhum está selecionado, não mostrar nada
+      if (!hasAccounts && hasCreditCards && noCardsSelected) {
+        return false;
+      }
+      
+      const accountMatch = t.accountId ? 
+        accountCardFilters.accounts.includes(t.accountId) : 
+        noAccountsSelected;
+      const cardMatch = t.creditCardId ? 
+        accountCardFilters.creditCards.includes(t.creditCardId) : 
+        noCardsSelected;
       
       return dateMatch && (accountMatch || cardMatch);
     });
@@ -163,7 +188,7 @@ const ReportsPage: NextPage = () => {
       <div className="space-y-8 px-4 lg:px-6 pb-8">
         {/* Cards de Performance */}
         <FinancialPerformanceCards 
-          transactions={transactions}
+          transactions={filteredTransactions}
           monthlyIncomes={monthlyIncomes}
           monthlyExpenses={monthlyExpenses}
           monthlyBalance={monthlyBalance}
@@ -177,14 +202,14 @@ const ReportsPage: NextPage = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <BalanceEvolutionChart totalBalance={totalBalance} />
           <IncomeVsExpenseChart 
-            transactions={transactions}
+            transactions={filteredTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
             selectedAccountId={null}
             selectedCreditCardId={null}
           />
           <ExpenseCategoriesChart 
-            transactions={transactions}
+            transactions={filteredTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
             selectedAccountId={null}

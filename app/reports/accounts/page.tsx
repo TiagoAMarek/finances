@@ -10,12 +10,10 @@ import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExp
 import { PeriodSelector } from "../_components/PeriodSelector";
 import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import { ArrowLeft, Wallet } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Wallet } from "lucide-react";
 
 const AccountsAnalysisPage: NextPage = () => {
-  const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
+  const { isLoading: isLoadingAccounts } = useAccounts();
   const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
 
   const isLoading = isLoadingAccounts || isLoadingTransactions;

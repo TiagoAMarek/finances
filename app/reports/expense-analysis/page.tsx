@@ -34,8 +34,32 @@ const ExpenseAnalysisPage: NextPage = () => {
   const getFilteredTransactions = () => {
     return transactions.filter((t) => {
       // Aplicar filtros de conta/cartão
-      const accountMatch = t.accountId ? accountCardFilters.accounts.includes(t.accountId) : true;
-      const cardMatch = t.creditCardId ? accountCardFilters.creditCards.includes(t.creditCardId) : true;
+      const hasAccounts = accounts.length > 0;
+      const hasCreditCards = creditCards.length > 0;
+      const noAccountsSelected = accountCardFilters.accounts.length === 0;
+      const noCardsSelected = accountCardFilters.creditCards.length === 0;
+      
+      // Se nenhum filtro foi selecionado e existem opções, não mostrar nada
+      if (hasAccounts && hasCreditCards && noAccountsSelected && noCardsSelected) {
+        return false;
+      }
+      
+      // Se só tem contas e nenhuma está selecionada, não mostrar nada
+      if (hasAccounts && !hasCreditCards && noAccountsSelected) {
+        return false;
+      }
+      
+      // Se só tem cartões e nenhum está selecionado, não mostrar nada
+      if (!hasAccounts && hasCreditCards && noCardsSelected) {
+        return false;
+      }
+      
+      const accountMatch = t.accountId ? 
+        accountCardFilters.accounts.includes(t.accountId) : 
+        noAccountsSelected;
+      const cardMatch = t.creditCardId ? 
+        accountCardFilters.creditCards.includes(t.creditCardId) : 
+        noCardsSelected;
       
       return accountMatch || cardMatch;
     });
