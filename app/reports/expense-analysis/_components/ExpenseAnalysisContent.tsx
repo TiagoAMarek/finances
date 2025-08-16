@@ -13,6 +13,20 @@ export function ExpenseAnalysisContent({
   periodFilter,
   isLoading = false
 }: ExpenseAnalysisContentProps) {
+  // Mapear periodFilter para periodType do IncomeVsExpenseChart
+  const getPeriodType = (filter: "7days" | "currentMonth" | "3months") => {
+    switch (filter) {
+      case "7days":
+        return "7-days" as const;
+      case "currentMonth":
+        return "current-month" as const;
+      case "3months":
+        return "3-months" as const;
+      default:
+        return undefined;
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Visão Geral */}
@@ -20,8 +34,7 @@ export function ExpenseAnalysisContent({
         <h3 className="text-lg font-semibold">Visão Geral</h3>
         <IncomeVsExpenseChart
           transactions={transactions}
-          selectedMonth={new Date().getMonth()}
-          selectedYear={new Date().getFullYear()}
+          periodType={getPeriodType(periodFilter)}
           selectedAccountId={null}
           selectedCreditCardId={null}
         />

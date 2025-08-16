@@ -371,6 +371,76 @@ describe("IncomeVsExpenseChart", () => {
     });
   });
 
+  describe("Diferentes granularidades de período", () => {
+    it("deve exibir gráfico semanal para mês atual", () => {
+      const currentDate = new Date();
+      const dateFilter = { 
+        selectedMonth: currentDate.getMonth(), 
+        selectedYear: currentDate.getFullYear() 
+      };
+
+      render(
+        <IncomeVsExpenseChart
+          transactions={mockTransactions}
+          dateFilter={dateFilter}
+        />,
+      );
+
+      expect(screen.getByText(/- visão semanal/)).toBeInTheDocument();
+      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    });
+
+    it("deve exibir gráfico diário para período de 7 dias", () => {
+      render(
+        <IncomeVsExpenseChart
+          transactions={mockTransactions}
+          periodType="7-days"
+        />,
+      );
+
+      expect(screen.getByText("Últimos 7 dias - visão diária")).toBeInTheDocument();
+      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    });
+
+    it("deve exibir gráfico mensal para período de 3 meses", () => {
+      render(
+        <IncomeVsExpenseChart
+          transactions={mockTransactions}
+          periodType="3-months"
+        />,
+      );
+
+      expect(screen.getByText("Últimos 3 meses - visão mensal")).toBeInTheDocument();
+      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    });
+
+    it("deve usar periodType='current-month' para forçar visão semanal", () => {
+      render(
+        <IncomeVsExpenseChart
+          transactions={mockTransactions}
+          periodType="current-month"
+        />,
+      );
+
+      expect(screen.getByText(/- visão semanal/)).toBeInTheDocument();
+      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    });
+
+    it("deve manter comportamento padrão para mês específico não atual", () => {
+      const dateFilter = { selectedMonth: 0, selectedYear: 2023 }; // Janeiro 2023
+
+      render(
+        <IncomeVsExpenseChart
+          transactions={mockTransactions}
+          dateFilter={dateFilter}
+        />,
+      );
+
+      expect(screen.getByText("Janeiro 2023")).toBeInTheDocument();
+      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    });
+  });
+
   describe("Casos edge e formatação", () => {
     it("deve lidar com valores monetários decimais", () => {
       const testTransactions: Transaction[] = [
