@@ -1,6 +1,21 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts";
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Transaction } from "@/lib/schemas";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 interface IncomeVsExpenseChartProps {
   transactions: Transaction[];
@@ -8,37 +23,47 @@ interface IncomeVsExpenseChartProps {
   selectedYear?: number;
   selectedAccountId?: number | null;
   selectedCreditCardId?: number | null;
+  dateFilter?: {
+    selectedMonth: number;
+    selectedYear: number;
+  };
 }
 
-export function IncomeVsExpenseChart({ 
-  transactions, 
-  selectedMonth, 
-  selectedYear, 
-  selectedAccountId, 
-  selectedCreditCardId 
+export function IncomeVsExpenseChart({
+  transactions,
+  selectedMonth,
+  selectedYear,
+  selectedAccountId,
+  selectedCreditCardId,
+  dateFilter,
 }: IncomeVsExpenseChartProps) {
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
   // Gerar dados dos últimos 6 meses ou do período selecionado
   const generateChartData = () => {
     const data = [];
-    const baseDate = selectedMonth !== undefined && selectedYear !== undefined 
-      ? new Date(selectedYear, selectedMonth, 1)
-      : new Date();
+    // Priorizar dateFilter sobre props individuais para consistência
+    const effectiveMonth = dateFilter?.selectedMonth ?? selectedMonth;
+    const effectiveYear = dateFilter?.selectedYear ?? selectedYear;
     
+    const baseDate =
+      effectiveMonth !== undefined && effectiveYear !== undefined
+        ? new Date(effectiveYear, effectiveMonth, 1)
+        : new Date();
+
     for (let i = 5; i >= 0; i--) {
       const date = new Date(baseDate.getFullYear(), baseDate.getMonth() - i, 1);
-      const month = date.toLocaleDateString('pt-BR', { month: 'short' });
+      const month = date.toLocaleDateString("pt-BR", { month: "short" });
       const year = date.getFullYear();
       const monthIndex = date.getMonth();
-      
+
       // Filtrar transações do mês
       let monthTransactions = transactions.filter((t) => {
         const transactionDate = new Date(t.date);
@@ -50,10 +75,14 @@ export function IncomeVsExpenseChart({
 
       // Aplicar filtros de conta/cartão
       if (selectedAccountId !== null && selectedAccountId !== undefined) {
-        monthTransactions = monthTransactions.filter(t => t.accountId === selectedAccountId);
+        monthTransactions = monthTransactions.filter(
+          (t) => t.accountId === selectedAccountId,
+        );
       }
       if (selectedCreditCardId !== null && selectedCreditCardId !== undefined) {
-        monthTransactions = monthTransactions.filter(t => t.creditCardId === selectedCreditCardId);
+        monthTransactions = monthTransactions.filter(
+          (t) => t.creditCardId === selectedCreditCardId,
+        );
       }
 
       const incomes = monthTransactions
@@ -68,18 +97,24 @@ export function IncomeVsExpenseChart({
         month,
         receitas: incomes,
         despesas: expenses,
-        saldo: incomes - expenses
+        saldo: incomes - expenses,
       });
     }
-    
+
     return data;
   };
 
   const chartData = generateChartData();
-  
+
   // Calcular totais para o período
-  const totalIncomes = chartData.reduce((sum, month) => sum + month.receitas, 0);
-  const totalExpenses = chartData.reduce((sum, month) => sum + month.despesas, 0);
+  const totalIncomes = chartData.reduce(
+    (sum, month) => sum + month.receitas,
+    0,
+  );
+  const totalExpenses = chartData.reduce(
+    (sum, month) => sum + month.despesas,
+    0,
+  );
   const netBalance = totalIncomes - totalExpenses;
 
   return (
@@ -100,9 +135,12 @@ export function IncomeVsExpenseChart({
             <div className="w-3 h-3 bg-red-500 rounded"></div>
             <span>Total: {formatCurrency(totalExpenses)}</span>
           </div>
-          <div className={`font-medium ${
-            netBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-          }`}>
+          <div
+            className={`font-medium ${netBalance >= 0
+                ? "text-green-600 dark:text-green-400"
+                : "text-red-600 dark:text-red-400"
+              }`}
+          >
             Saldo: {formatCurrency(netBalance)}
           </div>
         </div>

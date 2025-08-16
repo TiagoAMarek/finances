@@ -4,13 +4,13 @@ import type { NextPage } from "next";
 import { useState } from "react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useTransactions } from "@/hooks/useTransactions";
-import { IncomeVsExpenseChart } from "../../dashboard/_components/IncomeVsExpenseChart";
 import { ExpenseCategoriesChart } from "../../dashboard/_components/ExpenseCategoriesChart";
 import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExpenseAnalysis";
 import { PeriodSelector } from "../_components/PeriodSelector";
 import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Wallet } from "lucide-react";
+import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
 
 const AccountsAnalysisPage: NextPage = () => {
   const { isLoading: isLoadingAccounts } = useAccounts();

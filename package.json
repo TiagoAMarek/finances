@@ -13,7 +13,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:server": "vitest run --project server",
+    "test:server:watch": "vitest --project server",
+    "test:client": "vitest run --project client",
+    "test:client:watch": "vitest --project client",
+    "test:server:coverage": "vitest run --coverage --project server",
+    "test:client:coverage": "vitest run --coverage --project client"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
@@ -58,6 +64,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/react": "^16.3.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
@@ -73,6 +81,7 @@
     "eslint-config-next": "15.4.4",
     "eslint-config-prettier": "^10.1.8",
     "ignore-loader": "^0.1.2",
+    "jsdom": "^26.1.0",
     "supertest": "^7.1.4",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.6",

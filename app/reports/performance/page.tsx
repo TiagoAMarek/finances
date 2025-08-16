@@ -4,9 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { AccountCardFilter } from "@/components/AccountCardFilter";
 import { FilterState } from "@/hooks/useAccountCardFilters";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
-import { useTransactions } from "@/hooks/useTransactions";
+import { useFilteredTransactions } from "@/hooks/useFilteredTransactions";
 import { ChartLine } from "lucide-react";
 import type { NextPage } from "next";
 import { useState } from "react";
@@ -16,12 +14,6 @@ import { WeeklyIncomeVsExpenseChart } from "../../dashboard/_components/WeeklyIn
 import { PeriodSelector } from "../_components/PeriodSelector";
 
 const PerformancePage: NextPage = () => {
-  const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
-  const { data: creditCards = [], isLoading: isLoadingCreditCards } = useCreditCards();
-  const { data: transactions = [], isLoading: isLoadingTransactions } =
-    useTransactions();
-
-  const isLoading = isLoadingAccounts || isLoadingCreditCards || isLoadingTransactions;
 
   // Estados dos filtros
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -31,48 +23,16 @@ const PerformancePage: NextPage = () => {
     creditCards: []
   });
 
-  // Calcular dados filtrados
-  const getFilteredTransactions = () => {
-    return transactions.filter((t) => {
-      const transactionDate = new Date(t.date);
-      const dateMatch = (
-        transactionDate.getMonth() === selectedMonth &&
-        transactionDate.getFullYear() === selectedYear
-      );
-      
-      // Aplicar filtros de conta/cartão
-      const hasAccounts = accounts.length > 0;
-      const hasCreditCards = creditCards.length > 0;
-      const noAccountsSelected = accountCardFilters.accounts.length === 0;
-      const noCardsSelected = accountCardFilters.creditCards.length === 0;
-      
-      // Se nenhum filtro foi selecionado e existem opções, não mostrar nada
-      if (hasAccounts && hasCreditCards && noAccountsSelected && noCardsSelected) {
-        return false;
-      }
-      
-      // Se só tem contas e nenhuma está selecionada, não mostrar nada
-      if (hasAccounts && !hasCreditCards && noAccountsSelected) {
-        return false;
-      }
-      
-      // Se só tem cartões e nenhum está selecionado, não mostrar nada
-      if (!hasAccounts && hasCreditCards && noCardsSelected) {
-        return false;
-      }
-      
-      const accountMatch = t.accountId ? 
-        accountCardFilters.accounts.includes(t.accountId) : 
-        noAccountsSelected;
-      const cardMatch = t.creditCardId ? 
-        accountCardFilters.creditCards.includes(t.creditCardId) : 
-        noCardsSelected;
-      
-      return dateMatch && (accountMatch || cardMatch);
-    });
-  };
-
-  const filteredTransactions = getFilteredTransactions();
+  // Usar hook para buscar e filtrar dados
+  const { 
+    filteredTransactions, 
+    accounts, 
+    creditCards, 
+    isLoading 
+  } = useFilteredTransactions({
+    accountCardFilters,
+    dateFilter: { selectedMonth, selectedYear }
+  });
 
   const monthlyIncomes = filteredTransactions
     .filter((t) => t.type === "income")

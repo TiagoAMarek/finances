@@ -17,7 +17,7 @@ const eslintConfig = [
   {
     files: [
       "**/*.test.ts",
-      "**/*.test.tsx", 
+      "**/*.test.tsx",
       "**/*.spec.ts",
       "**/*.spec.tsx",
       "tests/**/*.ts",

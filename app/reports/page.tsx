@@ -1,81 +1,41 @@
 "use client";
 
+import { AccountCardFilter } from "@/components/AccountCardFilter";
+import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
+import { PageHeader } from "@/components/PageHeader";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FilterState } from "@/hooks/useAccountCardFilters";
+import { useFilteredTransactions } from "@/hooks/useFilteredTransactions";
+import { CreditCard, Wallet } from "lucide-react";
 import type { NextPage } from "next";
 import { useState } from "react";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
-import { useTransactions } from "@/hooks/useTransactions";
 import { BalanceEvolutionChart } from "../dashboard/_components/BalanceEvolutionChart";
-import { IncomeVsExpenseChart } from "../dashboard/_components/IncomeVsExpenseChart";
 import { ExpenseCategoriesChart } from "../dashboard/_components/ExpenseCategoriesChart";
 import { FinancialPerformanceCards } from "../dashboard/_components/FinancialPerformanceCards";
 import { PeriodSelector } from "./_components/PeriodSelector";
-import { PageHeader } from "@/components/PageHeader";
-import { AccountCardFilter } from "@/components/AccountCardFilter";
-import { FilterState } from "@/hooks/useAccountCardFilters";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { Wallet, CreditCard } from "lucide-react";
 
 const ReportsPage: NextPage = () => {
-  const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
-  const { data: creditCards = [], isLoading: isLoadingCreditCards } = useCreditCards();
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
-
-  const isLoading = isLoadingAccounts || isLoadingCreditCards || isLoadingTransactions;
-
   // Estados dos filtros
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [accountCardFilters, setAccountCardFilters] = useState<FilterState>({
     accounts: [],
-    creditCards: []
+    creditCards: [],
   });
 
-  // Calcular dados filtrados
-  const getFilteredTransactions = () => {
-    return transactions.filter((t) => {
-      const transactionDate = new Date(t.date);
-      const dateMatch = (
-        transactionDate.getMonth() === selectedMonth &&
-        transactionDate.getFullYear() === selectedYear
-      );
-      
-      // Aplicar filtros de conta/cartão
-      // Se ambos os arrays estão vazios E existem contas/cartões, não mostrar nada
-      const hasAccounts = accounts.length > 0;
-      const hasCreditCards = creditCards.length > 0;
-      const noAccountsSelected = accountCardFilters.accounts.length === 0;
-      const noCardsSelected = accountCardFilters.creditCards.length === 0;
-      
-      // Se nenhum filtro foi selecionado e existem opções, não mostrar nada
-      if (hasAccounts && hasCreditCards && noAccountsSelected && noCardsSelected) {
-        return false;
-      }
-      
-      // Se só tem contas e nenhuma está selecionada, não mostrar nada
-      if (hasAccounts && !hasCreditCards && noAccountsSelected) {
-        return false;
-      }
-      
-      // Se só tem cartões e nenhum está selecionado, não mostrar nada
-      if (!hasAccounts && hasCreditCards && noCardsSelected) {
-        return false;
-      }
-      
-      const accountMatch = t.accountId ? 
-        accountCardFilters.accounts.includes(t.accountId) : 
-        noAccountsSelected;
-      const cardMatch = t.creditCardId ? 
-        accountCardFilters.creditCards.includes(t.creditCardId) : 
-        noCardsSelected;
-      
-      return dateMatch && (accountMatch || cardMatch);
+  // Usar hook para buscar e filtrar dados
+  const { filteredTransactions, accounts, creditCards, isLoading } =
+    useFilteredTransactions({
+      accountCardFilters,
+      dateFilter: { selectedMonth, selectedYear },
     });
-  };
-
-  const filteredTransactions = getFilteredTransactions();
 
   const monthlyIncomes = filteredTransactions
     .filter((t) => t.type === "income")
@@ -95,12 +55,12 @@ const ReportsPage: NextPage = () => {
 
   // Filtrar dados específicos para contas
   const getAccountData = () => {
-    return filteredTransactions.filter(t => t.accountId !== null);
+    return filteredTransactions.filter((t) => t.accountId !== null);
   };
 
   // Filtrar dados específicos para cartões
   const getCreditCardData = () => {
-    return filteredTransactions.filter(t => t.creditCardId !== null);
+    return filteredTransactions.filter((t) => t.creditCardId !== null);
   };
 
   if (isLoading) {
@@ -145,7 +105,10 @@ const ReportsPage: NextPage = () => {
                 <div className="p-4">
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     {[1, 2].map((j) => (
-                      <div key={j} className="rounded-lg border bg-card p-6 space-y-4">
+                      <div
+                        key={j}
+                        className="rounded-lg border bg-card p-6 space-y-4"
+                      >
                         <div className="space-y-2">
                           <Skeleton className="h-4 w-32" />
                           <Skeleton className="h-3 w-48" />
@@ -187,7 +150,7 @@ const ReportsPage: NextPage = () => {
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">
         {/* Cards de Performance */}
-        <FinancialPerformanceCards 
+        <FinancialPerformanceCards
           transactions={filteredTransactions}
           monthlyIncomes={monthlyIncomes}
           monthlyExpenses={monthlyExpenses}
@@ -201,14 +164,14 @@ const ReportsPage: NextPage = () => {
         {/* Gráficos Principais */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <BalanceEvolutionChart totalBalance={totalBalance} />
-          <IncomeVsExpenseChart 
+          <IncomeVsExpenseChart
             transactions={filteredTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
             selectedAccountId={null}
             selectedCreditCardId={null}
           />
-          <ExpenseCategoriesChart 
+          <ExpenseCategoriesChart
             transactions={filteredTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
@@ -216,7 +179,6 @@ const ReportsPage: NextPage = () => {
             selectedCreditCardId={null}
           />
         </div>
-
 
         {/* Análise por Contas Bancárias (resumida) */}
         <Accordion type="single" collapsible className="w-full">
@@ -233,7 +195,10 @@ const ReportsPage: NextPage = () => {
                   <Badge variant="outline" className="text-xs">
                     {getAccountData().length} transações
                   </Badge>
-                  <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs hidden sm:inline-flex"
+                  >
                     {accounts.length} contas
                   </Badge>
                 </div>
@@ -241,14 +206,14 @@ const ReportsPage: NextPage = () => {
             </AccordionTrigger>
             <AccordionContent>
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-4">
-                <IncomeVsExpenseChart 
+                <IncomeVsExpenseChart
                   transactions={getAccountData()}
                   selectedMonth={selectedMonth}
                   selectedYear={selectedYear}
                   selectedAccountId={null}
                   selectedCreditCardId={null}
                 />
-                <ExpenseCategoriesChart 
+                <ExpenseCategoriesChart
                   transactions={getAccountData()}
                   selectedMonth={selectedMonth}
                   selectedYear={selectedYear}
@@ -275,7 +240,10 @@ const ReportsPage: NextPage = () => {
                   <Badge variant="outline" className="text-xs">
                     {getCreditCardData().length} transações
                   </Badge>
-                  <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs hidden sm:inline-flex"
+                  >
                     {creditCards.length} cartões
                   </Badge>
                 </div>
@@ -283,14 +251,14 @@ const ReportsPage: NextPage = () => {
             </AccordionTrigger>
             <AccordionContent>
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-4">
-                <IncomeVsExpenseChart 
+                <IncomeVsExpenseChart
                   transactions={getCreditCardData()}
                   selectedMonth={selectedMonth}
                   selectedYear={selectedYear}
                   selectedAccountId={null}
                   selectedCreditCardId={null}
                 />
-                <ExpenseCategoriesChart 
+                <ExpenseCategoriesChart
                   transactions={getCreditCardData()}
                   selectedMonth={selectedMonth}
                   selectedYear={selectedYear}
@@ -307,3 +275,4 @@ const ReportsPage: NextPage = () => {
 };
 
 export default ReportsPage;
+

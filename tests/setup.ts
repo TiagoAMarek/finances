@@ -1,4 +1,5 @@
 import { vi, beforeAll, beforeEach, afterEach, afterAll } from 'vitest'
+import '@testing-library/jest-dom'
 
 // Mock environment variables for testing
 vi.stubEnv('JWT_SECRET', 'test-jwt-secret-key')

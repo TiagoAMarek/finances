@@ -1,98 +1,36 @@
 "use client";
 
-import type { NextPage } from "next";
-import { useState } from "react";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
-import { useTransactions } from "@/hooks/useTransactions";
-import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExpenseAnalysis";
-import { PageHeader } from "@/components/PageHeader";
 import { AccountCardFilter } from "@/components/AccountCardFilter";
-import { FilterState } from "@/hooks/useAccountCardFilters";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
-import { ArrowLeft, PieChart } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FilterState } from "@/hooks/useAccountCardFilters";
+import { useFilteredTransactions } from "@/hooks/useFilteredTransactions";
+import { ArrowLeft, PieChart } from "lucide-react";
+import type { NextPage } from "next";
+import Link from "next/link";
+import { useState } from "react";
+import { ExpenseAnalysisContent } from "./_components/ExpenseAnalysisContent";
+import { ExpenseAnalysisPageSkeleton } from "./_skeleton";
 
 const ExpenseAnalysisPage: NextPage = () => {
-  const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts();
-  const { data: creditCards = [], isLoading: isLoadingCreditCards } = useCreditCards();
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
-
-  const isLoading = isLoadingAccounts || isLoadingCreditCards || isLoadingTransactions;
-
   // Estados dos filtros
-  const [periodFilter, setPeriodFilter] = useState<"7days" | "currentMonth" | "3months">("currentMonth");
+  const [periodFilter, setPeriodFilter] = useState<
+    "7days" | "currentMonth" | "3months"
+  >("currentMonth");
   const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
   const [accountCardFilters, setAccountCardFilters] = useState<FilterState>({
     accounts: [],
-    creditCards: []
+    creditCards: [],
   });
 
-  // Filtrar transações com base nos filtros
-  const getFilteredTransactions = () => {
-    return transactions.filter((t) => {
-      // Aplicar filtros de conta/cartão
-      const hasAccounts = accounts.length > 0;
-      const hasCreditCards = creditCards.length > 0;
-      const noAccountsSelected = accountCardFilters.accounts.length === 0;
-      const noCardsSelected = accountCardFilters.creditCards.length === 0;
-      
-      // Se nenhum filtro foi selecionado e existem opções, não mostrar nada
-      if (hasAccounts && hasCreditCards && noAccountsSelected && noCardsSelected) {
-        return false;
-      }
-      
-      // Se só tem contas e nenhuma está selecionada, não mostrar nada
-      if (hasAccounts && !hasCreditCards && noAccountsSelected) {
-        return false;
-      }
-      
-      // Se só tem cartões e nenhum está selecionado, não mostrar nada
-      if (!hasAccounts && hasCreditCards && noCardsSelected) {
-        return false;
-      }
-      
-      const accountMatch = t.accountId ? 
-        accountCardFilters.accounts.includes(t.accountId) : 
-        noAccountsSelected;
-      const cardMatch = t.creditCardId ? 
-        accountCardFilters.creditCards.includes(t.creditCardId) : 
-        noCardsSelected;
-      
-      return accountMatch || cardMatch;
+  // Usar hook para buscar e filtrar dados
+  const { filteredTransactions, accounts, creditCards, isLoading } =
+    useFilteredTransactions({
+      accountCardFilters,
     });
-  };
 
-  const filteredTransactions = getFilteredTransactions();
-
-  if (isLoading) {
-    return (
-      <>
-        <PageHeader
-          title="Análise Detalhada de Gastos"
-          description="Insights avançados sobre seus padrões de consumo"
-          icon={PieChart}
-          action={<Skeleton className="h-9 w-32" />}
-        />
-
-        <div className="space-y-8 px-4 lg:px-6 pb-8">
-          <div className="space-y-6">
-            <Skeleton className="h-12 w-full" />
-
-            <div className="space-y-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-lg border bg-card p-6 space-y-4">
-                  <Skeleton className="h-48 w-full" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
+  if (isLoading) return <ExpenseAnalysisPageSkeleton />;
 
   return (
     <>
@@ -145,13 +83,11 @@ const ExpenseAnalysisPage: NextPage = () => {
             </TabsList>
 
             <TabsContent value="7days">
-              <div className={`transition-opacity duration-300 ${isAnalysisLoading ? 'opacity-50' : 'opacity-100'}`}>
-                <AdvancedExpenseAnalysis
+              <div
+                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+              >
+                <ExpenseAnalysisContent
                   transactions={filteredTransactions}
-                  selectedMonth={new Date().getMonth()}
-                  selectedYear={new Date().getFullYear()}
-                  selectedAccountId={null}
-                  selectedCreditCardId={null}
                   periodFilter="7days"
                   isLoading={isAnalysisLoading}
                 />
@@ -159,13 +95,11 @@ const ExpenseAnalysisPage: NextPage = () => {
             </TabsContent>
 
             <TabsContent value="currentMonth">
-              <div className={`transition-opacity duration-300 ${isAnalysisLoading ? 'opacity-50' : 'opacity-100'}`}>
-                <AdvancedExpenseAnalysis
+              <div
+                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+              >
+                <ExpenseAnalysisContent
                   transactions={filteredTransactions}
-                  selectedMonth={new Date().getMonth()}
-                  selectedYear={new Date().getFullYear()}
-                  selectedAccountId={null}
-                  selectedCreditCardId={null}
                   periodFilter="currentMonth"
                   isLoading={isAnalysisLoading}
                 />
@@ -173,13 +107,11 @@ const ExpenseAnalysisPage: NextPage = () => {
             </TabsContent>
 
             <TabsContent value="3months">
-              <div className={`transition-opacity duration-300 ${isAnalysisLoading ? 'opacity-50' : 'opacity-100'}`}>
-                <AdvancedExpenseAnalysis
+              <div
+                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+              >
+                <ExpenseAnalysisContent
                   transactions={filteredTransactions}
-                  selectedMonth={new Date().getMonth()}
-                  selectedYear={new Date().getFullYear()}
-                  selectedAccountId={null}
-                  selectedCreditCardId={null}
                   periodFilter="3months"
                   isLoading={isAnalysisLoading}
                 />

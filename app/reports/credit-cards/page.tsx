@@ -1,22 +1,24 @@
 "use client";
 
-import type { NextPage } from "next";
-import { useState } from "react";
+import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCreditCards } from "@/hooks/useCreditCards";
 import { useTransactions } from "@/hooks/useTransactions";
-import { IncomeVsExpenseChart } from "../../dashboard/_components/IncomeVsExpenseChart";
-import { ExpenseCategoriesChart } from "../../dashboard/_components/ExpenseCategoriesChart";
-import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExpenseAnalysis";
-import { PeriodSelector } from "../_components/PeriodSelector";
-import { PageHeader } from "@/components/PageHeader";
-import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 import { ArrowLeft, CreditCard } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import type { NextPage } from "next";
+import Link from "next/link";
+import { useState } from "react";
+import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExpenseAnalysis";
+import { ExpenseCategoriesChart } from "../../dashboard/_components/ExpenseCategoriesChart";
+import { PeriodSelector } from "../_components/PeriodSelector";
 
 const CreditCardsAnalysisPage: NextPage = () => {
-  const { data: creditCards = [], isLoading: isLoadingCreditCards } = useCreditCards();
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
+  const { data: creditCards = [], isLoading: isLoadingCreditCards } =
+    useCreditCards();
+  const { data: transactions = [], isLoading: isLoadingTransactions } =
+    useTransactions();
 
   const isLoading = isLoadingCreditCards || isLoadingTransactions;
 
@@ -26,9 +28,9 @@ const CreditCardsAnalysisPage: NextPage = () => {
 
   // Filtrar dados específicos para cartões
   const getCreditCardData = () => {
-    return transactions.filter(t => {
+    return transactions.filter((t) => {
       if (t.creditCardId === null) return false;
-      
+
       const transactionDate = new Date(t.date);
       return (
         transactionDate.getMonth() === selectedMonth &&
@@ -105,21 +107,22 @@ const CreditCardsAnalysisPage: NextPage = () => {
               Gastos nos Cartões de Crédito
             </h2>
             <p className="text-sm text-muted-foreground">
-              {creditCardTransactions.length} transações em {creditCards.length} cartões no período selecionado
+              {creditCardTransactions.length} transações em {creditCards.length}{" "}
+              cartões no período selecionado
             </p>
           </div>
         </div>
 
         {/* Gráficos de Análise */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <IncomeVsExpenseChart 
+          <IncomeVsExpenseChart
             transactions={creditCardTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
             selectedAccountId={null}
             selectedCreditCardId={null}
           />
-          <ExpenseCategoriesChart 
+          <ExpenseCategoriesChart
             transactions={creditCardTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
@@ -129,7 +132,7 @@ const CreditCardsAnalysisPage: NextPage = () => {
         </div>
 
         {/* Análise Avançada */}
-        <AdvancedExpenseAnalysis 
+        <AdvancedExpenseAnalysis
           transactions={creditCardTransactions}
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
@@ -142,3 +145,4 @@ const CreditCardsAnalysisPage: NextPage = () => {
 };
 
 export default CreditCardsAnalysisPage;
+
