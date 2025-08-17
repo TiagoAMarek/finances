@@ -19,7 +19,6 @@ export function ExpenseAnalysisPageSkeleton() {
           <div className="space-y-6">
             {/* Loading para Visão Geral */}
             <div className="space-y-4">
-              <Skeleton className="h-6 w-32" />
               <div className="rounded-lg border bg-card p-6 space-y-4">
                 <Skeleton className="h-48 w-full" />
               </div>
@@ -27,7 +26,6 @@ export function ExpenseAnalysisPageSkeleton() {
 
             {/* Loading para Análise Detalhada */}
             <div className="space-y-4">
-              <Skeleton className="h-6 w-40" />
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}

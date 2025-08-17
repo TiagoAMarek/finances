@@ -27,7 +27,7 @@ export interface ExpenseStatistics {
   total: number;
 }
 
-export type ExpensePeriodFilter = "7days" | "currentMonth" | "3months";
+export type ExpensePeriodFilter = "3months" | "6months" | "12months";
 
 export interface ExpenseAnalysisConfig {
   periodFilter: ExpensePeriodFilter;
@@ -53,19 +53,10 @@ export function filterTransactionsByPeriod(
   transactions: Transaction[],
   config: ExpenseAnalysisConfig,
 ): Transaction[] {
-  const { periodFilter, selectedMonth, selectedYear } = config;
+  const { periodFilter } = config;
   const now = new Date();
 
   switch (periodFilter) {
-    case "7days": {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(now.getDate() - 7);
-      return transactions.filter((t) => {
-        const transactionDate = new Date(t.date);
-        return transactionDate >= sevenDaysAgo && transactionDate <= now;
-      });
-    }
-
     case "3months": {
       const threeMonthsAgo = new Date();
       threeMonthsAgo.setMonth(now.getMonth() - 3);
@@ -75,16 +66,22 @@ export function filterTransactionsByPeriod(
       });
     }
 
-    case "currentMonth":
-    default: {
-      const targetMonth = selectedMonth ?? now.getMonth();
-      const targetYear = selectedYear ?? now.getFullYear();
+    case "6months": {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(now.getMonth() - 6);
       return transactions.filter((t) => {
         const transactionDate = new Date(t.date);
-        return (
-          transactionDate.getMonth() === targetMonth &&
-          transactionDate.getFullYear() === targetYear
-        );
+        return transactionDate >= sixMonthsAgo && transactionDate <= now;
+      });
+    }
+
+    case "12months":
+    default: {
+      const twelveMonthsAgo = new Date();
+      twelveMonthsAgo.setMonth(now.getMonth() - 12);
+      return transactions.filter((t) => {
+        const transactionDate = new Date(t.date);
+        return transactionDate >= twelveMonthsAgo && transactionDate <= now;
       });
     }
   }
@@ -224,20 +221,61 @@ export function generateExpenseTrendData(
   transactions: Transaction[],
   config: ExpenseAnalysisConfig,
 ): ExpenseChartPoint[] {
-  const { periodFilter, selectedMonth, selectedYear } = config;
+  const { periodFilter } = config;
 
   switch (periodFilter) {
-    case "7days":
-      return generateSevenDayPeriodsData(transactions);
-
     case "3months":
       return generateThreeMonthsData(transactions);
 
-    case "currentMonth":
+    case "6months": {
+      const data: ExpenseChartPoint[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const month = date.getMonth();
+        const year = date.getFullYear();
+
+        const monthTransactions = transactions.filter((t) => {
+          const transactionDate = new Date(t.date);
+          return (
+            transactionDate.getMonth() === month &&
+            transactionDate.getFullYear() === year
+          );
+        });
+
+        const monthLabel = date.toLocaleDateString("pt-BR", {
+          month: "short",
+          year: "numeric",
+        });
+        data.push(createExpenseChartPoint(monthLabel, monthTransactions));
+      }
+      return data;
+    }
+
+    case "12months":
     default: {
-      const targetMonth = selectedMonth ?? new Date().getMonth();
-      const targetYear = selectedYear ?? new Date().getFullYear();
-      return generateMonthlyWeeksData(transactions, targetMonth, targetYear);
+      const data: ExpenseChartPoint[] = [];
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const month = date.getMonth();
+        const year = date.getFullYear();
+
+        const monthTransactions = transactions.filter((t) => {
+          const transactionDate = new Date(t.date);
+          return (
+            transactionDate.getMonth() === month &&
+            transactionDate.getFullYear() === year
+          );
+        });
+
+        const monthLabel = date.toLocaleDateString("pt-BR", {
+          month: "short",
+          year: "numeric",
+        });
+        data.push(createExpenseChartPoint(monthLabel, monthTransactions));
+      }
+      return data;
     }
   }
 }
@@ -268,13 +306,13 @@ export function getExpensePeriodDescription(
   periodFilter: ExpensePeriodFilter,
 ): string {
   switch (periodFilter) {
-    case "7days":
-      return "nos últimos 7 dias";
     case "3months":
       return "nos últimos 3 meses";
-    case "currentMonth":
+    case "6months":
+      return "nos últimos 6 meses";
+    case "12months":
     default:
-      return "neste mês";
+      return "nos últimos 12 meses";
   }
 }
 

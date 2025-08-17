@@ -1,27 +1,36 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useCreateAccount, useUpdateAccount, useDeleteAccount } from "@/hooks/useAccounts";
+import {
+  useCreateAccount,
+  useUpdateAccount,
+  useDeleteAccount,
+} from "@/hooks/useAccounts";
 import { BankAccount } from "@/lib/schemas";
 
 export function useAccountActions() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
+  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(
+    null,
+  );
 
   const createAccountMutation = useCreateAccount();
   const updateAccountMutation = useUpdateAccount();
   const deleteAccountMutation = useDeleteAccount();
 
   const handleCreate = async (data: { name: string; balance: string }) => {
-    createAccountMutation.mutate({
-      ...data,
-      currency: "BRL"
-    }, {
-      onSuccess: () => {
-        toast.success("Conta criada com sucesso!");
-        setCreateModalOpen(false);
+    createAccountMutation.mutate(
+      {
+        ...data,
+        currency: "BRL",
       },
-    });
+      {
+        onSuccess: () => {
+          toast.success("Conta criada com sucesso!");
+          setCreateModalOpen(false);
+        },
+      },
+    );
   };
 
   const handleEdit = (account: BankAccount) => {

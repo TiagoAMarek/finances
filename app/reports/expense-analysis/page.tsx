@@ -16,8 +16,8 @@ import { ExpenseAnalysisPageSkeleton } from "./_skeleton";
 const ExpenseAnalysisPage: NextPage = () => {
   // Estados dos filtros
   const [periodFilter, setPeriodFilter] = useState<
-    "7days" | "currentMonth" | "3months"
-  >("currentMonth");
+    "3months" | "6months" | "12months"
+  >("3months");
   const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
   const [accountCardFilters, setAccountCardFilters] = useState<FilterState>({
     accounts: [],
@@ -61,7 +61,7 @@ const ExpenseAnalysisPage: NextPage = () => {
           <Tabs
             value={periodFilter}
             onValueChange={(value: string) => {
-              const typedValue = value as "7days" | "currentMonth" | "3months";
+              const typedValue = value as "3months" | "6months" | "12months";
               setIsAnalysisLoading(true);
               setTimeout(() => {
                 setPeriodFilter(typedValue);
@@ -71,40 +71,16 @@ const ExpenseAnalysisPage: NextPage = () => {
             className="w-full space-y-6"
           >
             <TabsList className="grid w-full grid-cols-3 h-auto">
-              <TabsTrigger value="7days" className="text-sm py-3">
-                Últimos 7 dias
-              </TabsTrigger>
-              <TabsTrigger value="currentMonth" className="text-sm py-3">
-                Mês atual
-              </TabsTrigger>
               <TabsTrigger value="3months" className="text-sm py-3">
                 Últimos 3 meses
               </TabsTrigger>
+              <TabsTrigger value="6months" className="text-sm py-3">
+                Últimos 6 meses
+              </TabsTrigger>
+              <TabsTrigger value="12months" className="text-sm py-3">
+                Últimos 12 meses
+              </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="7days">
-              <div
-                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
-              >
-                <ExpenseAnalysisContent
-                  transactions={filteredTransactions}
-                  periodFilter="7days"
-                  isLoading={isAnalysisLoading}
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="currentMonth">
-              <div
-                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
-              >
-                <ExpenseAnalysisContent
-                  transactions={filteredTransactions}
-                  periodFilter="currentMonth"
-                  isLoading={isAnalysisLoading}
-                />
-              </div>
-            </TabsContent>
 
             <TabsContent value="3months">
               <div
@@ -113,6 +89,30 @@ const ExpenseAnalysisPage: NextPage = () => {
                 <ExpenseAnalysisContent
                   transactions={filteredTransactions}
                   periodFilter="3months"
+                  isLoading={isAnalysisLoading}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="6months">
+              <div
+                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+              >
+                <ExpenseAnalysisContent
+                  transactions={filteredTransactions}
+                  periodFilter="6months"
+                  isLoading={isAnalysisLoading}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="12months">
+              <div
+                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+              >
+                <ExpenseAnalysisContent
+                  transactions={filteredTransactions}
+                  periodFilter="12months"
                   isLoading={isAnalysisLoading}
                 />
               </div>

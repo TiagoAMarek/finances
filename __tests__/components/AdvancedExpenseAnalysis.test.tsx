@@ -128,7 +128,7 @@ const mockExpenseAnalysisData = {
   ],
   statistics: { max: 1500, min: 1000, average: 1250, total: 2500 },
   isEmpty: false,
-  periodDescription: "neste mês",
+  periodDescription: "nos últimos 3 meses",
 };
 
 const mockEmptyExpenseAnalysisData = {
@@ -136,7 +136,7 @@ const mockEmptyExpenseAnalysisData = {
   formattedChartData: [],
   statistics: { max: 0, min: 0, average: 0, total: 0 },
   isEmpty: true,
-  periodDescription: "neste mês",
+  periodDescription: "nos últimos 3 meses",
 };
 
 describe("AdvancedExpenseAnalysis", () => {
@@ -202,78 +202,75 @@ describe("AdvancedExpenseAnalysis", () => {
       render(
         <AdvancedExpenseAnalysis
           transactions={transactionsWithoutExpenses}
-          periodFilter="currentMonth"
+          periodFilter="3months"
         />,
-      );
-
-      expect(screen.getByText("Nenhuma despesa registrada")).toBeInTheDocument();
-      expect(screen.getByText("neste mês")).toBeInTheDocument();
-    });
-
-    it("deve exibir mensagem correta para período de 7 dias", () => {
-      // Mock empty state with 7 days description
-      mockUseExpenseAnalysis.mockReturnValue({
-        ...mockEmptyExpenseAnalysisData,
-        periodDescription: "nos últimos 7 dias",
-      });
-
-      render(
-        <AdvancedExpenseAnalysis transactions={[]} periodFilter="7days" />,
-      );
-
-      expect(screen.getByText("Nenhuma despesa registrada")).toBeInTheDocument();
-      expect(screen.getByText("nos últimos 7 dias")).toBeInTheDocument();
-    });
-
-    it("deve exibir mensagem correta para período de 3 meses", () => {
-      // Mock empty state with 3 months description
-      mockUseExpenseAnalysis.mockReturnValue({
-        ...mockEmptyExpenseAnalysisData,
-        periodDescription: "nos últimos 3 meses",
-      });
-
-      render(
-        <AdvancedExpenseAnalysis transactions={[]} periodFilter="3months" />,
       );
 
       expect(screen.getByText("Nenhuma despesa registrada")).toBeInTheDocument();
       expect(screen.getByText("nos últimos 3 meses")).toBeInTheDocument();
     });
+
+    it("deve exibir mensagem correta para período de 6 meses", () => {
+      // Mock empty state with 6 months description
+      mockUseExpenseAnalysis.mockReturnValue({
+        ...mockEmptyExpenseAnalysisData,
+        periodDescription: "nos últimos 6 meses",
+      });
+
+      render(
+        <AdvancedExpenseAnalysis transactions={[]} periodFilter="6months" />,
+      );
+
+      expect(screen.getByText("Nenhuma despesa registrada")).toBeInTheDocument();
+      expect(screen.getByText("nos últimos 6 meses")).toBeInTheDocument();
+    });
+
+    it("deve exibir mensagem correta para período de 12 meses", () => {
+      // Mock empty state with 12 months description
+      mockUseExpenseAnalysis.mockReturnValue({
+        ...mockEmptyExpenseAnalysisData,
+        periodDescription: "nos últimos 12 meses",
+      });
+
+      render(
+        <AdvancedExpenseAnalysis transactions={[]} periodFilter="12months" />,
+      );
+
+      expect(screen.getByText("Nenhuma despesa registrada")).toBeInTheDocument();
+      expect(screen.getByText("nos últimos 12 meses")).toBeInTheDocument();
+    });
   });
 
   describe("Filtros de período", () => {
-    it("deve funcionar com periodFilter='currentMonth'", () => {
-      const currentDate = new Date();
-      render(
-        <AdvancedExpenseAnalysis
-          transactions={mockTransactions}
-          periodFilter="currentMonth"
-          selectedMonth={currentDate.getMonth()}
-          selectedYear={currentDate.getFullYear()}
-        />,
-      );
-
-      expect(screen.getByText("Tendência de Gastos")).toBeInTheDocument();
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
-    });
-
-    it("deve funcionar com periodFilter='7days'", () => {
-      render(
-        <AdvancedExpenseAnalysis
-          transactions={mockTransactions}
-          periodFilter="7days"
-        />,
-      );
-
-      expect(screen.getByText("Tendência de Gastos")).toBeInTheDocument();
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
-    });
-
     it("deve funcionar com periodFilter='3months'", () => {
       render(
         <AdvancedExpenseAnalysis
           transactions={mockTransactions}
           periodFilter="3months"
+        />,
+      );
+
+      expect(screen.getByText("Tendência de Gastos")).toBeInTheDocument();
+      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+    });
+
+    it("deve funcionar com periodFilter='6months'", () => {
+      render(
+        <AdvancedExpenseAnalysis
+          transactions={mockTransactions}
+          periodFilter="6months"
+        />,
+      );
+
+      expect(screen.getByText("Tendência de Gastos")).toBeInTheDocument();
+      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+    });
+
+    it("deve funcionar com periodFilter='12months'", () => {
+      render(
+        <AdvancedExpenseAnalysis
+          transactions={mockTransactions}
+          periodFilter="12months"
         />,
       );
 
@@ -289,7 +286,7 @@ describe("AdvancedExpenseAnalysis", () => {
         <AdvancedExpenseAnalysis
           transactions={mockTransactions}
           selectedAccountId={1}
-          periodFilter="currentMonth"
+          periodFilter="3months"
           selectedMonth={currentDate.getMonth()}
           selectedYear={currentDate.getFullYear()}
         />,
@@ -305,7 +302,7 @@ describe("AdvancedExpenseAnalysis", () => {
         <AdvancedExpenseAnalysis
           transactions={mockTransactions}
           selectedCreditCardId={1}
-          periodFilter="currentMonth"
+          periodFilter="3months"
           selectedMonth={currentDate.getMonth()}
           selectedYear={currentDate.getFullYear()}
         />,
@@ -321,7 +318,7 @@ describe("AdvancedExpenseAnalysis", () => {
         <AdvancedExpenseAnalysis
           transactions={mockTransactions}
           selectedAccountId={1}
-          periodFilter="currentMonth"
+          periodFilter="3months"
           selectedMonth={currentDate.getMonth()}
           selectedYear={currentDate.getFullYear()}
         />,
@@ -356,7 +353,7 @@ describe("AdvancedExpenseAnalysis", () => {
       render(<AdvancedExpenseAnalysis transactions={[]} />);
 
       expect(screen.getByText("Nenhuma despesa registrada")).toBeInTheDocument();
-      expect(screen.getByText("neste mês")).toBeInTheDocument();
+      expect(screen.getByText("nos últimos 3 meses")).toBeInTheDocument();
     });
 
     it("deve lidar com transações apenas de receita", () => {
@@ -466,7 +463,7 @@ describe("AdvancedExpenseAnalysis", () => {
       render(
         <AdvancedExpenseAnalysis
           transactions={mockTransactions}
-          periodFilter="currentMonth"
+          periodFilter="3months"
         />,
       );
 
@@ -479,7 +476,7 @@ describe("AdvancedExpenseAnalysis", () => {
           transactions={mockTransactions}
           selectedMonth={6} // Julho
           selectedYear={2024}
-          periodFilter="currentMonth"
+          periodFilter="3months"
         />,
       );
 
@@ -491,7 +488,7 @@ describe("AdvancedExpenseAnalysis", () => {
     it("deve chamar useExpenseAnalysis com props corretos", () => {
       const props = {
         transactions: mockTransactions,
-        periodFilter: "currentMonth" as const,
+        periodFilter: "3months" as const,
         selectedMonth: 6,
         selectedYear: 2024,
         selectedAccountId: 1,
@@ -502,7 +499,7 @@ describe("AdvancedExpenseAnalysis", () => {
 
       expect(mockUseExpenseAnalysis).toHaveBeenCalledWith({
         transactions: mockTransactions,
-        periodFilter: "currentMonth",
+        periodFilter: "3months",
         selectedMonth: 6,
         selectedYear: 2024,
         selectedAccountId: 1,

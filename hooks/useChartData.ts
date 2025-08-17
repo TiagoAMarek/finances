@@ -173,6 +173,7 @@ export function useIncomeVsExpenseChartData(
   const dailyData = useDailyChartData(transactions, filter);
   const threeMonthsData = useMonthlyChartData(transactions, 3, filter);
   const sixMonthsData = useMonthlyChartData(transactions, 6, filter);
+  const twelveMonthsData = useMonthlyChartData(transactions, 12, filter);
 
   const weeklyData = useWeeklyChartData(
     transactions,
@@ -219,6 +220,9 @@ export function useIncomeVsExpenseChartData(
       case "6-months":
         return sixMonthsData;
 
+      case "12-months":
+        return twelveMonthsData;
+
       default:
         // If month/year are provided but no explicit periodType, treat as custom
         if (
@@ -241,9 +245,10 @@ export function useIncomeVsExpenseChartData(
     config.selectedYear,
     dailyData,
     threeMonthsData,
+    sixMonthsData,
+    twelveMonthsData,
     weeklyData,
     singleMonthData,
-    sixMonthsData,
     currentMonth,
     currentYear,
   ]);
@@ -291,6 +296,9 @@ export function useChartDescription(config: ChartConfig): string {
 
       case "6-months":
         return "Comparativo mensal dos últimos 6 meses";
+
+      case "12-months":
+        return "Comparativo mensal dos últimos 12 meses";
 
       default:
         // If month/year are provided but no explicit periodType, treat as custom

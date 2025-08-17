@@ -27,8 +27,9 @@ export type PeriodType =
   | "current-month"
   | "7-days"
   | "3-months"
-  | "custom"
-  | "6-months";
+  | "6-months"
+  | "12-months"
+  | "custom";
 
 /**
  * Chart configuration for different period types

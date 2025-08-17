@@ -4,7 +4,7 @@ import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
 
 interface ExpenseAnalysisContentProps {
   transactions: Transaction[];
-  periodFilter: "7days" | "currentMonth" | "3months";
+  periodFilter: "3months" | "6months" | "12months";
   isLoading?: boolean;
 }
 
@@ -14,14 +14,14 @@ export function ExpenseAnalysisContent({
   isLoading = false,
 }: ExpenseAnalysisContentProps) {
   // Mapear periodFilter para periodType do IncomeVsExpenseChart
-  const getPeriodType = (filter: "7days" | "currentMonth" | "3months") => {
+  const getPeriodType = (filter: "3months" | "6months" | "12months") => {
     switch (filter) {
-      case "7days":
-        return "7-days" as const;
-      case "currentMonth":
-        return "current-month" as const;
       case "3months":
         return "3-months" as const;
+      case "6months":
+        return "6-months" as const;
+      case "12months":
+        return "12-months" as const;
       default:
         return undefined;
     }
@@ -31,7 +31,6 @@ export function ExpenseAnalysisContent({
     <div className="space-y-8">
       {/* Visão Geral */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Visão Geral</h3>
         <IncomeVsExpenseChart
           transactions={transactions}
           periodType={getPeriodType(periodFilter)}
@@ -42,7 +41,6 @@ export function ExpenseAnalysisContent({
 
       {/* Análise Detalhada */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Análise Detalhada</h3>
         <AdvancedExpenseAnalysis
           transactions={transactions}
           selectedMonth={new Date().getMonth()}

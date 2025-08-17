@@ -29,7 +29,7 @@ export const AdvancedExpenseAnalysis = memo<AdvancedExpenseAnalysisProps>(
     selectedYear,
     selectedAccountId,
     selectedCreditCardId,
-    periodFilter = "currentMonth",
+    periodFilter = "3months",
   }) {
     // Use the custom hook for all data processing
     const analysisData = useExpenseAnalysis({

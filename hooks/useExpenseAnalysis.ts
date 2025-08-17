@@ -52,7 +52,7 @@ export interface UseExpenseAnalysisProps {
  */
 export function useExpenseAnalysis({
   transactions,
-  periodFilter = "currentMonth",
+  periodFilter = "3months",
   selectedMonth,
   selectedYear,
   selectedAccountId,
@@ -136,7 +136,7 @@ export function useExpenseAnalysis({
  */
 export function useFilteredExpenseTransactions({
   transactions,
-  periodFilter = "currentMonth",
+  periodFilter = "3months",
   selectedMonth,
   selectedYear,
   selectedAccountId,
@@ -177,7 +177,7 @@ export function useFilteredExpenseTransactions({
  */
 export function useExpenseStatistics({
   transactions,
-  periodFilter = "currentMonth",
+  periodFilter = "3months",
   selectedMonth,
   selectedYear,
   selectedAccountId,
