@@ -1,0 +1,62 @@
+import { Transaction } from "@/lib/schemas";
+import { PeriodType } from "@/lib/chart-utils";
+
+/**
+ * Date filter configuration
+ */
+export interface DateFilter {
+  selectedMonth: number;
+  selectedYear: number;
+}
+
+/**
+ * Account and credit card filter configuration
+ */
+export interface AccountFilter {
+  selectedAccountId?: number | null;
+  selectedCreditCardId?: number | null;
+}
+
+/**
+ * Props for IncomeVsExpenseChart component
+ */
+export interface IncomeVsExpenseChartProps {
+  /** Array of transactions to display in the chart */
+  transactions: Transaction[];
+  
+  /** Type of period to display (determines chart granularity) */
+  periodType?: PeriodType;
+  
+  /** Date filter configuration (preferred over individual month/year props) */
+  dateFilter?: DateFilter;
+  
+  /** Account filter configuration */
+  accountFilter?: AccountFilter;
+  
+  // Legacy props for backward compatibility - will be deprecated
+  /** @deprecated Use dateFilter.selectedMonth instead */
+  selectedMonth?: number;
+  /** @deprecated Use dateFilter.selectedYear instead */
+  selectedYear?: number;
+  /** @deprecated Use accountFilter.selectedAccountId instead */
+  selectedAccountId?: number | null;
+  /** @deprecated Use accountFilter.selectedCreditCardId instead */
+  selectedCreditCardId?: number | null;
+}
+
+/**
+ * Chart totals display data
+ */
+export interface ChartTotals {
+  totalIncomes: number;
+  totalExpenses: number;
+  netBalance: number;
+}
+
+/**
+ * Chart summary props for the summary section
+ */
+export interface ChartSummaryProps {
+  totals: ChartTotals;
+  className?: string;
+}

@@ -4,9 +4,14 @@
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production  
 - `pnpm lint` - Run ESLint with Next.js, TypeScript, and Prettier rules
+- `pnpm typecheck` - Run TypeScript compiler checks
+- `pnpm test` - Run all tests (Vitest with server and client projects)
+- `pnpm test:watch` - Run tests in watch mode
+- `pnpm test:server` - Run server-side tests only
+- `pnpm test:client` - Run client-side tests only
+- `pnpm test:coverage` - Run tests with coverage report
 - `pnpm drizzle-kit generate` - Generate database migrations
 - `pnpm drizzle-kit push` - Push schema changes to database
-- No test framework configured
 
 ## Code Style Guidelines
 - **Imports**: Use `@/` alias for root imports (components, lib, utils)
@@ -19,3 +24,4 @@
 - **Database**: Decimal values stored as strings, dates as ISO strings
 - **Authentication**: JWT tokens in localStorage, automatic 401 handling
 - **File Structure**: Pages in `app/[route]/page.tsx`, API routes in `app/api/[resource]/route.ts`
+- **Testing**: Vitest with separate server (Node.js) and client (jsdom) environments

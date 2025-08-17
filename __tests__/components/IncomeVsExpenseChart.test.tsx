@@ -383,6 +383,7 @@ describe("IncomeVsExpenseChart", () => {
         <IncomeVsExpenseChart
           transactions={mockTransactions}
           dateFilter={dateFilter}
+          periodType="custom"
         />,
       );
 
@@ -433,6 +434,7 @@ describe("IncomeVsExpenseChart", () => {
         <IncomeVsExpenseChart
           transactions={mockTransactions}
           dateFilter={dateFilter}
+          periodType="custom"
         />,
       );
 
