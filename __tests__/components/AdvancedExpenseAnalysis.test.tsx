@@ -1,8 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { AdvancedExpenseAnalysis } from "@/components/AdvancedExpenseAnalysis";
 import { Transaction } from "@/lib/schemas";
+import { useExpenseAnalysis } from "@/hooks/useExpenseAnalysis";
 
 // Mock do Recharts para evitar problemas de renderização em testes
 vi.mock("recharts", () => ({
@@ -19,6 +20,13 @@ vi.mock("recharts", () => ({
   XAxis: () => <div data-testid="x-axis" />,
   YAxis: () => <div data-testid="y-axis" />,
   Tooltip: () => <div data-testid="tooltip" />,
+}));
+
+// Mock dos custom hooks para permitir testes unitários isolados
+vi.mock("@/hooks/useExpenseAnalysis", () => ({
+  useExpenseAnalysis: vi.fn(),
+  useFilteredExpenseTransactions: vi.fn(),
+  useExpenseStatistics: vi.fn(),
 }));
 
 // Dados de teste - usando datas atuais para garantir que sejam encontradas
@@ -108,7 +116,38 @@ const mockTransactions: Transaction[] = [
   },
 ];
 
+// Mock default return for the hook
+const mockExpenseAnalysisData = {
+  chartData: [
+    { period: "Sem 1", total: 1000, transactions: 2, averagePerTransaction: 500 },
+    { period: "Sem 2", total: 1500, transactions: 3, averagePerTransaction: 500 },
+  ],
+  formattedChartData: [
+    { month: "Sem 1", total: 1000, transactions: 2 },
+    { month: "Sem 2", total: 1500, transactions: 3 },
+  ],
+  statistics: { max: 1500, min: 1000, average: 1250, total: 2500 },
+  isEmpty: false,
+  periodDescription: "neste mês",
+};
+
+const mockEmptyExpenseAnalysisData = {
+  chartData: [],
+  formattedChartData: [],
+  statistics: { max: 0, min: 0, average: 0, total: 0 },
+  isEmpty: true,
+  periodDescription: "neste mês",
+};
+
 describe("AdvancedExpenseAnalysis", () => {
+  const mockUseExpenseAnalysis = useExpenseAnalysis as unknown as ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    // Reset mocks before each test
+    vi.clearAllMocks();
+    // Default mock return
+    mockUseExpenseAnalysis.mockReturnValue(mockExpenseAnalysisData);
+  });
   describe("Renderização básica", () => {
     it("deve renderizar o componente com título e descrição", () => {
       render(<AdvancedExpenseAnalysis transactions={mockTransactions} />);
@@ -142,6 +181,9 @@ describe("AdvancedExpenseAnalysis", () => {
 
   describe("Estado vazio", () => {
     it("deve exibir estado vazio quando não há despesas", () => {
+      // Mock empty state
+      mockUseExpenseAnalysis.mockReturnValue(mockEmptyExpenseAnalysisData);
+
       const transactionsWithoutExpenses: Transaction[] = [
         {
           id: 1,
@@ -169,6 +211,12 @@ describe("AdvancedExpenseAnalysis", () => {
     });
 
     it("deve exibir mensagem correta para período de 7 dias", () => {
+      // Mock empty state with 7 days description
+      mockUseExpenseAnalysis.mockReturnValue({
+        ...mockEmptyExpenseAnalysisData,
+        periodDescription: "nos últimos 7 dias",
+      });
+
       render(
         <AdvancedExpenseAnalysis transactions={[]} periodFilter="7days" />,
       );
@@ -178,6 +226,12 @@ describe("AdvancedExpenseAnalysis", () => {
     });
 
     it("deve exibir mensagem correta para período de 3 meses", () => {
+      // Mock empty state with 3 months description
+      mockUseExpenseAnalysis.mockReturnValue({
+        ...mockEmptyExpenseAnalysisData,
+        periodDescription: "nos últimos 3 meses",
+      });
+
       render(
         <AdvancedExpenseAnalysis transactions={[]} periodFilter="3months" />,
       );
@@ -296,6 +350,9 @@ describe("AdvancedExpenseAnalysis", () => {
 
   describe("Casos edge", () => {
     it("deve lidar com array vazio de transações", () => {
+      // Mock empty state
+      mockUseExpenseAnalysis.mockReturnValue(mockEmptyExpenseAnalysisData);
+
       render(<AdvancedExpenseAnalysis transactions={[]} />);
 
       expect(screen.getByText("Nenhuma despesa registrada")).toBeInTheDocument();
@@ -303,6 +360,9 @@ describe("AdvancedExpenseAnalysis", () => {
     });
 
     it("deve lidar com transações apenas de receita", () => {
+      // Mock empty state
+      mockUseExpenseAnalysis.mockReturnValue(mockEmptyExpenseAnalysisData);
+
       const incomeOnlyTransactions: Transaction[] = [
         {
           id: 1,
@@ -424,6 +484,43 @@ describe("AdvancedExpenseAnalysis", () => {
       );
 
       expect(screen.getByText("Tendência de Gastos")).toBeInTheDocument();
+    });
+  });
+
+  describe("Integração com hook", () => {
+    it("deve chamar useExpenseAnalysis com props corretos", () => {
+      const props = {
+        transactions: mockTransactions,
+        periodFilter: "currentMonth" as const,
+        selectedMonth: 6,
+        selectedYear: 2024,
+        selectedAccountId: 1,
+        selectedCreditCardId: null,
+      };
+
+      render(<AdvancedExpenseAnalysis {...props} />);
+
+      expect(mockUseExpenseAnalysis).toHaveBeenCalledWith({
+        transactions: mockTransactions,
+        periodFilter: "currentMonth",
+        selectedMonth: 6,
+        selectedYear: 2024,
+        selectedAccountId: 1,
+        selectedCreditCardId: null,
+      });
+    });
+
+    it("deve renderizar dados retornados pelo hook", () => {
+      const customMockData = {
+        ...mockExpenseAnalysisData,
+        statistics: { max: 2000, min: 500, average: 1250, total: 3750 },
+      };
+      mockUseExpenseAnalysis.mockReturnValue(customMockData);
+
+      render(<AdvancedExpenseAnalysis transactions={mockTransactions} />);
+
+      expect(screen.getByText("Tendência de Gastos")).toBeInTheDocument();
+      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
     });
   });
 });
