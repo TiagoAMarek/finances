@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import { BankAccount, CreditCard } from "@/lib/schemas";
-import { useAccountCardFilters, FilterState } from "@/hooks/useAccountCardFilters";
+import {
+  useAccountCardFilters,
+  FilterState,
+} from "@/hooks/useAccountCardFilters";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Toggle } from "@/components/ui/toggle";
@@ -27,7 +30,7 @@ export function AccountCardFilter({
   accounts,
   creditCards,
   onFiltersChange,
-  className
+  className,
 }: AccountCardFilterProps) {
   const {
     filters,
@@ -39,7 +42,7 @@ export function AccountCardFilter({
     allCreditCardsSelected,
     activeFiltersCount,
     totalFiltersCount,
-    hasActiveFilters
+    hasActiveFilters,
   } = useAccountCardFilters({ accounts, creditCards });
 
   // Notificar mudanças nos filtros
@@ -57,15 +60,15 @@ export function AccountCardFilter({
         >
           <Filter className="h-4 w-4" />
           <span className="hidden sm:inline">Filtros</span>
-          <Badge 
-            variant={hasActiveFilters ? "default" : "secondary"} 
+          <Badge
+            variant={hasActiveFilters ? "default" : "secondary"}
             className="text-xs"
           >
             {activeFiltersCount}/{totalFiltersCount}
           </Badge>
         </Button>
       </PopoverTrigger>
-      
+
       <PopoverContent className="w-96 p-0" align="end">
         <div className="p-4 border-b">
           <h4 className="font-medium">Filtros de Contas e Cartões</h4>
@@ -73,7 +76,7 @@ export function AccountCardFilter({
             Selecione quais contas e cartões incluir nas análises
           </p>
         </div>
-        
+
         <ScrollArea className="max-h-80">
           <div className="p-4 space-y-6">
             {/* Seção de Contas */}
@@ -93,7 +96,7 @@ export function AccountCardFilter({
                     Todas
                   </Toggle>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {accounts.map((account) => (
                     <Toggle
@@ -114,9 +117,7 @@ export function AccountCardFilter({
             )}
 
             {/* Separador */}
-            {accounts.length > 0 && creditCards.length > 0 && (
-              <Separator />
-            )}
+            {accounts.length > 0 && creditCards.length > 0 && <Separator />}
 
             {/* Seção de Cartões */}
             {creditCards.length > 0 && (
@@ -135,7 +136,7 @@ export function AccountCardFilter({
                     Todos
                   </Toggle>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {creditCards.map((card) => (
                     <Toggle

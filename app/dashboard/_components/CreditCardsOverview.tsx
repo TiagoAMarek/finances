@@ -3,7 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CreditCard as CreditCardIcon, AlertTriangle, Plus, Settings } from "lucide-react";
+import {
+  CreditCard as CreditCardIcon,
+  AlertTriangle,
+  Plus,
+  Settings,
+} from "lucide-react";
 import { CreditCard } from "@/lib/schemas";
 
 interface CreditCardsOverviewProps {
@@ -12,14 +17,17 @@ interface CreditCardsOverviewProps {
 
 export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
   // Calcular total das faturas
-  const totalBills = creditCards.reduce((sum, card) => sum + parseFloat(card.currentBill), 0);
+  const totalBills = creditCards.reduce(
+    (sum, card) => sum + parseFloat(card.currentBill),
+    0,
+  );
 
   if (creditCards.length === 0) {
     return (
@@ -41,9 +49,7 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
               Nenhum cartão cadastrado
             </p>
             <Button asChild variant="outline" size="sm">
-              <Link href="/credit_cards">
-                Adicionar Cartão
-              </Link>
+              <Link href="/credit_cards">Adicionar Cartão</Link>
             </Button>
           </div>
         </CardContent>
@@ -78,7 +84,7 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
             </span>
           </div>
         </div>
-        
+
         {/* Lista de cartões */}
         <div className="space-y-3 flex-1">
           {creditCards.map((card) => {
@@ -86,7 +92,7 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
             const currentBill = parseFloat(card.currentBill);
             const usagePercentage = limit > 0 ? (currentBill / limit) * 100 : 0;
             const isHighUsage = usagePercentage > 80;
-            
+
             return (
               <div
                 key={card.id}
@@ -98,7 +104,9 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
                       <CreditCardIcon className="h-3 w-3 text-purple-500" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-sm truncate">{card.name}</p>
+                      <p className="font-medium text-sm truncate">
+                        {card.name}
+                      </p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span>Limite: {formatCurrency(limit)}</span>
                         {isHighUsage && (
@@ -110,7 +118,7 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-semibold text-red-600 dark:text-red-400">
                       {formatCurrency(currentBill)}
@@ -120,15 +128,15 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
                     </p>
                   </div>
                 </div>
-                
-                <Progress 
-                  value={usagePercentage} 
+
+                <Progress
+                  value={usagePercentage}
                   className={`h-2 ${
-                    isHighUsage 
-                      ? '[&>div]:bg-red-500' 
-                      : usagePercentage > 50 
-                        ? '[&>div]:bg-orange-500'
-                        : '[&>div]:bg-green-500'
+                    isHighUsage
+                      ? "[&>div]:bg-red-500"
+                      : usagePercentage > 50
+                        ? "[&>div]:bg-orange-500"
+                        : "[&>div]:bg-green-500"
                   }`}
                 />
               </div>

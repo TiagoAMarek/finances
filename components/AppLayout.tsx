@@ -1,9 +1,13 @@
 "use client";
 
-import { usePathname } from 'next/navigation';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/AppSidebar';
-import { Separator } from '@/components/ui/separator';
+import { usePathname } from "next/navigation";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,33 +22,29 @@ interface AppLayoutProps {
 }
 
 const routeMapping: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/accounts': 'Contas Bancárias',
-  '/credit_cards': 'Cartões de Crédito',
-  '/transactions': 'Lançamentos',
-  '/reports': 'Relatórios',
-  '/reports/performance': 'Performance Financeira',
-  '/reports/expense-analysis': 'Análise de Gastos',
-  '/reports/accounts': 'Análise por Contas',
-  '/reports/credit-cards': 'Análise por Cartões',
+  "/dashboard": "Dashboard",
+  "/accounts": "Contas Bancárias",
+  "/credit_cards": "Cartões de Crédito",
+  "/transactions": "Lançamentos",
+  "/reports": "Relatórios",
+  "/reports/performance": "Performance Financeira",
+  "/reports/expense-analysis": "Análise de Gastos",
+  "/reports/accounts": "Análise por Contas",
+  "/reports/credit-cards": "Análise por Cartões",
 };
 
 export function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
 
   // Routes that shouldn't show the sidebar
-  const publicRoutes = ['/login', '/register'];
+  const publicRoutes = ["/login", "/register"];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   if (isPublicRoute) {
-    return (
-      <div className="min-h-screen bg-background">
-        {children}
-      </div>
-    );
+    return <div className="min-h-screen bg-background">{children}</div>;
   }
 
-  const currentPageTitle = routeMapping[pathname] || 'Página';
+  const currentPageTitle = routeMapping[pathname] || "Página";
 
   return (
     <SidebarProvider>
@@ -57,11 +57,9 @@ export function AppLayout({ children }: AppLayoutProps) {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard">
-                    Dashboard
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
-                {pathname !== '/dashboard' && (
+                {pathname !== "/dashboard" && (
                   <>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>
@@ -73,9 +71,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </Breadcrumb>
           </div>
         </header>
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

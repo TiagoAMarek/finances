@@ -14,7 +14,7 @@ import { AdvancedExpenseAnalysisProps } from "./AdvancedExpenseAnalysis/types";
 
 /**
  * Advanced Expense Analysis Component - Refactored for performance and maintainability
- * 
+ *
  * Features:
  * - Modular architecture with specialized subcomponents
  * - Custom hooks for data processing and business logic
@@ -41,12 +41,8 @@ export const AdvancedExpenseAnalysis = memo<AdvancedExpenseAnalysisProps>(
       selectedCreditCardId,
     });
 
-    const {
-      formattedChartData,
-      statistics,
-      isEmpty,
-      periodDescription,
-    } = analysisData;
+    const { formattedChartData, statistics, isEmpty, periodDescription } =
+      analysisData;
 
     // Show empty state if no expense data is available
     if (isEmpty) {

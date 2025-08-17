@@ -1,7 +1,7 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   CreditCard,
@@ -12,9 +12,9 @@ import {
   TrendingUp,
   PieChart,
   Wallet,
-  Activity
-} from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+  Activity,
+} from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Sidebar,
   SidebarContent,
@@ -26,56 +26,56 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 
 const navLinks = [
   {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: Home
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: Home,
   },
   {
-    name: 'Contas Bancárias',
-    href: '/accounts',
-    icon: Banknote
+    name: "Contas Bancárias",
+    href: "/accounts",
+    icon: Banknote,
   },
   {
-    name: 'Cartões de Crédito',
-    href: '/credit_cards',
-    icon: CreditCard
+    name: "Cartões de Crédito",
+    href: "/credit_cards",
+    icon: CreditCard,
   },
   {
-    name: 'Lançamentos',
-    href: '/transactions',
-    icon: Receipt
+    name: "Lançamentos",
+    href: "/transactions",
+    icon: Receipt,
   },
 ];
 
 const reportLinks = [
   {
-    name: 'Relatórios',
-    href: '/reports',
-    icon: TrendingUp
+    name: "Relatórios",
+    href: "/reports",
+    icon: TrendingUp,
   },
   {
-    name: 'Performance Mensal',
-    href: '/reports/performance',
-    icon: Activity
+    name: "Performance Mensal",
+    href: "/reports/performance",
+    icon: Activity,
   },
   {
-    name: 'Análise de Gastos',
-    href: '/reports/expense-analysis',
-    icon: PieChart
+    name: "Análise de Gastos",
+    href: "/reports/expense-analysis",
+    icon: PieChart,
   },
   {
-    name: 'Análise por Contas',
-    href: '/reports/accounts',
-    icon: Wallet
+    name: "Análise por Contas",
+    href: "/reports/accounts",
+    icon: Wallet,
   },
   {
-    name: 'Análise por Cartões',
-    href: '/reports/credit-cards',
-    icon: CreditCard
+    name: "Análise por Cartões",
+    href: "/reports/credit-cards",
+    icon: CreditCard,
   },
 ];
 
@@ -84,8 +84,8 @@ export function AppSidebar() {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    router.push('/login');
+    localStorage.removeItem("access_token");
+    router.push("/login");
   };
 
   return (
@@ -99,7 +99,9 @@ export function AppSidebar() {
                   <Banknote className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Finanças Pessoais</span>
+                  <span className="truncate font-semibold">
+                    Finanças Pessoais
+                  </span>
                   <span className="truncate text-xs">Gerenciamento</span>
                 </div>
               </Link>
@@ -182,10 +184,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={handleLogout}
-              tooltip="Sair"
-            >
+            <SidebarMenuButton onClick={handleLogout} tooltip="Sair">
               <LogOut className="size-4" />
               <span>Sair</span>
             </SidebarMenuButton>

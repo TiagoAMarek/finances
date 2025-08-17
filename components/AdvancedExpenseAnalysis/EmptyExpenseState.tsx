@@ -17,7 +17,7 @@ interface EmptyExpenseStateProps {
 
 /**
  * Empty state component for when no expense data is available
- * 
+ *
  * Features:
  * - Clear messaging about lack of data
  * - Context-aware period description

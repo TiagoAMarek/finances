@@ -13,11 +13,7 @@ export function QuickCreateButton({
   className,
 }: QuickCreateButtonProps) {
   return (
-    <Button
-      size="sm"
-      onClick={onClick}
-      className={className}
-    >
+    <Button size="sm" onClick={onClick} className={className}>
       <Plus className="h-4 w-4" />
       <span className="hidden sm:inline">{children}</span>
     </Button>

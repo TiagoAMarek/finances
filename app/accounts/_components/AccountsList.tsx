@@ -2,7 +2,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { CreditCardIcon, Banknote, TrendingUpIcon, TrendingDownIcon } from "lucide-react";
+import {
+  CreditCardIcon,
+  Banknote,
+  TrendingUpIcon,
+  TrendingDownIcon,
+} from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 import { AccountItem } from "./AccountItem";
 
@@ -55,7 +60,7 @@ function AccountsListSkeleton() {
           </div>
           <Skeleton className="h-5 w-16 rounded-full" />
         </div>
-        
+
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -96,12 +101,11 @@ function EmptyState() {
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted/50 mb-6">
           <Banknote className="h-10 w-10 text-muted-foreground" />
         </div>
-        <h3 className="text-xl font-semibold mb-2">
-          Nenhuma conta cadastrada
-        </h3>
+        <h3 className="text-xl font-semibold mb-2">Nenhuma conta cadastrada</h3>
         <p className="text-muted-foreground mb-6 max-w-md">
-          Comece adicionando suas contas bancárias para ter uma visão completa das suas finanças.
-          Use o botão &quot;Nova Conta&quot; no topo da página.
+          Comece adicionando suas contas bancárias para ter uma visão completa
+          das suas finanças. Use o botão &quot;Nova Conta&quot; no topo da
+          página.
         </p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CreditCardIcon className="h-4 w-4" />
@@ -128,14 +132,21 @@ export function AccountsList({
   }
 
   // Calculate summary statistics
-  const totalBalance = accounts.reduce((sum, account) => sum + parseFloat(account.balance), 0);
-  const positiveAccounts = accounts.filter(account => parseFloat(account.balance) >= 0);
-  const negativeAccounts = accounts.filter(account => parseFloat(account.balance) < 0);
-  
+  const totalBalance = accounts.reduce(
+    (sum, account) => sum + parseFloat(account.balance),
+    0,
+  );
+  const positiveAccounts = accounts.filter(
+    (account) => parseFloat(account.balance) >= 0,
+  );
+  const negativeAccounts = accounts.filter(
+    (account) => parseFloat(account.balance) < 0,
+  );
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -146,18 +157,28 @@ export function AccountsList({
         {/* Saldo Total */}
         <div className="text-center py-2 md:py-0">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-              totalBalance >= 0 ? 'bg-primary/10' : 'bg-gray-500/10'
-            }`}>
-              <CreditCardIcon className={`h-4 w-4 ${
-                totalBalance >= 0 ? 'text-primary' : 'text-gray-500'
-              }`} />
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                totalBalance >= 0 ? "bg-primary/10" : "bg-gray-500/10"
+              }`}
+            >
+              <CreditCardIcon
+                className={`h-4 w-4 ${
+                  totalBalance >= 0 ? "text-primary" : "text-gray-500"
+                }`}
+              />
             </div>
-            <p className="text-sm font-medium text-muted-foreground">Saldo Total</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Saldo Total
+            </p>
           </div>
-          <p className={`text-2xl font-bold ${
-            totalBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-          }`}>
+          <p
+            className={`text-2xl font-bold ${
+              totalBalance >= 0
+                ? "text-green-600 dark:text-green-400"
+                : "text-red-600 dark:text-red-400"
+            }`}
+          >
             {formatCurrency(totalBalance)}
           </p>
         </div>
@@ -168,7 +189,9 @@ export function AccountsList({
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10">
               <TrendingUpIcon className="h-4 w-4 text-green-500" />
             </div>
-            <p className="text-sm font-medium text-muted-foreground">Contas Positivas</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Contas Positivas
+            </p>
           </div>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
             {positiveAccounts.length}
@@ -181,7 +204,9 @@ export function AccountsList({
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
               <TrendingDownIcon className="h-4 w-4 text-red-500" />
             </div>
-            <p className="text-sm font-medium text-muted-foreground">Contas Negativas</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Contas Negativas
+            </p>
           </div>
           <p className="text-2xl font-bold text-red-600 dark:text-red-400">
             {negativeAccounts.length}
@@ -196,13 +221,15 @@ export function AccountsList({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CreditCardIcon className="h-5 w-5 text-foreground" />
-            <h2 className="text-xl font-semibold text-foreground">Suas Contas Bancárias</h2>
+            <h2 className="text-xl font-semibold text-foreground">
+              Suas Contas Bancárias
+            </h2>
           </div>
           <Badge variant="secondary" className="text-xs">
-            {accounts.length} {accounts.length === 1 ? 'conta' : 'contas'}
+            {accounts.length} {accounts.length === 1 ? "conta" : "contas"}
           </Badge>
         </div>
-        
+
         <div className="space-y-3">
           {accounts.map((account) => (
             <AccountItem

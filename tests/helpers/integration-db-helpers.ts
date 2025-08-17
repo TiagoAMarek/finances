@@ -1,17 +1,22 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
-import { users, bankAccounts, creditCards, transactions } from '@/app/api/lib/schema';
-import { hashPassword } from '@/app/api/lib/auth';
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
+import {
+  users,
+  bankAccounts,
+  creditCards,
+  transactions,
+} from "@/app/api/lib/schema";
+import { hashPassword } from "@/app/api/lib/auth";
 
 // Create a real SQLite in-memory database for integration tests
 export function createIntegrationTestDb() {
-  const sqlite = new Database(':memory:');
-  
+  const sqlite = new Database(":memory:");
+
   // Enable foreign keys
-  sqlite.exec('PRAGMA foreign_keys = ON;');
-  
+  sqlite.exec("PRAGMA foreign_keys = ON;");
+
   const db = drizzle(sqlite, {
-    schema: { users, bankAccounts, creditCards, transactions }
+    schema: { users, bankAccounts, creditCards, transactions },
   });
 
   // Create tables manually since we're using in-memory
@@ -71,19 +76,22 @@ export function createIntegrationTestDb() {
 // Helper to create a test user with hashed password
 export async function createTestUser(
   db: any,
-  userData: { email?: string; password?: string } = {}
+  userData: { email?: string; password?: string } = {},
 ) {
-  const email = userData.email || 'test@example.com';
-  const plainPassword = userData.password || '123456';
+  const email = userData.email || "test@example.com";
+  const plainPassword = userData.password || "123456";
   const hashedPassword = await hashPassword(plainPassword);
 
-  const [user] = await db.insert(users).values({
-    email,
-    hashedPassword,
-  }).returning({
-    id: users.id,
-    email: users.email,
-  });
+  const [user] = await db
+    .insert(users)
+    .values({
+      email,
+      hashedPassword,
+    })
+    .returning({
+      id: users.id,
+      email: users.email,
+    });
 
   return {
     user,
@@ -95,13 +103,16 @@ export async function createTestUser(
 export async function createTestBankAccount(
   db: any,
   userId: number,
-  accountData: { name?: string; balance?: string } = {}
+  accountData: { name?: string; balance?: string } = {},
 ) {
-  const [account] = await db.insert(bankAccounts).values({
-    ownerId: userId,
-    name: accountData.name || 'Test Account',
-    balance: accountData.balance || '1000.00',
-  }).returning();
+  const [account] = await db
+    .insert(bankAccounts)
+    .values({
+      ownerId: userId,
+      name: accountData.name || "Test Account",
+      balance: accountData.balance || "1000.00",
+    })
+    .returning();
 
   return account;
 }
@@ -110,14 +121,17 @@ export async function createTestBankAccount(
 export async function createTestCreditCard(
   db: any,
   userId: number,
-  cardData: { name?: string; limit?: string } = {}
+  cardData: { name?: string; limit?: string } = {},
 ) {
-  const [card] = await db.insert(creditCards).values({
-    ownerId: userId,
-    name: cardData.name || 'Test Card',
-    limit: cardData.limit || '5000.00',
-    currentBill: '0.00',
-  }).returning();
+  const [card] = await db
+    .insert(creditCards)
+    .values({
+      ownerId: userId,
+      name: cardData.name || "Test Card",
+      limit: cardData.limit || "5000.00",
+      currentBill: "0.00",
+    })
+    .returning();
 
   return card;
 }
@@ -127,36 +141,39 @@ export async function createTestTransaction(
   db: any,
   userId: number,
   transactionData: {
-    type?: 'income' | 'expense' | 'transfer';
+    type?: "income" | "expense" | "transfer";
     amount?: string;
     description?: string;
     date?: string;
     category?: string;
     accountId?: number;
     creditCardId?: number;
-  } = {}
+  } = {},
 ) {
-  const [transaction] = await db.insert(transactions).values({
-    ownerId: userId,
-    type: transactionData.type || 'expense',
-    amount: transactionData.amount || '100.00',
-    description: transactionData.description || 'Test Transaction',
-    date: transactionData.date || new Date().toISOString().split('T')[0],
-    category: transactionData.category || 'General',
-    accountId: transactionData.accountId || null,
-    creditCardId: transactionData.creditCardId || null,
-  }).returning();
+  const [transaction] = await db
+    .insert(transactions)
+    .values({
+      ownerId: userId,
+      type: transactionData.type || "expense",
+      amount: transactionData.amount || "100.00",
+      description: transactionData.description || "Test Transaction",
+      date: transactionData.date || new Date().toISOString().split("T")[0],
+      category: transactionData.category || "General",
+      accountId: transactionData.accountId || null,
+      creditCardId: transactionData.creditCardId || null,
+    })
+    .returning();
 
   return transaction;
 }
 
 // Helper to clean up database between tests
 export function cleanupTestDb(sqlite: Database.Database) {
-  sqlite.exec('DELETE FROM transactions;');
-  sqlite.exec('DELETE FROM credit_cards;');
-  sqlite.exec('DELETE FROM bank_accounts;');
-  sqlite.exec('DELETE FROM users;');
-  
+  sqlite.exec("DELETE FROM transactions;");
+  sqlite.exec("DELETE FROM credit_cards;");
+  sqlite.exec("DELETE FROM bank_accounts;");
+  sqlite.exec("DELETE FROM users;");
+
   // Reset auto-increment counters
-  sqlite.exec('DELETE FROM sqlite_sequence;');
+  sqlite.exec("DELETE FROM sqlite_sequence;");
 }

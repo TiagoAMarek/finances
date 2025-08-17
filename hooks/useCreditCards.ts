@@ -1,15 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchWithAuth } from '@/utils/api';
-import { CreditCard, CreditCardCreateInput } from '@/lib/schemas';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/utils/api";
+import { CreditCard, CreditCardCreateInput } from "@/lib/schemas";
 
 // Fetch Credit Cards
 export const useCreditCards = () => {
-  return useQuery<CreditCard[]>({ 
-    queryKey: ['creditCards'],
+  return useQuery<CreditCard[]>({
+    queryKey: ["creditCards"],
     queryFn: async () => {
-      const response = await fetchWithAuth('/api/credit_cards');
+      const response = await fetchWithAuth("/api/credit_cards");
       if (!response.ok) {
-        throw new Error('Erro ao carregar cartões de crédito.');
+        throw new Error("Erro ao carregar cartões de crédito.");
       }
       return response.json();
     },
@@ -21,19 +21,19 @@ export const useCreateCreditCard = () => {
   const queryClient = useQueryClient();
   return useMutation<CreditCard, Error, CreditCardCreateInput>({
     mutationFn: async (newCard) => {
-      const response = await fetchWithAuth('/api/credit_cards', {
-        method: 'POST',
+      const response = await fetchWithAuth("/api/credit_cards", {
+        method: "POST",
         body: JSON.stringify(newCard),
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Erro ao criar cartão de crédito.');
+        throw new Error(errorData.detail || "Erro ao criar cartão de crédito.");
       }
       const data = await response.json();
       return data.card; // Extract card from response
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['creditCards'] });
+      queryClient.invalidateQueries({ queryKey: ["creditCards"] });
     },
   });
 };
@@ -43,19 +43,24 @@ export const useUpdateCreditCard = () => {
   const queryClient = useQueryClient();
   return useMutation<CreditCard, Error, CreditCard>({
     mutationFn: async (updatedCard) => {
-      const response = await fetchWithAuth(`/api/credit_cards/${updatedCard.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(updatedCard),
-      });
+      const response = await fetchWithAuth(
+        `/api/credit_cards/${updatedCard.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(updatedCard),
+        },
+      );
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Erro ao atualizar cartão de crédito.');
+        throw new Error(
+          errorData.detail || "Erro ao atualizar cartão de crédito.",
+        );
       }
       const data = await response.json();
       return data.card; // Extract card from response
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['creditCards'] });
+      queryClient.invalidateQueries({ queryKey: ["creditCards"] });
     },
   });
 };
@@ -66,15 +71,17 @@ export const useDeleteCreditCard = () => {
   return useMutation<void, Error, number>({
     mutationFn: async (cardId) => {
       const response = await fetchWithAuth(`/api/credit_cards/${cardId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Erro ao excluir cartão de crédito.');
+        throw new Error(
+          errorData.detail || "Erro ao excluir cartão de crédito.",
+        );
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['creditCards'] });
+      queryClient.invalidateQueries({ queryKey: ["creditCards"] });
     },
   });
 };

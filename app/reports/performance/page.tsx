@@ -14,25 +14,20 @@ import { WeeklyIncomeVsExpenseChart } from "../../dashboard/_components/WeeklyIn
 import { PeriodSelector } from "../_components/PeriodSelector";
 
 const PerformancePage: NextPage = () => {
-
   // Estados dos filtros
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [accountCardFilters, setAccountCardFilters] = useState<FilterState>({
     accounts: [],
-    creditCards: []
+    creditCards: [],
   });
 
   // Usar hook para buscar e filtrar dados
-  const { 
-    filteredTransactions, 
-    accounts, 
-    creditCards, 
-    isLoading 
-  } = useFilteredTransactions({
-    accountCardFilters,
-    dateFilter: { selectedMonth, selectedYear }
-  });
+  const { filteredTransactions, accounts, creditCards, isLoading } =
+    useFilteredTransactions({
+      accountCardFilters,
+      dateFilter: { selectedMonth, selectedYear },
+    });
 
   const monthlyIncomes = filteredTransactions
     .filter((t) => t.type === "income")
@@ -146,4 +141,3 @@ const PerformancePage: NextPage = () => {
 };
 
 export default PerformancePage;
-

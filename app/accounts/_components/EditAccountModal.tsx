@@ -10,7 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { EditIcon, CreditCardIcon, DollarSignIcon, Loader2Icon, SaveIcon } from "lucide-react";
+import {
+  EditIcon,
+  CreditCardIcon,
+  DollarSignIcon,
+  Loader2Icon,
+  SaveIcon,
+} from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 
 interface EditAccountModalProps {
@@ -41,7 +47,7 @@ export function EditAccountModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!account) return;
-    
+
     onSave({
       ...account,
       name,
@@ -62,9 +68,9 @@ export function EditAccountModal({
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -104,7 +110,10 @@ export function EditAccountModal({
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="editAccountName" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="editAccountName"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <CreditCardIcon className="h-4 w-4" />
                   Nome da Conta
                 </Label>
@@ -124,7 +133,10 @@ export function EditAccountModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="editAccountBalance" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="editAccountBalance"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <DollarSignIcon className="h-4 w-4" />
                   Saldo Atual
                 </Label>
@@ -136,7 +148,9 @@ export function EditAccountModal({
                     type="number"
                     id="editAccountBalance"
                     value={balance || ""}
-                    onChange={(e) => setBalance(parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      setBalance(parseFloat(e.target.value) || 0)
+                    }
                     placeholder="0,00"
                     className="h-11 pl-10"
                     step="0.01"
@@ -147,7 +161,6 @@ export function EditAccountModal({
                   Atualize o saldo atual da sua conta bancária
                 </p>
               </div>
-
 
               <div className="flex gap-3 pt-4">
                 <Button

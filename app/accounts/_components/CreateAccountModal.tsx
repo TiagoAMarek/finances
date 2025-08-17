@@ -11,7 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
-import { PlusIcon, CreditCardIcon, DollarSignIcon, Loader2Icon } from "lucide-react";
+import {
+  PlusIcon,
+  CreditCardIcon,
+  DollarSignIcon,
+  Loader2Icon,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface CreateAccountModalProps {
@@ -74,7 +79,10 @@ export function CreateAccountModal({
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="accountName" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="accountName"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <CreditCardIcon className="h-4 w-4" />
                   Nome da Conta
                 </Label>
@@ -94,7 +102,10 @@ export function CreateAccountModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="accountBalance" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="accountBalance"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <DollarSignIcon className="h-4 w-4" />
                   Saldo Inicial
                 </Label>
@@ -106,7 +117,9 @@ export function CreateAccountModal({
                     type="number"
                     id="accountBalance"
                     value={balance || ""}
-                    onChange={(e) => setBalance(parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      setBalance(parseFloat(e.target.value) || 0)
+                    }
                     placeholder="0,00"
                     className="h-11 pl-10"
                     step="0.01"
@@ -118,7 +131,6 @@ export function CreateAccountModal({
                   Informe o saldo atual da sua conta bancária
                 </p>
               </div>
-
 
               <div className="flex gap-3 pt-4">
                 <Button

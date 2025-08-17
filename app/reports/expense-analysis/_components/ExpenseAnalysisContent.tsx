@@ -11,7 +11,7 @@ interface ExpenseAnalysisContentProps {
 export function ExpenseAnalysisContent({
   transactions,
   periodFilter,
-  isLoading = false
+  isLoading = false,
 }: ExpenseAnalysisContentProps) {
   // Mapear periodFilter para periodType do IncomeVsExpenseChart
   const getPeriodType = (filter: "7days" | "currentMonth" | "3months") => {

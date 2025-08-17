@@ -10,11 +10,14 @@ interface AccountsOverviewProps {
   totalBalance: number;
 }
 
-export function AccountsOverview({ accounts, totalBalance }: AccountsOverviewProps) {
+export function AccountsOverview({
+  accounts,
+  totalBalance,
+}: AccountsOverviewProps) {
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -38,9 +41,7 @@ export function AccountsOverview({ accounts, totalBalance }: AccountsOverviewPro
               Nenhuma conta cadastrada
             </p>
             <Button asChild variant="outline" size="sm">
-              <Link href="/accounts">
-                Adicionar Conta
-              </Link>
+              <Link href="/accounts">Adicionar Conta</Link>
             </Button>
           </div>
         </CardContent>
@@ -70,20 +71,24 @@ export function AccountsOverview({ accounts, totalBalance }: AccountsOverviewPro
             <span className="text-sm font-medium text-muted-foreground">
               Saldo Total
             </span>
-            <span className={`text-xl font-bold ${
-              totalBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-            }`}>
+            <span
+              className={`text-xl font-bold ${
+                totalBalance >= 0
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-red-600 dark:text-red-400"
+              }`}
+            >
               {formatCurrency(totalBalance)}
             </span>
           </div>
         </div>
-        
+
         {/* Lista de contas */}
         <div className="space-y-2 flex-1">
           {accounts.map((account) => {
             const balance = parseFloat(account.balance);
             const isPositive = balance >= 0;
-            
+
             return (
               <div
                 key={account.id}
@@ -94,14 +99,20 @@ export function AccountsOverview({ accounts, totalBalance }: AccountsOverviewPro
                     <Banknote className="h-3 w-3 text-blue-500" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{account.name}</p>
+                    <p className="font-medium text-sm truncate">
+                      {account.name}
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="text-right flex-shrink-0">
-                  <span className={`font-semibold text-sm ${
-                    isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                  }`}>
+                  <span
+                    className={`font-semibold text-sm ${
+                      isPositive
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
                     {formatCurrency(balance)}
                   </span>
                 </div>

@@ -43,7 +43,7 @@ export interface UseExpenseAnalysisProps {
 
 /**
  * Custom hook for expense analysis data processing
- * 
+ *
  * Handles all business logic for expense trend analysis including:
  * - Transaction filtering by account/credit card
  * - Period-based data generation
@@ -130,7 +130,7 @@ export function useExpenseAnalysis({
 
 /**
  * Hook for getting filtered expense transactions
- * 
+ *
  * Useful for components that only need the filtered transaction data
  * without the full analysis processing
  */
@@ -172,7 +172,7 @@ export function useFilteredExpenseTransactions({
 
 /**
  * Hook for expense statistics only
- * 
+ *
  * Lightweight hook for components that only need statistical data
  */
 export function useExpenseStatistics({

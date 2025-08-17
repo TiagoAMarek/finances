@@ -14,7 +14,8 @@ import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
 
 const AccountsAnalysisPage: NextPage = () => {
   const { isLoading: isLoadingAccounts } = useAccounts();
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
+  const { data: transactions = [], isLoading: isLoadingTransactions } =
+    useTransactions();
 
   const isLoading = isLoadingAccounts || isLoadingTransactions;
 
@@ -24,7 +25,7 @@ const AccountsAnalysisPage: NextPage = () => {
 
   // Filtrar dados específicos para contas
   const getAccountData = () => {
-    return transactions.filter(t => {
+    return transactions.filter((t) => {
       if (t.accountId === null) return false;
 
       const transactionDate = new Date(t.date);

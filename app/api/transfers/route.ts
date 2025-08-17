@@ -1,16 +1,21 @@
-import { NextRequest } from 'next/server';
-import { eq, and, sql } from 'drizzle-orm';
-import { db } from '../lib/db';
-import { transactions, bankAccounts } from '../lib/schema';
-import { TransferCreateSchema } from '../lib/validation';
-import { getUserFromRequest, createErrorResponse, createSuccessResponse, handleZodError } from '../lib/auth';
+import { NextRequest } from "next/server";
+import { eq, and, sql } from "drizzle-orm";
+import { db } from "../lib/db";
+import { transactions, bankAccounts } from "../lib/schema";
+import { TransferCreateSchema } from "../lib/validation";
+import {
+  getUserFromRequest,
+  createErrorResponse,
+  createSuccessResponse,
+  handleZodError,
+} from "../lib/auth";
 
 // POST /api/transfers - Create transfer between accounts
 export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
-  
+
   if (!user) {
-    return createErrorResponse('Unauthorized', 401);
+    return createErrorResponse("Unauthorized", 401);
   }
 
   try {
@@ -18,59 +23,80 @@ export async function POST(request: NextRequest) {
     const validatedData = TransferCreateSchema.parse(body);
 
     // Validate both accounts exist and belong to user
-    const [fromAccount] = await db.select().from(bankAccounts)
-      .where(and(eq(bankAccounts.id, validatedData.fromAccountId), eq(bankAccounts.ownerId, user.userId)))
+    const [fromAccount] = await db
+      .select()
+      .from(bankAccounts)
+      .where(
+        and(
+          eq(bankAccounts.id, validatedData.fromAccountId),
+          eq(bankAccounts.ownerId, user.userId),
+        ),
+      )
       .limit(1);
-    
+
     if (!fromAccount) {
-      return createErrorResponse('Source account not found', 404);
+      return createErrorResponse("Source account not found", 404);
     }
 
-    const [toAccount] = await db.select().from(bankAccounts)
-      .where(and(eq(bankAccounts.id, validatedData.toAccountId), eq(bankAccounts.ownerId, user.userId)))
+    const [toAccount] = await db
+      .select()
+      .from(bankAccounts)
+      .where(
+        and(
+          eq(bankAccounts.id, validatedData.toAccountId),
+          eq(bankAccounts.ownerId, user.userId),
+        ),
+      )
       .limit(1);
-    
+
     if (!toAccount) {
-      return createErrorResponse('Destination account not found', 404);
+      return createErrorResponse("Destination account not found", 404);
     }
 
     // Check if source account has sufficient balance
     const currentBalance = parseFloat(fromAccount.balance);
     if (currentBalance < parseFloat(validatedData.amount)) {
-      return createErrorResponse('Insufficient balance in source account', 400);
+      return createErrorResponse("Insufficient balance in source account", 400);
     }
 
     // Create transfer transaction
-    const [newTransfer] = await db.insert(transactions).values({
-      description: validatedData.description,
-      amount: validatedData.amount.toString(),
-      type: 'transfer',
-      date: validatedData.date, // Already a string in ISO format
-      category: 'Transfer',
-      ownerId: user.userId,
-      accountId: validatedData.fromAccountId,
-      toAccountId: validatedData.toAccountId,
-    }).returning();
+    const [newTransfer] = await db
+      .insert(transactions)
+      .values({
+        description: validatedData.description,
+        amount: validatedData.amount.toString(),
+        type: "transfer",
+        date: validatedData.date, // Already a string in ISO format
+        category: "Transfer",
+        ownerId: user.userId,
+        accountId: validatedData.fromAccountId,
+        toAccountId: validatedData.toAccountId,
+      })
+      .returning();
 
     // Update account balances
-    await db.update(bankAccounts)
+    await db
+      .update(bankAccounts)
       .set({ balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}` })
       .where(eq(bankAccounts.id, validatedData.fromAccountId));
-      
-    await db.update(bankAccounts)
+
+    await db
+      .update(bankAccounts)
       .set({ balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}` })
       .where(eq(bankAccounts.id, validatedData.toAccountId));
 
-    return createSuccessResponse({
-      message: 'Transfer created successfully',
-      transaction: newTransfer,
-    }, 201);
-
+    return createSuccessResponse(
+      {
+        message: "Transfer created successfully",
+        transaction: newTransfer,
+      },
+      201,
+    );
   } catch (error) {
     const zodErrorResponse = handleZodError(error);
     if (zodErrorResponse) return zodErrorResponse;
-    
-    console.error('Create transfer error:', error);
-    return createErrorResponse('Internal server error', 500);
+
+    console.error("Create transfer error:", error);
+    return createErrorResponse("Internal server error", 500);
   }
 }

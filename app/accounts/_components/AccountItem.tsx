@@ -11,7 +11,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { EditIcon, TrashIcon, CreditCardIcon, TrendingUpIcon, TrendingDownIcon } from "lucide-react";
+import {
+  EditIcon,
+  TrashIcon,
+  CreditCardIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+} from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 
 interface AccountItemProps {
@@ -28,14 +34,14 @@ export function AccountItem({
   isDeleting,
 }: AccountItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  
+
   const balance = parseFloat(account.balance);
   const isPositive = balance >= 0;
-  
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -52,23 +58,27 @@ export function AccountItem({
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
               <CreditCardIcon className="h-6 w-6 text-primary" />
             </div>
-            
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
                 <h3 className="text-lg font-semibold text-foreground truncate">
                   {account.name}
                 </h3>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 {isPositive ? (
                   <TrendingUpIcon className="h-4 w-4 text-green-500" />
                 ) : (
                   <TrendingDownIcon className="h-4 w-4 text-red-500" />
                 )}
-                <span className={`text-xl font-bold ${
-                  isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                }`}>
+                <span
+                  className={`text-xl font-bold ${
+                    isPositive
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                  }`}
+                >
                   {formatCurrency(Math.abs(balance))}
                 </span>
                 {!isPositive && (
@@ -77,7 +87,7 @@ export function AccountItem({
                   </Badge>
                 )}
               </div>
-              
+
               <p className="text-xs text-muted-foreground mt-1">
                 Saldo disponível na conta
               </p>
@@ -94,7 +104,7 @@ export function AccountItem({
               <EditIcon className="h-4 w-4 mr-1" />
               Editar
             </Button>
-            
+
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
               <DialogTrigger asChild>
                 <Button
@@ -112,13 +122,16 @@ export function AccountItem({
                     <TrashIcon className="h-6 w-6 text-destructive" />
                   </div>
                   <div className="space-y-1">
-                    <DialogTitle className="text-xl">Confirmar Exclusão</DialogTitle>
+                    <DialogTitle className="text-xl">
+                      Confirmar Exclusão
+                    </DialogTitle>
                     <DialogDescription className="text-sm">
-                      Esta ação não pode ser desfeita e removerá permanentemente a conta.
+                      Esta ação não pode ser desfeita e removerá permanentemente
+                      a conta.
                     </DialogDescription>
                   </div>
                 </DialogHeader>
-                
+
                 <div className="bg-muted/50 rounded-lg p-4 border border-dashed">
                   <div className="text-center">
                     <p className="font-medium text-foreground">
@@ -129,7 +142,7 @@ export function AccountItem({
                     </p>
                   </div>
                 </div>
-                
+
                 <DialogFooter className="flex gap-3 sm:gap-3">
                   <Button
                     variant="outline"

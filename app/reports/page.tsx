@@ -275,4 +275,3 @@ const ReportsPage: NextPage = () => {
 };
 
 export default ReportsPage;
-

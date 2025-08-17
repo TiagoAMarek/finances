@@ -11,7 +11,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { EditIcon, TrashIcon, Receipt, TrendingUp, TrendingDown, CreditCardIcon, BanknoteIcon } from "lucide-react";
+import {
+  EditIcon,
+  TrashIcon,
+  Receipt,
+  TrendingUp,
+  TrendingDown,
+  CreditCardIcon,
+  BanknoteIcon,
+} from "lucide-react";
 import { Transaction } from "@/lib/schemas";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useCreditCards } from "@/hooks/useCreditCards";
@@ -30,23 +38,25 @@ export function TransactionItem({
   isDeleting,
 }: TransactionItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  
+
   const { data: accounts = [] } = useAccounts();
   const { data: creditCards = [] } = useCreditCards();
-  
-  const account = accounts.find(acc => acc.id === transaction.accountId);
-  const creditCard = creditCards.find(card => card.id === transaction.creditCardId);
-  const isIncome = transaction.type === 'income';
-  
+
+  const account = accounts.find((acc) => acc.id === transaction.accountId);
+  const creditCard = creditCards.find(
+    (card) => card.id === transaction.creditCardId,
+  );
+  const isIncome = transaction.type === "income";
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
   const handleDelete = () => {
@@ -59,29 +69,31 @@ export function TransactionItem({
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4 flex-1">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0 ${
-              isIncome ? 'bg-green-500/10' : 'bg-red-500/10'
-            }`}>
+            <div
+              className={`flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0 ${
+                isIncome ? "bg-green-500/10" : "bg-red-500/10"
+              }`}
+            >
               {isIncome ? (
                 <TrendingUp className="h-6 w-6 text-green-500" />
               ) : (
                 <TrendingDown className="h-6 w-6 text-red-500" />
               )}
             </div>
-            
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
                 <h3 className="text-lg font-semibold text-foreground truncate">
                   {transaction.description}
                 </h3>
-                <Badge 
-                  variant={isIncome ? 'default' : 'destructive'} 
+                <Badge
+                  variant={isIncome ? "default" : "destructive"}
                   className="text-xs flex-shrink-0"
                 >
-                  {isIncome ? 'Receita' : 'Despesa'}
+                  {isIncome ? "Receita" : "Despesa"}
                 </Badge>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                   <span className="flex items-center gap-1">
@@ -91,7 +103,7 @@ export function TransactionItem({
                   <span>•</span>
                   <span>{formatDate(transaction.date)}</span>
                 </div>
-                
+
                 {(account || creditCard) && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     {account && (
@@ -114,13 +126,17 @@ export function TransactionItem({
 
           <div className="flex items-center gap-2 ml-4 flex-shrink-0">
             <div className="text-right">
-              <span className={`text-xl font-bold ${
-                isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-              }`}>
+              <span
+                className={`text-xl font-bold ${
+                  isIncome
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
                 {formatCurrency(parseFloat(transaction.amount))}
               </span>
             </div>
-            
+
             <div className="flex items-center gap-1 ml-4">
               <Button
                 variant="ghost"
@@ -131,8 +147,11 @@ export function TransactionItem({
                 <EditIcon className="h-4 w-4 mr-1" />
                 Editar
               </Button>
-              
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+
+              <Dialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button
                     variant="ghost"
@@ -149,24 +168,28 @@ export function TransactionItem({
                       <TrashIcon className="h-6 w-6 text-destructive" />
                     </div>
                     <div className="space-y-1">
-                      <DialogTitle className="text-xl">Confirmar Exclusão</DialogTitle>
+                      <DialogTitle className="text-xl">
+                        Confirmar Exclusão
+                      </DialogTitle>
                       <DialogDescription className="text-sm">
-                        Esta ação não pode ser desfeita e removerá permanentemente o lançamento.
+                        Esta ação não pode ser desfeita e removerá
+                        permanentemente o lançamento.
                       </DialogDescription>
                     </div>
                   </DialogHeader>
-                  
+
                   <div className="bg-muted/50 rounded-lg p-4 border border-dashed">
                     <div className="text-center">
                       <p className="font-medium text-foreground">
                         {transaction.description}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {formatCurrency(parseFloat(transaction.amount))} • {transaction.category}
+                        {formatCurrency(parseFloat(transaction.amount))} •{" "}
+                        {transaction.category}
                       </p>
                     </div>
                   </div>
-                  
+
                   <DialogFooter className="flex gap-3 sm:gap-3">
                     <Button
                       variant="outline"

@@ -1,23 +1,23 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    router.push('/login');
+    localStorage.removeItem("access_token");
+    router.push("/login");
   };
 
   const navLinks = [
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Contas', href: '/accounts' },
-    { name: 'Cartões', href: '/credit_cards' },
-    { name: 'Transações', href: '/transactions' },
-    { name: 'Resumo Mensal', href: '/monthly_overview' },
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Contas", href: "/accounts" },
+    { name: "Cartões", href: "/credit_cards" },
+    { name: "Transações", href: "/transactions" },
+    { name: "Resumo Mensal", href: "/monthly_overview" },
   ];
 
   return (
@@ -31,7 +31,7 @@ const Navbar = () => {
             <Link
               key={link.name}
               href={link.href}
-              className={`rounded-md px-3 py-2 text-sm font-medium ${pathname === link.href ? 'bg-gray-900' : 'hover:bg-gray-700'}`}
+              className={`rounded-md px-3 py-2 text-sm font-medium ${pathname === link.href ? "bg-gray-900" : "hover:bg-gray-700"}`}
             >
               {link.name}
             </Link>

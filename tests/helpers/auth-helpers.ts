@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
 
 // Simple helper functions for unit tests (no database dependencies)
 
@@ -10,25 +10,26 @@ export const createNextRequest = (
     body?: any;
     token?: string;
     headers?: Record<string, string>;
-  } = {}
+  } = {},
 ): NextRequest => {
-  const { method = 'GET', body, token, headers = {} } = options;
-  
+  const { method = "GET", body, token, headers = {} } = options;
+
   const requestHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...headers,
   };
 
   if (token) {
-    requestHeaders['Authorization'] = `Bearer ${token}`;
+    requestHeaders["Authorization"] = `Bearer ${token}`;
   }
 
   const requestInit = {
     method,
     headers: requestHeaders,
-    ...(body && method !== 'GET' && {
-      body: typeof body === 'string' ? body : JSON.stringify(body)
-    })
+    ...(body &&
+      method !== "GET" && {
+        body: typeof body === "string" ? body : JSON.stringify(body),
+      }),
   };
 
   return new NextRequest(url, requestInit);
@@ -40,14 +41,14 @@ export const createMockRequest = createNextRequest;
 // Create authorization header for requests
 export const createAuthHeader = (token: string): Record<string, string> => {
   return {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   };
 };
 
 // Create unauthorized request (no token)
 export const createUnauthorizedHeaders = (): Record<string, string> => {
   return {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 };

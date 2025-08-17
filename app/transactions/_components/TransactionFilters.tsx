@@ -11,13 +11,19 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FilterIcon, SearchIcon, CalendarIcon, TagIcon, XIcon } from "lucide-react";
+import {
+  FilterIcon,
+  SearchIcon,
+  CalendarIcon,
+  TagIcon,
+  XIcon,
+} from "lucide-react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useCreditCards } from "@/hooks/useCreditCards";
 
 export interface TransactionFilters {
   search: string;
-  type: 'all' | 'income' | 'expense';
+  type: "all" | "income" | "expense";
   category: string;
   accountId: string;
   creditCardId: string;
@@ -49,19 +55,19 @@ export function TransactionFiltersComponent({
 
   const clearFilters = () => {
     onFiltersChange({
-      search: '',
-      type: 'all',
-      category: '',
-      accountId: '',
-      creditCardId: '',
-      dateFrom: '',
-      dateTo: '',
+      search: "",
+      type: "all",
+      category: "",
+      accountId: "",
+      creditCardId: "",
+      dateFrom: "",
+      dateTo: "",
     });
     setIsExpanded(false);
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => 
-    value !== '' && value !== 'all'
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value !== "" && value !== "all",
   );
 
   return (
@@ -74,12 +80,15 @@ export function TransactionFiltersComponent({
             <Input
               placeholder="Buscar por descrição..."
               value={filters.search}
-              onChange={(e) => updateFilter('search', e.target.value)}
+              onChange={(e) => updateFilter("search", e.target.value)}
               className="pl-10"
             />
           </div>
-          
-          <Select value={filters.type} onValueChange={(value) => updateFilter('type', value)}>
+
+          <Select
+            value={filters.type}
+            onValueChange={(value) => updateFilter("type", value)}
+          >
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -138,7 +147,10 @@ export function TransactionFiltersComponent({
                     <TagIcon className="h-4 w-4" />
                     Categoria
                   </Label>
-                  <Select value={filters.category} onValueChange={(value) => updateFilter('category', value)}>
+                  <Select
+                    value={filters.category}
+                    onValueChange={(value) => updateFilter("category", value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Todas as categorias" />
                     </SelectTrigger>
@@ -156,14 +168,20 @@ export function TransactionFiltersComponent({
                 {/* Account Filter */}
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Conta Bancária</Label>
-                  <Select value={filters.accountId} onValueChange={(value) => updateFilter('accountId', value)}>
+                  <Select
+                    value={filters.accountId}
+                    onValueChange={(value) => updateFilter("accountId", value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Todas as contas" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">Todas as contas</SelectItem>
                       {accounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id.toString()}>
+                        <SelectItem
+                          key={account.id}
+                          value={account.id.toString()}
+                        >
                           {account.name}
                         </SelectItem>
                       ))}
@@ -173,8 +191,15 @@ export function TransactionFiltersComponent({
 
                 {/* Credit Card Filter */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Cartão de Crédito</Label>
-                  <Select value={filters.creditCardId} onValueChange={(value) => updateFilter('creditCardId', value)}>
+                  <Label className="text-sm font-medium">
+                    Cartão de Crédito
+                  </Label>
+                  <Select
+                    value={filters.creditCardId}
+                    onValueChange={(value) =>
+                      updateFilter("creditCardId", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Todos os cartões" />
                     </SelectTrigger>
@@ -200,7 +225,7 @@ export function TransactionFiltersComponent({
                   <Input
                     type="date"
                     value={filters.dateFrom}
-                    onChange={(e) => updateFilter('dateFrom', e.target.value)}
+                    onChange={(e) => updateFilter("dateFrom", e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -211,7 +236,7 @@ export function TransactionFiltersComponent({
                   <Input
                     type="date"
                     value={filters.dateTo}
-                    onChange={(e) => updateFilter('dateTo', e.target.value)}
+                    onChange={(e) => updateFilter("dateTo", e.target.value)}
                   />
                 </div>
               </div>

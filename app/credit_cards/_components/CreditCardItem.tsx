@@ -12,7 +12,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { EditIcon, TrashIcon, CreditCardIcon, AlertTriangleIcon } from "lucide-react";
+import {
+  EditIcon,
+  TrashIcon,
+  CreditCardIcon,
+  AlertTriangleIcon,
+} from "lucide-react";
 import { CreditCard } from "@/lib/schemas";
 
 interface CreditCardItemProps {
@@ -29,17 +34,17 @@ export function CreditCardItem({
   isDeleting,
 }: CreditCardItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  
+
   const limit = parseFloat(card.limit);
   const currentBill = parseFloat(card.currentBill);
   const availableCredit = limit - currentBill;
   const usagePercentage = limit > 0 ? (currentBill / limit) * 100 : 0;
   const isHighUsage = usagePercentage > 80;
-  
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -57,7 +62,7 @@ export function CreditCardItem({
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10">
                 <CreditCardIcon className="h-6 w-6 text-blue-500" />
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1">
                   <h3 className="text-lg font-semibold text-foreground truncate">
@@ -66,13 +71,16 @@ export function CreditCardItem({
                   {isHighUsage && (
                     <div className="flex items-center gap-1">
                       <AlertTriangleIcon className="h-4 w-4 text-amber-500" />
-                      <Badge variant="secondary" className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10"
+                      >
                         Alto uso
                       </Badge>
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>Limite: {formatCurrency(limit)}</span>
                   <span>•</span>
@@ -91,8 +99,11 @@ export function CreditCardItem({
                 <EditIcon className="h-4 w-4 mr-1" />
                 Editar
               </Button>
-              
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+
+              <Dialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button
                     variant="ghost"
@@ -109,24 +120,26 @@ export function CreditCardItem({
                       <TrashIcon className="h-6 w-6 text-destructive" />
                     </div>
                     <div className="space-y-1">
-                      <DialogTitle className="text-xl">Confirmar Exclusão</DialogTitle>
+                      <DialogTitle className="text-xl">
+                        Confirmar Exclusão
+                      </DialogTitle>
                       <DialogDescription className="text-sm">
-                        Esta ação não pode ser desfeita e removerá permanentemente o cartão.
+                        Esta ação não pode ser desfeita e removerá
+                        permanentemente o cartão.
                       </DialogDescription>
                     </div>
                   </DialogHeader>
-                  
+
                   <div className="bg-muted/50 rounded-lg p-4 border border-dashed">
                     <div className="text-center">
-                      <p className="font-medium text-foreground">
-                        {card.name}
-                      </p>
+                      <p className="font-medium text-foreground">{card.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        Fatura: {formatCurrency(currentBill)} • Limite: {formatCurrency(limit)}
+                        Fatura: {formatCurrency(currentBill)} • Limite:{" "}
+                        {formatCurrency(limit)}
                       </p>
                     </div>
                   </div>
-                  
+
                   <DialogFooter className="flex gap-3 sm:gap-3">
                     <Button
                       variant="outline"
@@ -156,7 +169,7 @@ export function CreditCardItem({
               </Dialog>
             </div>
           </div>
-          
+
           {/* Fatura e Progress Bar */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -172,15 +185,15 @@ export function CreditCardItem({
                 </p>
               </div>
             </div>
-            
-            <Progress 
-              value={usagePercentage} 
+
+            <Progress
+              value={usagePercentage}
               className={`h-2 ${
-                isHighUsage 
-                  ? '[&>div]:bg-amber-500' 
-                  : usagePercentage > 50 
-                    ? '[&>div]:bg-orange-500'
-                    : '[&>div]:bg-green-500'
+                isHighUsage
+                  ? "[&>div]:bg-amber-500"
+                  : usagePercentage > 50
+                    ? "[&>div]:bg-orange-500"
+                    : "[&>div]:bg-green-500"
               }`}
             />
           </div>

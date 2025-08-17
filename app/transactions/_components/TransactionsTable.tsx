@@ -27,18 +27,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  MoreHorizontal, 
-  EditIcon, 
-  TrashIcon, 
-  TrendingUpIcon, 
+import {
+  MoreHorizontal,
+  EditIcon,
+  TrashIcon,
+  TrendingUpIcon,
   TrendingDownIcon,
   CalendarIcon,
   CreditCardIcon,
   BanknoteIcon,
   ArrowUpDownIcon,
   ArrowUpIcon,
-  ArrowDownIcon
+  ArrowDownIcon,
 } from "lucide-react";
 import { Transaction } from "@/lib/schemas";
 import { useAccounts } from "@/hooks/useAccounts";
@@ -52,8 +52,8 @@ interface TransactionsTableProps {
   isLoading?: boolean;
 }
 
-type SortField = 'date' | 'description' | 'amount' | 'category';
-type SortDirection = 'asc' | 'desc';
+type SortField = "date" | "description" | "amount" | "category";
+type SortDirection = "asc" | "desc";
 
 export function TransactionsTable({
   transactions,
@@ -62,51 +62,54 @@ export function TransactionsTable({
   isDeleting,
   isLoading = false,
 }: TransactionsTableProps) {
-  const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
-  const [sortField, setSortField] = useState<SortField>('date');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [transactionToDelete, setTransactionToDelete] =
+    useState<Transaction | null>(null);
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const { data: accounts = [] } = useAccounts();
   const { data: creditCards = [] } = useCreditCards();
 
   const formatCurrency = (value: string) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(parseFloat(value));
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
   const getAccountName = (accountId: number | null) => {
     if (!accountId) return null;
-    const account = accounts.find(acc => acc.id === accountId);
-    return account?.name || 'N/A';
+    const account = accounts.find((acc) => acc.id === accountId);
+    return account?.name || "N/A";
   };
 
   const getCreditCardName = (creditCardId: number | null) => {
     if (!creditCardId) return null;
-    const card = creditCards.find(card => card.id === creditCardId);
-    return card?.name || 'N/A';
+    const card = creditCards.find((card) => card.id === creditCardId);
+    return card?.name || "N/A";
   };
 
   const getTypeInfo = (type: string) => {
-    if (type === 'income') {
+    if (type === "income") {
       return {
-        label: 'Receita',
+        label: "Receita",
         icon: TrendingUpIcon,
-        className: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800',
+        className:
+          "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800",
       };
     }
     return {
-      label: 'Despesa',
+      label: "Despesa",
       icon: TrendingDownIcon,
-      className: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800',
+      className:
+        "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800",
     };
   };
 
@@ -123,16 +126,16 @@ export function TransactionsTable({
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return ArrowUpDownIcon;
-    return sortDirection === 'asc' ? ArrowUpIcon : ArrowDownIcon;
+    return sortDirection === "asc" ? ArrowUpIcon : ArrowDownIcon;
   };
 
   const sortedTransactions = useMemo(() => {
@@ -141,19 +144,19 @@ export function TransactionsTable({
       let bValue: string | number;
 
       switch (sortField) {
-        case 'date':
+        case "date":
           aValue = new Date(a.date).getTime();
           bValue = new Date(b.date).getTime();
           break;
-        case 'description':
+        case "description":
           aValue = a.description.toLowerCase();
           bValue = b.description.toLowerCase();
           break;
-        case 'amount':
+        case "amount":
           aValue = parseFloat(a.amount);
           bValue = parseFloat(b.amount);
           break;
-        case 'category':
+        case "category":
           aValue = a.category.toLowerCase();
           bValue = b.category.toLowerCase();
           break;
@@ -161,8 +164,8 @@ export function TransactionsTable({
           return 0;
       }
 
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
   }, [transactions, sortField, sortDirection]);
@@ -185,13 +188,27 @@ export function TransactionsTable({
           <TableBody>
             {[1, 2, 3, 4, 5].map((i) => (
               <TableRow key={i}>
-                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-full max-w-[200px]" /></TableCell>
-                <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                <TableCell className="text-right"><Skeleton className="h-4 w-20 ml-auto" /></TableCell>
-                <TableCell><Skeleton className="h-8 w-8 rounded" /></TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-20" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-full max-w-[200px]" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-20" />
+                </TableCell>
+                <TableCell className="text-right">
+                  <Skeleton className="h-4 w-20 ml-auto" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-8 w-8 rounded" />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -211,10 +228,12 @@ export function TransactionsTable({
                   variant="ghost"
                   size="sm"
                   className="h-auto p-0 font-semibold hover:bg-transparent"
-                  onClick={() => handleSort('date')}
+                  onClick={() => handleSort("date")}
                 >
                   Data
-                  {React.createElement(getSortIcon('date'), { className: "ml-1 h-3 w-3" })}
+                  {React.createElement(getSortIcon("date"), {
+                    className: "ml-1 h-3 w-3",
+                  })}
                 </Button>
               </TableHead>
               <TableHead>
@@ -222,10 +241,12 @@ export function TransactionsTable({
                   variant="ghost"
                   size="sm"
                   className="h-auto p-0 font-semibold hover:bg-transparent"
-                  onClick={() => handleSort('description')}
+                  onClick={() => handleSort("description")}
                 >
                   Descrição
-                  {React.createElement(getSortIcon('description'), { className: "ml-1 h-3 w-3" })}
+                  {React.createElement(getSortIcon("description"), {
+                    className: "ml-1 h-3 w-3",
+                  })}
                 </Button>
               </TableHead>
               <TableHead className="w-[120px]">Tipo</TableHead>
@@ -234,10 +255,12 @@ export function TransactionsTable({
                   variant="ghost"
                   size="sm"
                   className="h-auto p-0 font-semibold hover:bg-transparent"
-                  onClick={() => handleSort('category')}
+                  onClick={() => handleSort("category")}
                 >
                   Categoria
-                  {React.createElement(getSortIcon('category'), { className: "ml-1 h-3 w-3" })}
+                  {React.createElement(getSortIcon("category"), {
+                    className: "ml-1 h-3 w-3",
+                  })}
                 </Button>
               </TableHead>
               <TableHead className="w-[140px]">Conta/Cartão</TableHead>
@@ -246,10 +269,12 @@ export function TransactionsTable({
                   variant="ghost"
                   size="sm"
                   className="h-auto p-0 font-semibold hover:bg-transparent"
-                  onClick={() => handleSort('amount')}
+                  onClick={() => handleSort("amount")}
                 >
                   Valor
-                  {React.createElement(getSortIcon('amount'), { className: "ml-1 h-3 w-3" })}
+                  {React.createElement(getSortIcon("amount"), {
+                    className: "ml-1 h-3 w-3",
+                  })}
                 </Button>
               </TableHead>
               <TableHead className="w-[60px]"></TableHead>
@@ -260,7 +285,9 @@ export function TransactionsTable({
               const typeInfo = getTypeInfo(transaction.type);
               const TypeIcon = typeInfo.icon;
               const accountName = getAccountName(transaction.accountId);
-              const creditCardName = getCreditCardName(transaction.creditCardId);
+              const creditCardName = getCreditCardName(
+                transaction.creditCardId,
+              );
 
               return (
                 <TableRow key={transaction.id} className="hover:bg-muted/50">
@@ -269,11 +296,15 @@ export function TransactionsTable({
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50">
                         <CalendarIcon className="h-3 w-3 text-muted-foreground" />
                       </div>
-                      <span className="text-sm">{formatDate(transaction.date)}</span>
+                      <span className="text-sm">
+                        {formatDate(transaction.date)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p className="font-medium leading-none">{transaction.description}</p>
+                    <p className="font-medium leading-none">
+                      {transaction.description}
+                    </p>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={typeInfo.className}>
@@ -282,13 +313,18 @@ export function TransactionsTable({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm font-medium">{transaction.category}</span>
+                    <span className="text-sm font-medium">
+                      {transaction.category}
+                    </span>
                   </TableCell>
                   <TableCell>
                     {accountName && (
                       <div className="flex items-center gap-1.5">
                         <BanknoteIcon className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm truncate max-w-[100px]" title={accountName}>
+                        <span
+                          className="text-sm truncate max-w-[100px]"
+                          title={accountName}
+                        >
                           {accountName}
                         </span>
                       </div>
@@ -296,18 +332,23 @@ export function TransactionsTable({
                     {creditCardName && (
                       <div className="flex items-center gap-1.5">
                         <CreditCardIcon className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm truncate max-w-[100px]" title={creditCardName}>
+                        <span
+                          className="text-sm truncate max-w-[100px]"
+                          title={creditCardName}
+                        >
                           {creditCardName}
                         </span>
                       </div>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className={`font-bold ${
-                      transaction.type === 'income' 
-                        ? 'text-green-600 dark:text-green-400' 
-                        : 'text-red-600 dark:text-red-400'
-                    }`}>
+                    <span
+                      className={`font-bold ${
+                        transaction.type === "income"
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-red-600 dark:text-red-400"
+                      }`}
+                    >
                       {formatCurrency(transaction.amount)}
                     </span>
                   </TableCell>
@@ -325,7 +366,7 @@ export function TransactionsTable({
                           Editar
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleDeleteClick(transaction)}
                           className="text-destructive focus:text-destructive"
                         >
@@ -351,13 +392,17 @@ export function TransactionsTable({
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!transactionToDelete} onOpenChange={() => setTransactionToDelete(null)}>
+      <AlertDialog
+        open={!!transactionToDelete}
+        onOpenChange={() => setTransactionToDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir o lançamento &quot;{transactionToDelete?.description}&quot;? 
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir o lançamento &quot;
+              {transactionToDelete?.description}&quot;? Esta ação não pode ser
+              desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -367,7 +412,7 @@ export function TransactionsTable({
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? 'Excluindo...' : 'Excluir'}
+              {isDeleting ? "Excluindo..." : "Excluir"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

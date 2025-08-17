@@ -23,16 +23,16 @@ export interface AccountFilter {
 export interface IncomeVsExpenseChartProps {
   /** Array of transactions to display in the chart */
   transactions: Transaction[];
-  
+
   /** Type of period to display (determines chart granularity) */
   periodType?: PeriodType;
-  
+
   /** Date filter configuration (preferred over individual month/year props) */
   dateFilter?: DateFilter;
-  
+
   /** Account filter configuration */
   accountFilter?: AccountFilter;
-  
+
   // Legacy props for backward compatibility - will be deprecated
   /** @deprecated Use dateFilter.selectedMonth instead */
   selectedMonth?: number;

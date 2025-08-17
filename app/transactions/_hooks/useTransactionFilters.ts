@@ -3,13 +3,13 @@ import { Transaction } from "@/lib/schemas";
 import { TransactionFilters } from "../_components/TransactionFilters";
 
 const defaultFilters: TransactionFilters = {
-  search: '',
-  type: 'all',
-  category: '',
-  accountId: '',
-  creditCardId: '',
-  dateFrom: '',
-  dateTo: '',
+  search: "",
+  type: "all",
+  category: "",
+  accountId: "",
+  creditCardId: "",
+  dateFrom: "",
+  dateTo: "",
 };
 
 export function useTransactionFilters(transactions: Transaction[]) {
@@ -18,21 +18,26 @@ export function useTransactionFilters(transactions: Transaction[]) {
   // Extract unique categories from transactions
   const categories = useMemo(() => {
     const uniqueCategories = new Set(
-      transactions.map(t => t.category).filter(Boolean)
+      transactions.map((t) => t.category).filter(Boolean),
     );
     return Array.from(uniqueCategories).sort();
   }, [transactions]);
 
   // Apply filters to transactions
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(transaction => {
+    return transactions.filter((transaction) => {
       // Search filter
-      if (filters.search && !transaction.description.toLowerCase().includes(filters.search.toLowerCase())) {
+      if (
+        filters.search &&
+        !transaction.description
+          .toLowerCase()
+          .includes(filters.search.toLowerCase())
+      ) {
         return false;
       }
 
       // Type filter
-      if (filters.type !== 'all' && transaction.type !== filters.type) {
+      if (filters.type !== "all" && transaction.type !== filters.type) {
         return false;
       }
 
@@ -42,12 +47,18 @@ export function useTransactionFilters(transactions: Transaction[]) {
       }
 
       // Account filter
-      if (filters.accountId && transaction.accountId?.toString() !== filters.accountId) {
+      if (
+        filters.accountId &&
+        transaction.accountId?.toString() !== filters.accountId
+      ) {
         return false;
       }
 
       // Credit Card filter
-      if (filters.creditCardId && transaction.creditCardId?.toString() !== filters.creditCardId) {
+      if (
+        filters.creditCardId &&
+        transaction.creditCardId?.toString() !== filters.creditCardId
+      ) {
         return false;
       }
 
@@ -74,6 +85,8 @@ export function useTransactionFilters(transactions: Transaction[]) {
     resetFilters,
     categories,
     filteredTransactions,
-    hasActiveFilters: Object.values(filters).some(value => value !== '' && value !== 'all'),
+    hasActiveFilters: Object.values(filters).some(
+      (value) => value !== "" && value !== "all",
+    ),
   };
 }

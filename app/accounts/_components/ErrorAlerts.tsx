@@ -10,7 +10,9 @@ interface ErrorAlertsProps {
 }
 
 export function ErrorAlerts({ errors }: ErrorAlertsProps) {
-  const errorList = Object.entries(errors).filter(([, error]) => error !== null && error !== undefined);
+  const errorList = Object.entries(errors).filter(
+    ([, error]) => error !== null && error !== undefined,
+  );
 
   if (errorList.length === 0) {
     return null;

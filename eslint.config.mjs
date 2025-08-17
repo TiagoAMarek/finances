@@ -11,7 +11,12 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.config({
-    extends: ["next/core-web-vitals", "next/typescript", "prettier"],
+    extends: [
+      "next/core-web-vitals",
+      "next/typescript",
+      "prettier",
+      "plugin:prettier/recommended",
+    ],
   }),
   // Include test files for linting
   {
@@ -22,7 +27,7 @@ const eslintConfig = [
       "**/*.spec.tsx",
       "tests/**/*.ts",
       "tests/**/*.tsx",
-      "vitest.config.ts"
+      "vitest.config.ts",
     ],
     rules: {
       // Allow any for test files where it's common

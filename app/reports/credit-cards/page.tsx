@@ -145,4 +145,3 @@ const CreditCardsAnalysisPage: NextPage = () => {
 };
 
 export default CreditCardsAnalysisPage;
-

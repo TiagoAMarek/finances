@@ -11,7 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
-import { PlusIcon, CreditCardIcon, DollarSignIcon, Loader2Icon } from "lucide-react";
+import {
+  PlusIcon,
+  CreditCardIcon,
+  DollarSignIcon,
+  Loader2Icon,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface CreateCardModalProps {
@@ -63,7 +68,9 @@ export function CreateCardModal({
             <CreditCardIcon className="h-6 w-6 text-blue-500" />
           </div>
           <div className="space-y-1">
-            <DialogTitle className="text-xl">Novo Cartão de Crédito</DialogTitle>
+            <DialogTitle className="text-xl">
+              Novo Cartão de Crédito
+            </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               Cadastre um novo cartão para controlar suas despesas
             </DialogDescription>
@@ -74,7 +81,10 @@ export function CreateCardModal({
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="cardName" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="cardName"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <CreditCardIcon className="h-4 w-4" />
                   Nome do Cartão
                 </Label>
@@ -94,7 +104,10 @@ export function CreateCardModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="cardLimit" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="cardLimit"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <DollarSignIcon className="h-4 w-4" />
                   Limite do Cartão
                 </Label>

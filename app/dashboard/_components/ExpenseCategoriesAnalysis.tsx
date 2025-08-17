@@ -17,10 +17,10 @@ interface ExpenseCategoriesAnalysisProps {
   maxItems?: number;
 }
 
-export function ExpenseCategoriesAnalysis({ 
-  categoryData, 
-  formatCurrency, 
-  maxItems = 8 
+export function ExpenseCategoriesAnalysis({
+  categoryData,
+  formatCurrency,
+  maxItems = 8,
 }: ExpenseCategoriesAnalysisProps) {
   return (
     <div className="space-y-3">
@@ -28,22 +28,23 @@ export function ExpenseCategoriesAnalysis({
         <div key={item.category} className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
+              <div
+                className="w-3 h-3 rounded-full"
                 style={{
-                  backgroundColor: `hsl(${index * 45}, 70%, 50%)`
-                }} 
+                  backgroundColor: `hsl(${index * 45}, 70%, 50%)`,
+                }}
               />
               <span className="font-medium">{item.category}</span>
               <Badge variant="secondary" className="text-xs">
                 {item.count} transações
               </Badge>
               {Math.abs(item.change) > 10 && (
-                <Badge 
-                  variant={item.change > 0 ? "destructive" : "default"} 
+                <Badge
+                  variant={item.change > 0 ? "destructive" : "default"}
                   className="text-xs"
                 >
-                  {item.change > 0 ? '+' : ''}{item.change.toFixed(1)}%
+                  {item.change > 0 ? "+" : ""}
+                  {item.change.toFixed(1)}%
                 </Badge>
               )}
             </div>

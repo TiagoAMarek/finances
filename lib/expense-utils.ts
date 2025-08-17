@@ -1,9 +1,13 @@
 import { Transaction } from "@/lib/schemas";
-import { formatCurrency, applyTransactionFilters, TransactionFilter } from "./chart-utils";
+import {
+  formatCurrency,
+  applyTransactionFilters,
+  TransactionFilter,
+} from "./chart-utils";
 
 /**
  * Expense Analysis Utility Functions
- * 
+ *
  * Specialized utilities for expense analysis and trend generation,
  * building on the foundation of chart-utils.ts
  */
@@ -102,7 +106,8 @@ export function createExpenseChartPoint(
 ): ExpenseChartPoint {
   const total = calculateTotalExpenses(transactions);
   const transactionCount = transactions.length;
-  const averagePerTransaction = transactionCount > 0 ? total / transactionCount : 0;
+  const averagePerTransaction =
+    transactionCount > 0 ? total / transactionCount : 0;
 
   return {
     period,
@@ -197,8 +202,7 @@ export function generateMonthlyWeeksData(
     const weekTransactions = transactions.filter((t) => {
       const transactionDate = new Date(t.date);
       return (
-        transactionDate >= currentWeekStart &&
-        transactionDate <= currentWeekEnd
+        transactionDate >= currentWeekStart && transactionDate <= currentWeekEnd
       );
     });
 

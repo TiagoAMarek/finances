@@ -1,24 +1,24 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { POST } from '@/app/api/auth/login/route';
-import Database from 'better-sqlite3';
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { POST } from "@/app/api/auth/login/route";
+import Database from "better-sqlite3";
 import {
   createIntegrationTestDb,
   createTestUser,
-  cleanupTestDb
-} from '../../../helpers/integration-db-helpers';
-import { createNextRequest } from '../../../helpers/auth-helpers';
+  cleanupTestDb,
+} from "../../../helpers/integration-db-helpers";
+import { createNextRequest } from "../../../helpers/auth-helpers";
 
 let testDb: any;
 let sqlite: Database.Database;
 
 // Mock the database module to use our test database
-vi.mock('@/app/api/lib/db', () => ({
+vi.mock("@/app/api/lib/db", () => ({
   get db() {
     return testDb;
-  }
+  },
 }));
 
-describe('POST /api/auth/login - Integration Tests', () => {
+describe("POST /api/auth/login - Integration Tests", () => {
   beforeEach(() => {
     // Create a fresh database for each test
     const dbSetup = createIntegrationTestDb();
@@ -34,19 +34,19 @@ describe('POST /api/auth/login - Integration Tests', () => {
     }
   });
 
-  it('autentica usuário existente com credenciais corretas', async () => {
+  it("autentica usuário existente com credenciais corretas", async () => {
     // Arrange: Create user in database
     const { user } = await createTestUser(testDb, {
-      email: 'user@example.com',
-      password: 'senha123'
+      email: "user@example.com",
+      password: "senha123",
     });
 
     // Act: Make login request
-    const request = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'user@example.com',
-        password: 'senha123',
+        email: "user@example.com",
+        password: "senha123",
       },
     });
 
@@ -55,13 +55,13 @@ describe('POST /api/auth/login - Integration Tests', () => {
 
     // Assert API response
     expect(response.status).toBe(200);
-    expect(data).toHaveProperty('access_token');
-    expect(typeof data.access_token).toBe('string');
+    expect(data).toHaveProperty("access_token");
+    expect(typeof data.access_token).toBe("string");
     expect(data.access_token.length).toBeGreaterThan(0);
 
     // Verify token contains correct user data
     const tokenPayload = JSON.parse(
-      Buffer.from(data.access_token.split('.')[1], 'base64').toString()
+      Buffer.from(data.access_token.split(".")[1], "base64").toString(),
     );
 
     expect(tokenPayload.userId).toBe(user.id);
@@ -69,13 +69,13 @@ describe('POST /api/auth/login - Integration Tests', () => {
     expect(tokenPayload.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
   });
 
-  it('rejeita login com email inexistente', async () => {
+  it("rejeita login com email inexistente", async () => {
     // Act: Try to login with non-existent email
-    const request = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'inexistente@example.com',
-        password: '123456',
+        email: "inexistente@example.com",
+        password: "123456",
       },
     });
 
@@ -84,22 +84,22 @@ describe('POST /api/auth/login - Integration Tests', () => {
 
     // Assert
     expect(response.status).toBe(401);
-    expect(data.detail).toBe('Invalid email or password');
+    expect(data.detail).toBe("Invalid email or password");
   });
 
-  it('rejeita login com senha incorreta', async () => {
+  it("rejeita login com senha incorreta", async () => {
     // Arrange: Create user in database
     await createTestUser(testDb, {
-      email: 'user@example.com',
-      password: 'senha-correta'
+      email: "user@example.com",
+      password: "senha-correta",
     });
 
     // Act: Try to login with wrong password
-    const request = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'user@example.com',
-        password: 'senha-errada',
+        email: "user@example.com",
+        password: "senha-errada",
       },
     });
 
@@ -108,16 +108,16 @@ describe('POST /api/auth/login - Integration Tests', () => {
 
     // Assert
     expect(response.status).toBe(401);
-    expect(data.detail).toBe('Invalid email or password');
+    expect(data.detail).toBe("Invalid email or password");
   });
 
-  it('valida entrada com mensagens em português', async () => {
+  it("valida entrada com mensagens em português", async () => {
     // Act: Try to login with invalid email format
-    const request = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'email-inválido',
-        password: '123456',
+        email: "email-inválido",
+        password: "123456",
       },
     });
 
@@ -126,29 +126,29 @@ describe('POST /api/auth/login - Integration Tests', () => {
 
     // Assert validation error in Portuguese
     expect(response.status).toBe(400);
-    expect(data.detail).toContain('Formato de email inválido');
+    expect(data.detail).toContain("Formato de email inválido");
   });
 
-  it('verifica comparação de senha com hash real do banco', async () => {
+  it("verifica comparação de senha com hash real do banco", async () => {
     // Arrange: Create user with specific password
-    const plainPassword = 'minha-senha-complexa-123!@#';
+    const plainPassword = "minha-senha-complexa-123!@#";
     const { user } = await createTestUser(testDb, {
-      email: 'user@example.com',
-      password: plainPassword
+      email: "user@example.com",
+      password: plainPassword,
     });
 
     // Verify user was saved with hashed password
     const savedUser = await testDb.query.users.findFirst({
-      where: (users: any, { eq }: any) => eq(users.id, user.id)
+      where: (users: any, { eq }: any) => eq(users.id, user.id),
     });
     expect(savedUser.hashedPassword).toBeTruthy();
     expect(savedUser.hashedPassword).not.toBe(plainPassword);
 
     // Act: Login with correct password
-    const request = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'user@example.com',
+        email: "user@example.com",
         password: plainPassword,
       },
     });
@@ -161,21 +161,21 @@ describe('POST /api/auth/login - Integration Tests', () => {
     expect(data.access_token).toBeTruthy();
   });
 
-  it('gera token JWT válido com expiração correta', async () => {
+  it("gera token JWT válido com expiração correta", async () => {
     // Arrange: Create user
     await createTestUser(testDb, {
-      email: 'user@example.com',
-      password: '123456'
+      email: "user@example.com",
+      password: "123456",
     });
 
     // Act: Login
     const loginTime = Math.floor(Date.now() / 1000);
 
-    const request = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'user@example.com',
-        password: '123456',
+        email: "user@example.com",
+        password: "123456",
       },
     });
 
@@ -186,48 +186,46 @@ describe('POST /api/auth/login - Integration Tests', () => {
     expect(response.status).toBe(200);
     expect(data.access_token).toBeTruthy();
 
-    const tokenParts = data.access_token.split('.');
+    const tokenParts = data.access_token.split(".");
     expect(tokenParts).toHaveLength(3); // header.payload.signature
 
-    const payload = JSON.parse(
-      Buffer.from(tokenParts[1], 'base64').toString()
-    );
+    const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString());
 
     // Check token expiration (should be 24 hours from now)
-    const expectedExp = loginTime + (24 * 60 * 60); // 24 hours
+    const expectedExp = loginTime + 24 * 60 * 60; // 24 hours
     expect(payload.exp).toBeGreaterThanOrEqual(expectedExp - 5); // Allow 5 second tolerance
     expect(payload.exp).toBeLessThanOrEqual(expectedExp + 5);
 
     expect(payload.userId).toBe(1); // First user should have ID 1
-    expect(payload.email).toBe('user@example.com');
+    expect(payload.email).toBe("user@example.com");
   });
 
-  it('testa proteção contra timing attack (mesma mensagem de erro)', async () => {
-    // This test ensures that both non-existent users and wrong passwords 
+  it("testa proteção contra timing attack (mesma mensagem de erro)", async () => {
+    // This test ensures that both non-existent users and wrong passwords
     // return the same error message (basic timing attack protection)
 
     // Arrange: Create one real user
     await createTestUser(testDb, {
-      email: 'real@example.com',
-      password: '123456'
+      email: "real@example.com",
+      password: "123456",
     });
 
     // Test non-existent user
-    const request1 = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request1 = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'fake@example.com',
-        password: '123456',
+        email: "fake@example.com",
+        password: "123456",
       },
     });
     const response1 = await POST(request1);
 
     // Test wrong password
-    const request2 = createNextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
+    const request2 = createNextRequest("http://localhost/api/auth/login", {
+      method: "POST",
       body: {
-        email: 'real@example.com',
-        password: 'wrong-password',
+        email: "real@example.com",
+        password: "wrong-password",
       },
     });
     const response2 = await POST(request2);
@@ -238,40 +236,40 @@ describe('POST /api/auth/login - Integration Tests', () => {
 
     const data1 = await response1.json();
     const data2 = await response2.json();
-    expect(data1.detail).toBe('Invalid email or password');
-    expect(data2.detail).toBe('Invalid email or password');
+    expect(data1.detail).toBe("Invalid email or password");
+    expect(data2.detail).toBe("Invalid email or password");
 
     // Both responses should be indistinguishable to an attacker
     expect(data1).toEqual(data2);
   });
 
-  it('testa comportamento com múltiplos usuários no banco', async () => {
+  it("testa comportamento com múltiplos usuários no banco", async () => {
     // Arrange: Create multiple users
     await createTestUser(testDb, {
-      email: 'user1@example.com',
-      password: 'password1'
+      email: "user1@example.com",
+      password: "password1",
     });
 
     await createTestUser(testDb, {
-      email: 'user2@example.com',
-      password: 'password2'
+      email: "user2@example.com",
+      password: "password2",
     });
 
     await createTestUser(testDb, {
-      email: 'user3@example.com',
-      password: 'password3'
+      email: "user3@example.com",
+      password: "password3",
     });
 
     // Act & Assert: Each user can login independently
     const testCases = [
-      { email: 'user1@example.com', password: 'password1' },
-      { email: 'user2@example.com', password: 'password2' },
-      { email: 'user3@example.com', password: 'password3' },
+      { email: "user1@example.com", password: "password1" },
+      { email: "user2@example.com", password: "password2" },
+      { email: "user3@example.com", password: "password3" },
     ];
 
     for (const testCase of testCases) {
-      const request = createNextRequest('http://localhost/api/auth/login', {
-        method: 'POST',
+      const request = createNextRequest("http://localhost/api/auth/login", {
+        method: "POST",
         body: testCase,
       });
 
@@ -283,7 +281,7 @@ describe('POST /api/auth/login - Integration Tests', () => {
 
       // Verify token contains correct user
       const payload = JSON.parse(
-        Buffer.from(data.access_token.split('.')[1], 'base64').toString()
+        Buffer.from(data.access_token.split(".")[1], "base64").toString(),
       );
       expect(payload.email).toBe(testCase.email);
     }

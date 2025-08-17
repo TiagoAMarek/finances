@@ -1,9 +1,14 @@
-import { NextRequest } from 'next/server';
-import { eq } from 'drizzle-orm';
-import { db } from '../../lib/db';
-import { users } from '../../lib/schema';
-import { RegisterSchema } from '../../lib/validation';
-import { hashPassword, createErrorResponse, createSuccessResponse, handleZodError } from '../../lib/auth';
+import { NextRequest } from "next/server";
+import { eq } from "drizzle-orm";
+import { db } from "../../lib/db";
+import { users } from "../../lib/schema";
+import { RegisterSchema } from "../../lib/validation";
+import {
+  hashPassword,
+  createErrorResponse,
+  createSuccessResponse,
+  handleZodError,
+} from "../../lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,33 +16,42 @@ export async function POST(request: NextRequest) {
     const validatedData = RegisterSchema.parse(body);
 
     // Check if user already exists
-    const existingUser = await db.select().from(users).where(eq(users.email, validatedData.email)).limit(1);
-    
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, validatedData.email))
+      .limit(1);
+
     if (existingUser.length > 0) {
-      return createErrorResponse('User with this email already exists', 400);
+      return createErrorResponse("User with this email already exists", 400);
     }
 
     // Hash password and create user
     const hashedPassword = await hashPassword(validatedData.password);
-    
-    const [newUser] = await db.insert(users).values({
-      email: validatedData.email,
-      hashedPassword,
-    }).returning({
-      id: users.id,
-      email: users.email,
-    });
 
-    return createSuccessResponse({
-      message: 'User registered successfully',
-      user: newUser,
-    }, 201);
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email: validatedData.email,
+        hashedPassword,
+      })
+      .returning({
+        id: users.id,
+        email: users.email,
+      });
 
+    return createSuccessResponse(
+      {
+        message: "User registered successfully",
+        user: newUser,
+      },
+      201,
+    );
   } catch (error) {
     const zodErrorResponse = handleZodError(error);
     if (zodErrorResponse) return zodErrorResponse;
-    
-    console.error('Registration error:', error);
-    return createErrorResponse('Internal server error', 500);
+
+    console.error("Registration error:", error);
+    return createErrorResponse("Internal server error", 500);
   }
 }

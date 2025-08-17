@@ -19,7 +19,15 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { EditIcon, Receipt, DollarSignIcon, Loader2Icon, SaveIcon, CalendarIcon, TagIcon } from "lucide-react";
+import {
+  EditIcon,
+  Receipt,
+  DollarSignIcon,
+  Loader2Icon,
+  SaveIcon,
+  CalendarIcon,
+  TagIcon,
+} from "lucide-react";
 import { Transaction } from "@/lib/schemas";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useCreditCards } from "@/hooks/useCreditCards";
@@ -41,12 +49,16 @@ export function EditTransactionModal({
 }: EditTransactionModalProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState<number>(0);
-  const [type, setType] = useState<'income' | 'expense'>('expense');
+  const [type, setType] = useState<"income" | "expense">("expense");
   const [date, setDate] = useState("");
   const [category, setCategory] = useState("");
-  const [sourceType, setSourceType] = useState<'account' | 'creditCard'>('account');
+  const [sourceType, setSourceType] = useState<"account" | "creditCard">(
+    "account",
+  );
   const [selectedAccount, setSelectedAccount] = useState<number | null>(null);
-  const [selectedCreditCard, setSelectedCreditCard] = useState<number | null>(null);
+  const [selectedCreditCard, setSelectedCreditCard] = useState<number | null>(
+    null,
+  );
 
   const { data: accounts = [] } = useAccounts();
   const { data: creditCards = [] } = useCreditCards();
@@ -55,19 +67,19 @@ export function EditTransactionModal({
     if (transaction) {
       setDescription(transaction.description);
       setAmount(parseFloat(transaction.amount));
-      setType(transaction.type as 'income' | 'expense');
+      setType(transaction.type as "income" | "expense");
       setDate(transaction.date);
       setCategory(transaction.category);
       setSelectedAccount(transaction.accountId);
       setSelectedCreditCard(transaction.creditCardId);
-      
+
       // Determinar o tipo de origem baseado na transação existente
       if (transaction.accountId) {
-        setSourceType('account');
+        setSourceType("account");
       } else if (transaction.creditCardId) {
-        setSourceType('creditCard');
+        setSourceType("creditCard");
       } else {
-        setSourceType('account'); // default
+        setSourceType("account"); // default
       }
     }
   }, [transaction]);
@@ -75,27 +87,27 @@ export function EditTransactionModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!transaction) return;
-    
+
     // Validação: deve ter uma conta OU um cartão, nunca ambos ou nenhum
-    if (sourceType === 'account' && !selectedAccount) {
-      alert('Selecione uma conta bancária');
+    if (sourceType === "account" && !selectedAccount) {
+      alert("Selecione uma conta bancária");
       return;
     }
-    
-    if (sourceType === 'creditCard' && !selectedCreditCard) {
-      alert('Selecione um cartão de crédito');
+
+    if (sourceType === "creditCard" && !selectedCreditCard) {
+      alert("Selecione um cartão de crédito");
       return;
     }
-    
+
     onSave({
       ...transaction,
       description,
       amount: amount.toString(),
-      type: type as 'income' | 'expense' | 'transfer',
+      type: type as "income" | "expense" | "transfer",
       date,
       category,
-      accountId: sourceType === 'account' ? selectedAccount : null,
-      creditCardId: sourceType === 'creditCard' ? selectedCreditCard : null,
+      accountId: sourceType === "account" ? selectedAccount : null,
+      creditCardId: sourceType === "creditCard" ? selectedCreditCard : null,
     });
   };
 
@@ -103,19 +115,19 @@ export function EditTransactionModal({
     if (transaction) {
       setDescription(transaction.description);
       setAmount(parseFloat(transaction.amount));
-      setType(transaction.type as 'income' | 'expense');
+      setType(transaction.type as "income" | "expense");
       setDate(transaction.date);
       setCategory(transaction.category);
       setSelectedAccount(transaction.accountId);
       setSelectedCreditCard(transaction.creditCardId);
-      
+
       // Resetar o tipo de origem também
       if (transaction.accountId) {
-        setSourceType('account');
+        setSourceType("account");
       } else if (transaction.creditCardId) {
-        setSourceType('creditCard');
+        setSourceType("creditCard");
       } else {
-        setSourceType('account');
+        setSourceType("account");
       }
     }
   };
@@ -126,9 +138,9 @@ export function EditTransactionModal({
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -152,18 +164,33 @@ export function EditTransactionModal({
         {/* Preview do lançamento atual */}
         <div className="bg-muted/30 rounded-lg p-4 border border-dashed mb-4">
           <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-              transaction.type === 'income' ? 'bg-green-500/10' : 'bg-red-500/10'
-            }`}>
-              <Receipt className={`h-5 w-5 ${
-                transaction.type === 'income' ? 'text-green-500' : 'text-red-500'
-              }`} />
+            <div
+              className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                transaction.type === "income"
+                  ? "bg-green-500/10"
+                  : "bg-red-500/10"
+              }`}
+            >
+              <Receipt
+                className={`h-5 w-5 ${
+                  transaction.type === "income"
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              />
             </div>
             <div className="flex-1">
-              <p className="font-medium text-foreground">{transaction.description}</p>
+              <p className="font-medium text-foreground">
+                {transaction.description}
+              </p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Badge variant={transaction.type === 'income' ? 'default' : 'destructive'} className="text-xs">
-                  {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                <Badge
+                  variant={
+                    transaction.type === "income" ? "default" : "destructive"
+                  }
+                  className="text-xs"
+                >
+                  {transaction.type === "income" ? "Receita" : "Despesa"}
                 </Badge>
                 <span>•</span>
                 <span>{formatCurrency(parseFloat(transaction.amount))}</span>
@@ -179,7 +206,10 @@ export function EditTransactionModal({
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="editDescription" className="text-sm font-medium flex items-center gap-2">
+                  <Label
+                    htmlFor="editDescription"
+                    className="text-sm font-medium flex items-center gap-2"
+                  >
                     <Receipt className="h-4 w-4" />
                     Descrição
                   </Label>
@@ -196,7 +226,10 @@ export function EditTransactionModal({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="editAmount" className="text-sm font-medium flex items-center gap-2">
+                  <Label
+                    htmlFor="editAmount"
+                    className="text-sm font-medium flex items-center gap-2"
+                  >
                     <DollarSignIcon className="h-4 w-4" />
                     Valor
                   </Label>
@@ -208,7 +241,9 @@ export function EditTransactionModal({
                       type="number"
                       id="editAmount"
                       value={amount || ""}
-                      onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
+                      onChange={(e) =>
+                        setAmount(parseFloat(e.target.value) || 0)
+                      }
                       placeholder="0,00"
                       className="h-11 pl-10"
                       step="0.01"
@@ -224,7 +259,12 @@ export function EditTransactionModal({
                   <Label htmlFor="editType" className="text-sm font-medium">
                     Tipo
                   </Label>
-                  <Select value={type} onValueChange={(value) => setType(value as 'income' | 'expense')}>
+                  <Select
+                    value={type}
+                    onValueChange={(value) =>
+                      setType(value as "income" | "expense")
+                    }
+                  >
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
@@ -246,7 +286,10 @@ export function EditTransactionModal({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="editDate" className="text-sm font-medium flex items-center gap-2">
+                  <Label
+                    htmlFor="editDate"
+                    className="text-sm font-medium flex items-center gap-2"
+                  >
                     <CalendarIcon className="h-4 w-4" />
                     Data
                   </Label>
@@ -262,7 +305,10 @@ export function EditTransactionModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="editCategory" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="editCategory"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <TagIcon className="h-4 w-4" />
                   Categoria
                 </Label>
@@ -284,7 +330,7 @@ export function EditTransactionModal({
                   </Label>
                   <RadioGroup
                     value={sourceType}
-                    onValueChange={(value: 'account' | 'creditCard') => {
+                    onValueChange={(value: "account" | "creditCard") => {
                       setSourceType(value);
                       // Limpar seleções quando mudar o tipo
                       setSelectedAccount(null);
@@ -294,27 +340,41 @@ export function EditTransactionModal({
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="account" id="edit-account-radio" />
-                      <Label htmlFor="edit-account-radio" className="cursor-pointer">
+                      <Label
+                        htmlFor="edit-account-radio"
+                        className="cursor-pointer"
+                      >
                         🏦 Conta Bancária
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="creditCard" id="edit-creditCard-radio" />
-                      <Label htmlFor="edit-creditCard-radio" className="cursor-pointer">
+                      <RadioGroupItem
+                        value="creditCard"
+                        id="edit-creditCard-radio"
+                      />
+                      <Label
+                        htmlFor="edit-creditCard-radio"
+                        className="cursor-pointer"
+                      >
                         💳 Cartão de Crédito
                       </Label>
                     </div>
                   </RadioGroup>
                 </div>
 
-                {sourceType === 'account' && (
+                {sourceType === "account" && (
                   <div className="space-y-2">
-                    <Label htmlFor="editAccount" className="text-sm font-medium">
+                    <Label
+                      htmlFor="editAccount"
+                      className="text-sm font-medium"
+                    >
                       Selecione a Conta Bancária *
                     </Label>
                     <Select
                       value={selectedAccount?.toString() || ""}
-                      onValueChange={(value) => setSelectedAccount(value ? parseInt(value) : null)}
+                      onValueChange={(value) =>
+                        setSelectedAccount(value ? parseInt(value) : null)
+                      }
                       required
                     >
                       <SelectTrigger className="h-11">
@@ -322,7 +382,10 @@ export function EditTransactionModal({
                       </SelectTrigger>
                       <SelectContent>
                         {accounts.map((account) => (
-                          <SelectItem key={account.id} value={account.id.toString()}>
+                          <SelectItem
+                            key={account.id}
+                            value={account.id.toString()}
+                          >
                             {account.name}
                           </SelectItem>
                         ))}
@@ -331,14 +394,19 @@ export function EditTransactionModal({
                   </div>
                 )}
 
-                {sourceType === 'creditCard' && (
+                {sourceType === "creditCard" && (
                   <div className="space-y-2">
-                    <Label htmlFor="editCreditCard" className="text-sm font-medium">
+                    <Label
+                      htmlFor="editCreditCard"
+                      className="text-sm font-medium"
+                    >
                       Selecione o Cartão de Crédito *
                     </Label>
                     <Select
                       value={selectedCreditCard?.toString() || ""}
-                      onValueChange={(value) => setSelectedCreditCard(value ? parseInt(value) : null)}
+                      onValueChange={(value) =>
+                        setSelectedCreditCard(value ? parseInt(value) : null)
+                      }
                       required
                     >
                       <SelectTrigger className="h-11">
@@ -368,7 +436,9 @@ export function EditTransactionModal({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isLoading || !description.trim() || !category.trim()}
+                  disabled={
+                    isLoading || !description.trim() || !category.trim()
+                  }
                   className="flex-1"
                 >
                   {isLoading ? (

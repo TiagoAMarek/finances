@@ -1,14 +1,14 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Auth schemas
 export const LoginSchema = z.object({
-  email: z.string().email('Formato de email inválido'),
-  password: z.string().min(1, 'Senha é obrigatória'),
+  email: z.string().email("Formato de email inválido"),
+  password: z.string().min(1, "Senha é obrigatória"),
 });
 
 export const RegisterSchema = z.object({
-  email: z.string().email('Formato de email inválido'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  email: z.string().email("Formato de email inválido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 // Bank account schemas - reflecting API structure
@@ -21,13 +21,13 @@ export const BankAccountSchema = z.object({
 });
 
 export const BankAccountCreateSchema = z.object({
-  name: z.string().min(1, 'Nome da conta é obrigatório'),
-  balance: z.string().default('0'),
-  currency: z.string().default('BRL'),
+  name: z.string().min(1, "Nome da conta é obrigatório"),
+  balance: z.string().default("0"),
+  currency: z.string().default("BRL"),
 });
 
 export const BankAccountUpdateSchema = z.object({
-  name: z.string().min(1, 'Nome da conta é obrigatório').optional(),
+  name: z.string().min(1, "Nome da conta é obrigatório").optional(),
   balance: z.string().optional(),
   currency: z.string().optional(),
 });
@@ -42,13 +42,13 @@ export const CreditCardSchema = z.object({
 });
 
 export const CreditCardCreateSchema = z.object({
-  name: z.string().min(1, 'Nome do cartão é obrigatório'),
-  limit: z.string().default('0'),
-  currentBill: z.string().default('0'),
+  name: z.string().min(1, "Nome do cartão é obrigatório"),
+  limit: z.string().default("0"),
+  currentBill: z.string().default("0"),
 });
 
 export const CreditCardUpdateSchema = z.object({
-  name: z.string().min(1, 'Nome do cartão é obrigatório').optional(),
+  name: z.string().min(1, "Nome do cartão é obrigatório").optional(),
   limit: z.string().optional(),
   currentBill: z.string().optional(),
 });
@@ -58,7 +58,7 @@ export const TransactionSchema = z.object({
   id: z.number(),
   description: z.string(),
   amount: z.string(), // Decimal fields come as strings from API
-  type: z.enum(['income', 'expense', 'transfer']),
+  type: z.enum(["income", "expense", "transfer"]),
   date: z.string(), // ISO format string
   category: z.string(),
   ownerId: z.number(),
@@ -67,46 +67,60 @@ export const TransactionSchema = z.object({
   toAccountId: z.number().nullable().optional(), // For transfers
 });
 
-export const TransactionCreateSchema = z.object({
-  description: z.string().min(1, 'Descrição é obrigatória'),
-  amount: z.string().min(1, 'Valor é obrigatório'),
-  type: z.enum(['income', 'expense', 'transfer']),
-  date: z.string().min(1, 'Data é obrigatória'),
-  category: z.string().min(1, 'Categoria é obrigatória'),
-  accountId: z.number().optional(),
-  creditCardId: z.number().optional(),
-  toAccountId: z.number().optional(), // For transfers
-}).refine((data) => {
-  if (data.type === 'transfer') {
-    return data.accountId && data.toAccountId && data.accountId !== data.toAccountId;
-  }
-  return !!(data.accountId || data.creditCardId) && !(data.accountId && data.creditCardId);
-}, {
-  message: 'Configuração de transação inválida',
-});
+export const TransactionCreateSchema = z
+  .object({
+    description: z.string().min(1, "Descrição é obrigatória"),
+    amount: z.string().min(1, "Valor é obrigatório"),
+    type: z.enum(["income", "expense", "transfer"]),
+    date: z.string().min(1, "Data é obrigatória"),
+    category: z.string().min(1, "Categoria é obrigatória"),
+    accountId: z.number().optional(),
+    creditCardId: z.number().optional(),
+    toAccountId: z.number().optional(), // For transfers
+  })
+  .refine(
+    (data) => {
+      if (data.type === "transfer") {
+        return (
+          data.accountId &&
+          data.toAccountId &&
+          data.accountId !== data.toAccountId
+        );
+      }
+      return (
+        !!(data.accountId || data.creditCardId) &&
+        !(data.accountId && data.creditCardId)
+      );
+    },
+    {
+      message: "Configuração de transação inválida",
+    },
+  );
 
 export const TransactionUpdateSchema = z.object({
   id: z.number(),
-  description: z.string().min(1, 'Descrição é obrigatória').optional(),
+  description: z.string().min(1, "Descrição é obrigatória").optional(),
   amount: z.string().optional(),
-  type: z.enum(['income', 'expense', 'transfer']).optional(),
+  type: z.enum(["income", "expense", "transfer"]).optional(),
   date: z.string().optional(),
-  category: z.string().min(1, 'Categoria é obrigatória').optional(),
+  category: z.string().min(1, "Categoria é obrigatória").optional(),
   accountId: z.number().optional(),
   creditCardId: z.number().optional(),
   toAccountId: z.number().optional(),
 });
 
 // Transfer schema
-export const TransferCreateSchema = z.object({
-  description: z.string().min(1, 'Descrição é obrigatória'),
-  amount: z.string().min(1, 'Valor é obrigatório'),
-  date: z.string().min(1, 'Data é obrigatória'),
-  fromAccountId: z.number(),
-  toAccountId: z.number(),
-}).refine((data) => data.fromAccountId !== data.toAccountId, {
-  message: 'Não é possível transferir para a mesma conta',
-});
+export const TransferCreateSchema = z
+  .object({
+    description: z.string().min(1, "Descrição é obrigatória"),
+    amount: z.string().min(1, "Valor é obrigatório"),
+    date: z.string().min(1, "Data é obrigatória"),
+    fromAccountId: z.number(),
+    toAccountId: z.number(),
+  })
+  .refine((data) => data.fromAccountId !== data.toAccountId, {
+    message: "Não é possível transferir para a mesma conta",
+  });
 
 // Monthly summary schema - reflecting API structure
 export const MonthlySummarySchema = z.object({
@@ -164,7 +178,9 @@ export type CreditCardUpdateInput = z.infer<typeof CreditCardUpdateSchema>;
 export type TransactionCreateInput = z.infer<typeof TransactionCreateSchema>;
 export type TransactionUpdateInput = z.infer<typeof TransactionUpdateSchema>;
 export type TransferCreateInput = z.infer<typeof TransferCreateSchema>;
-export type MonthlySummaryRequestInput = z.infer<typeof MonthlySummaryRequestSchema>;
+export type MonthlySummaryRequestInput = z.infer<
+  typeof MonthlySummaryRequestSchema
+>;
 
 // Response types
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;

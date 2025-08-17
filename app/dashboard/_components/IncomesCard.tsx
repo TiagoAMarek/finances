@@ -22,7 +22,7 @@ export function IncomesCard({ monthlyIncomes }: IncomesCardProps) {
           {formatCurrency(monthlyIncomes)}
         </div>
         <p className="text-xs text-muted-foreground mt-1">
-          {new Date().toLocaleDateString('pt-BR', { month: 'long' })}
+          {new Date().toLocaleDateString("pt-BR", { month: "long" })}
         </p>
       </CardContent>
     </Card>

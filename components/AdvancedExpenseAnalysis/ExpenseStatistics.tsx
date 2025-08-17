@@ -27,16 +27,14 @@ const StatisticCard = memo<StatisticCardProps>(function StatisticCard({
   return (
     <div className={`text-center p-2 ${colorClass} rounded-lg border`}>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="font-semibold">
-        {formatCurrency(value)}
-      </p>
+      <p className="font-semibold">{formatCurrency(value)}</p>
     </div>
   );
 });
 
 /**
  * Statistics display component for expense analysis
- * 
+ *
  * Features:
  * - Displays key expense metrics (max, min, average, total)
  * - Responsive grid layout
@@ -48,7 +46,9 @@ export const ExpenseStatistics = memo<ExpenseStatisticsProps>(
     const { max, min, average, total } = statistics;
 
     return (
-      <div className={`grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 px-2 ${className}`}>
+      <div
+        className={`grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 px-2 ${className}`}
+      >
         <StatisticCard
           label="Maior"
           value={max}

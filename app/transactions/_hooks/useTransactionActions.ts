@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from "@/hooks/useTransactions";
+import {
+  useCreateTransaction,
+  useUpdateTransaction,
+  useDeleteTransaction,
+} from "@/hooks/useTransactions";
 import { Transaction } from "@/lib/schemas";
 
 interface CreateTransactionData {
   description: string;
   amount: string;
-  type: 'income' | 'expense' | 'transfer';
+  type: "income" | "expense" | "transfer";
   date: string;
   category: string;
   accountId?: number;
@@ -16,7 +20,8 @@ interface CreateTransactionData {
 export function useTransactionActions() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
 
   const createTransactionMutation = useCreateTransaction();
   const updateTransactionMutation = useUpdateTransaction();
@@ -28,7 +33,7 @@ export function useTransactionActions() {
       toast.success("Lançamento criado com sucesso!");
       setCreateModalOpen(false);
     } catch (err: unknown) {
-      toast.error((err as Error).message || 'Erro ao criar lançamento.');
+      toast.error((err as Error).message || "Erro ao criar lançamento.");
     }
   };
 
@@ -44,7 +49,7 @@ export function useTransactionActions() {
       setEditModalOpen(false);
       setEditingTransaction(null);
     } catch (err: unknown) {
-      toast.error((err as Error).message || 'Erro ao atualizar lançamento.');
+      toast.error((err as Error).message || "Erro ao atualizar lançamento.");
     }
   };
 
@@ -53,7 +58,7 @@ export function useTransactionActions() {
       await deleteTransactionMutation.mutateAsync(transactionId);
       toast.success("Lançamento excluído com sucesso!");
     } catch (err: unknown) {
-      toast.error((err as Error).message || 'Erro ao excluir lançamento.');
+      toast.error((err as Error).message || "Erro ao excluir lançamento.");
     }
   };
 

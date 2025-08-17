@@ -1,14 +1,14 @@
 "use client";
 
-import type { NextPage } from 'next';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useCreditCards } from '@/hooks/useCreditCards';
-import { PageHeader } from '@/components/PageHeader';
-import { useCreditCardActions } from './_hooks/useCreditCardActions';
-import { CreateCardModal } from './_components/CreateCardModal';
-import { EditCardModal } from './_components/EditCardModal';
-import { CreditCardsList } from './_components/CreditCardsList';
+import type { NextPage } from "next";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCreditCards } from "@/hooks/useCreditCards";
+import { PageHeader } from "@/components/PageHeader";
+import { useCreditCardActions } from "./_hooks/useCreditCardActions";
+import { CreateCardModal } from "./_components/CreateCardModal";
+import { EditCardModal } from "./_components/EditCardModal";
+import { CreditCardsList } from "./_components/CreditCardsList";
 
 const CreditCardsPage: NextPage = () => {
   const { data: creditCards = [], isLoading, error } = useCreditCards();
@@ -61,7 +61,7 @@ const CreditCardsPage: NextPage = () => {
           />
         }
       />
-      
+
       <div className="space-y-6 px-4 lg:px-6 pb-4 lg:pb-6">
         {/* Error Alerts */}
         {error && (

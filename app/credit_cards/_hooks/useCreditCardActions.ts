@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useCreateCreditCard, useUpdateCreditCard, useDeleteCreditCard } from "@/hooks/useCreditCards";
+import {
+  useCreateCreditCard,
+  useUpdateCreditCard,
+  useDeleteCreditCard,
+} from "@/hooks/useCreditCards";
 import { CreditCard } from "@/lib/schemas";
 
 export function useCreditCardActions() {
@@ -13,15 +17,18 @@ export function useCreditCardActions() {
   const deleteCardMutation = useDeleteCreditCard();
 
   const handleCreate = async (data: { name: string; limit: string }) => {
-    createCardMutation.mutate({
-      ...data,
-      currentBill: "0"
-    }, {
-      onSuccess: () => {
-        toast.success("Cartão criado com sucesso!");
-        setCreateModalOpen(false);
+    createCardMutation.mutate(
+      {
+        ...data,
+        currentBill: "0",
       },
-    });
+      {
+        onSuccess: () => {
+          toast.success("Cartão criado com sucesso!");
+          setCreateModalOpen(false);
+        },
+      },
+    );
   };
 
   const handleEdit = (card: CreditCard) => {

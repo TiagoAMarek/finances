@@ -1,25 +1,38 @@
 "use client";
 
-import type { NextPage } from 'next';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useTransactions } from '@/hooks/useTransactions';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCreditCards } from '@/hooks/useCreditCards';
-import { PageHeader } from '@/components/PageHeader';
-import { QuickCreateButton } from '@/components/QuickCreateButton';
-import { CreateTransactionModal } from './_components/CreateTransactionModal';
-import { EditTransactionModal } from './_components/EditTransactionModal';
-import { TransactionsList } from './_components/TransactionsList';
-import { TransactionFiltersComponent } from './_components/TransactionFilters';
-import { useTransactionActions } from './_hooks/useTransactionActions';
-import { useTransactionFilters } from './_hooks/useTransactionFilters';
+import type { NextPage } from "next";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTransactions } from "@/hooks/useTransactions";
+import { useAccounts } from "@/hooks/useAccounts";
+import { useCreditCards } from "@/hooks/useCreditCards";
+import { PageHeader } from "@/components/PageHeader";
+import { QuickCreateButton } from "@/components/QuickCreateButton";
+import { CreateTransactionModal } from "./_components/CreateTransactionModal";
+import { EditTransactionModal } from "./_components/EditTransactionModal";
+import { TransactionsList } from "./_components/TransactionsList";
+import { TransactionFiltersComponent } from "./_components/TransactionFilters";
+import { useTransactionActions } from "./_hooks/useTransactionActions";
+import { useTransactionFilters } from "./_hooks/useTransactionFilters";
 
 const TransactionsPage: NextPage = () => {
-  const { data: transactions = [], isLoading: isLoadingTransactions, isError: isErrorTransactions, error: transactionsError } = useTransactions();
-  const { isLoading: isLoadingAccounts, isError: isErrorAccounts, error: accountsError } = useAccounts();
-  const { isLoading: isLoadingCreditCards, isError: isErrorCreditCards, error: creditCardsError } = useCreditCards();
-  
+  const {
+    data: transactions = [],
+    isLoading: isLoadingTransactions,
+    isError: isErrorTransactions,
+    error: transactionsError,
+  } = useTransactions();
+  const {
+    isLoading: isLoadingAccounts,
+    isError: isErrorAccounts,
+    error: accountsError,
+  } = useAccounts();
+  const {
+    isLoading: isLoadingCreditCards,
+    isError: isErrorCreditCards,
+    error: creditCardsError,
+  } = useCreditCards();
+
   const {
     handleCreate,
     handleEdit,
@@ -41,8 +54,10 @@ const TransactionsPage: NextPage = () => {
     hasActiveFilters,
   } = useTransactionFilters(transactions);
 
-  const isPageLoading = isLoadingTransactions || isLoadingAccounts || isLoadingCreditCards;
-  const isPageError = isErrorTransactions || isErrorAccounts || isErrorCreditCards;
+  const isPageLoading =
+    isLoadingTransactions || isLoadingAccounts || isLoadingCreditCards;
+  const isPageError =
+    isErrorTransactions || isErrorAccounts || isErrorCreditCards;
   const pageError = transactionsError || accountsError || creditCardsError;
 
   if (isPageLoading) {
@@ -86,7 +101,6 @@ const TransactionsPage: NextPage = () => {
       </>
     );
   }
-
 
   return (
     <>

@@ -10,7 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { EditIcon, CreditCardIcon, DollarSignIcon, Loader2Icon, SaveIcon } from "lucide-react";
+import {
+  EditIcon,
+  CreditCardIcon,
+  DollarSignIcon,
+  Loader2Icon,
+  SaveIcon,
+} from "lucide-react";
 import { CreditCard } from "@/lib/schemas";
 
 interface EditCardModalProps {
@@ -43,7 +49,7 @@ export function EditCardModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!card) return;
-    
+
     onSave({
       ...card,
       name,
@@ -66,9 +72,9 @@ export function EditCardModal({
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -85,7 +91,9 @@ export function EditCardModal({
             <EditIcon className="h-6 w-6 text-orange-500" />
           </div>
           <div className="space-y-1">
-            <DialogTitle className="text-xl">Editar Cartão de Crédito</DialogTitle>
+            <DialogTitle className="text-xl">
+              Editar Cartão de Crédito
+            </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               Atualize os dados do seu cartão de crédito
             </DialogDescription>
@@ -101,9 +109,15 @@ export function EditCardModal({
             <div className="flex-1">
               <p className="font-medium text-foreground">{card.name}</p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Fatura: {formatCurrency(parseFloat(card.currentBill))}</span>
+                <span>
+                  Fatura: {formatCurrency(parseFloat(card.currentBill))}
+                </span>
                 <span>•</span>
-                <span className={isHighUsage ? 'text-amber-600' : 'text-muted-foreground'}>
+                <span
+                  className={
+                    isHighUsage ? "text-amber-600" : "text-muted-foreground"
+                  }
+                >
                   {usagePercentage.toFixed(1)}% usado
                 </span>
               </div>
@@ -115,7 +129,10 @@ export function EditCardModal({
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="editCardName" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="editCardName"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <CreditCardIcon className="h-4 w-4" />
                   Nome do Cartão
                 </Label>
@@ -135,7 +152,10 @@ export function EditCardModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="editCardLimit" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="editCardLimit"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <DollarSignIcon className="h-4 w-4" />
                   Limite do Cartão
                 </Label>
@@ -160,7 +180,10 @@ export function EditCardModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="editCurrentBill" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="editCurrentBill"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <DollarSignIcon className="h-4 w-4" />
                   Fatura Atual
                 </Label>
@@ -172,7 +195,9 @@ export function EditCardModal({
                     type="number"
                     id="editCurrentBill"
                     value={currentBill || ""}
-                    onChange={(e) => setCurrentBill(parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      setCurrentBill(parseFloat(e.target.value) || 0)
+                    }
                     placeholder="0,00"
                     className="h-11 pl-10"
                     step="0.01"

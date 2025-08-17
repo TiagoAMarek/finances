@@ -1,9 +1,15 @@
-import { NextRequest } from 'next/server';
-import { eq } from 'drizzle-orm';
-import { db } from '../../lib/db';
-import { users } from '../../lib/schema';
-import { LoginSchema } from '../../lib/validation';
-import { verifyPassword, signToken, createErrorResponse, createSuccessResponse, handleZodError } from '../../lib/auth';
+import { NextRequest } from "next/server";
+import { eq } from "drizzle-orm";
+import { db } from "../../lib/db";
+import { users } from "../../lib/schema";
+import { LoginSchema } from "../../lib/validation";
+import {
+  verifyPassword,
+  signToken,
+  createErrorResponse,
+  createSuccessResponse,
+  handleZodError,
+} from "../../lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,17 +17,24 @@ export async function POST(request: NextRequest) {
     const validatedData = LoginSchema.parse(body);
 
     // Find user by email
-    const [user] = await db.select().from(users).where(eq(users.email, validatedData.email)).limit(1);
-    
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, validatedData.email))
+      .limit(1);
+
     if (!user) {
-      return createErrorResponse('Invalid email or password', 401);
+      return createErrorResponse("Invalid email or password", 401);
     }
 
     // Verify password
-    const isValidPassword = await verifyPassword(validatedData.password, user.hashedPassword);
-    
+    const isValidPassword = await verifyPassword(
+      validatedData.password,
+      user.hashedPassword,
+    );
+
     if (!isValidPassword) {
-      return createErrorResponse('Invalid email or password', 401);
+      return createErrorResponse("Invalid email or password", 401);
     }
 
     // Generate JWT token
@@ -33,12 +46,11 @@ export async function POST(request: NextRequest) {
     return createSuccessResponse({
       access_token: token,
     });
-
   } catch (error) {
     const zodErrorResponse = handleZodError(error);
     if (zodErrorResponse) return zodErrorResponse;
-    
-    console.error('Login error:', error);
-    return createErrorResponse('Internal server error', 500);
+
+    console.error("Login error:", error);
+    return createErrorResponse("Internal server error", 500);
   }
 }

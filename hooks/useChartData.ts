@@ -19,7 +19,7 @@ import {
  */
 export function useDailyChartData(
   transactions: Transaction[],
-  filter: TransactionFilter = {}
+  filter: TransactionFilter = {},
 ): ChartDataPoint[] {
   return useMemo(() => {
     const data: ChartDataPoint[] = [];
@@ -33,25 +33,21 @@ export function useDailyChartData(
       const dayStart = new Date(
         date.getFullYear(),
         date.getMonth(),
-        date.getDate()
+        date.getDate(),
       );
       const dayEnd = new Date(
         date.getFullYear(),
         date.getMonth(),
-        date.getDate() + 1
+        date.getDate() + 1,
       );
 
       const dayTransactions = filterTransactionsByDateRange(
         transactions,
         dayStart,
-        dayEnd
+        dayEnd,
       );
 
-      const chartPoint = createChartDataPoint(
-        dayTransactions,
-        dayName,
-        filter
-      );
+      const chartPoint = createChartDataPoint(dayTransactions, dayName, filter);
 
       data.push(chartPoint);
     }
@@ -67,7 +63,7 @@ export function useWeeklyChartData(
   transactions: Transaction[],
   year: number,
   month: number,
-  filter: TransactionFilter = {}
+  filter: TransactionFilter = {},
 ): ChartDataPoint[] {
   return useMemo(() => {
     const data: ChartDataPoint[] = [];
@@ -79,13 +75,13 @@ export function useWeeklyChartData(
       const weekTransactions = filterTransactionsByDateRange(
         transactions,
         weekStart,
-        weekEnd
+        weekEnd,
       );
 
       const chartPoint = createChartDataPoint(
         weekTransactions,
         `Sem ${week}`,
-        filter
+        filter,
       );
 
       data.push(chartPoint);
@@ -101,7 +97,7 @@ export function useWeeklyChartData(
 export function useMonthlyChartData(
   transactions: Transaction[],
   monthsCount: number,
-  filter: TransactionFilter = {}
+  filter: TransactionFilter = {},
 ): ChartDataPoint[] {
   return useMemo(() => {
     const data: ChartDataPoint[] = [];
@@ -116,13 +112,13 @@ export function useMonthlyChartData(
       const monthTransactions = filterTransactionsByMonth(
         transactions,
         monthIndex,
-        year
+        year,
       );
 
       const chartPoint = createChartDataPoint(
         monthTransactions,
         `${month} ${year}`,
-        filter
+        filter,
       );
 
       data.push(chartPoint);
@@ -139,7 +135,7 @@ export function useSingleMonthChartData(
   transactions: Transaction[],
   year: number,
   month: number,
-  filter: TransactionFilter = {}
+  filter: TransactionFilter = {},
 ): ChartDataPoint[] {
   return useMemo(() => {
     const date = new Date(year, month, 1);
@@ -148,13 +144,13 @@ export function useSingleMonthChartData(
     const monthTransactions = filterTransactionsByMonth(
       transactions,
       month,
-      year
+      year,
     );
 
     const chartPoint = createChartDataPoint(
       monthTransactions,
       monthName,
-      filter
+      filter,
     );
 
     return [chartPoint];
@@ -167,7 +163,7 @@ export function useSingleMonthChartData(
 export function useIncomeVsExpenseChartData(
   transactions: Transaction[],
   config: ChartConfig,
-  filter: TransactionFilter = {}
+  filter: TransactionFilter = {},
 ): ChartDataPoint[] {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
@@ -182,14 +178,14 @@ export function useIncomeVsExpenseChartData(
     transactions,
     config.selectedYear || currentYear,
     config.selectedMonth ?? currentMonth,
-    filter
+    filter,
   );
 
   const singleMonthData = useSingleMonthChartData(
     transactions,
     config.selectedYear || currentYear,
     config.selectedMonth ?? currentMonth,
-    filter
+    filter,
   );
 
   return useMemo(() => {
@@ -204,7 +200,10 @@ export function useIncomeVsExpenseChartData(
         return weeklyData;
 
       case "custom":
-        if (config.selectedMonth !== undefined && config.selectedYear !== undefined) {
+        if (
+          config.selectedMonth !== undefined &&
+          config.selectedYear !== undefined
+        ) {
           // Check if it's current month for weekly view
           if (
             config.selectedMonth === currentMonth &&
@@ -219,10 +218,13 @@ export function useIncomeVsExpenseChartData(
 
       case "6-months":
         return sixMonthsData;
-        
+
       default:
         // If month/year are provided but no explicit periodType, treat as custom
-        if (config.selectedMonth !== undefined && config.selectedYear !== undefined) {
+        if (
+          config.selectedMonth !== undefined &&
+          config.selectedYear !== undefined
+        ) {
           if (
             config.selectedMonth === currentMonth &&
             config.selectedYear === currentYear
@@ -269,7 +271,10 @@ export function useChartDescription(config: ChartConfig): string {
         return `${currentMonthName} ${currentYear} - visão semanal`;
 
       case "custom":
-        if (config.selectedMonth !== undefined && config.selectedYear !== undefined) {
+        if (
+          config.selectedMonth !== undefined &&
+          config.selectedYear !== undefined
+        ) {
           const date = new Date(config.selectedYear, config.selectedMonth, 1);
           const monthName = getMonthNameLong(date);
 
@@ -286,10 +291,13 @@ export function useChartDescription(config: ChartConfig): string {
 
       case "6-months":
         return "Comparativo mensal dos últimos 6 meses";
-        
+
       default:
         // If month/year are provided but no explicit periodType, treat as custom
-        if (config.selectedMonth !== undefined && config.selectedYear !== undefined) {
+        if (
+          config.selectedMonth !== undefined &&
+          config.selectedYear !== undefined
+        ) {
           const date = new Date(config.selectedYear, config.selectedMonth, 1);
           const monthName = getMonthNameLong(date);
 
@@ -312,8 +320,14 @@ export function useChartDescription(config: ChartConfig): string {
  */
 export function useChartTotals(chartData: ChartDataPoint[]) {
   return useMemo(() => {
-    const totalIncomes = chartData.reduce((sum, point) => sum + point.receitas, 0);
-    const totalExpenses = chartData.reduce((sum, point) => sum + point.despesas, 0);
+    const totalIncomes = chartData.reduce(
+      (sum, point) => sum + point.receitas,
+      0,
+    );
+    const totalExpenses = chartData.reduce(
+      (sum, point) => sum + point.despesas,
+      0,
+    );
     const netBalance = totalIncomes - totalExpenses;
 
     return {

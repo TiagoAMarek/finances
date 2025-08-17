@@ -1,18 +1,18 @@
 "use client";
 
-import { useState } from 'react';
-import type { NextPage } from 'next';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useLogin } from '@/hooks/useAuth';
+import { useState } from "react";
+import type { NextPage } from "next";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useLogin } from "@/hooks/useAuth";
 
 const LoginPage: NextPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
   const loginMutation = useLogin();
@@ -24,10 +24,10 @@ const LoginPage: NextPage = () => {
       { email, password },
       {
         onSuccess: (data) => {
-          localStorage.setItem('access_token', data.access_token);
-          router.push('/dashboard');
+          localStorage.setItem("access_token", data.access_token);
+          router.push("/dashboard");
         },
-      }
+      },
     );
   };
 
@@ -43,7 +43,9 @@ const LoginPage: NextPage = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {loginMutation.error && (
               <Alert variant="destructive">
-                <AlertDescription>{loginMutation.error.message}</AlertDescription>
+                <AlertDescription>
+                  {loginMutation.error.message}
+                </AlertDescription>
               </Alert>
             )}
             <div className="space-y-2">
@@ -73,7 +75,7 @@ const LoginPage: NextPage = () => {
               className="w-full"
               disabled={loginMutation.isPending}
             >
-              {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
+              {loginMutation.isPending ? "Entrando..." : "Entrar"}
             </Button>
           </form>
           <div className="mt-4 flex items-center justify-between text-sm">

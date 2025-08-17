@@ -80,7 +80,7 @@ const CustomTooltip = memo<TooltipProps>(function CustomTooltip({
 
 /**
  * Pure chart component for expense analysis
- * 
+ *
  * Features:
  * - Optimized with React.memo for performance
  * - Custom tooltip with transaction details
