@@ -10,7 +10,7 @@ import { ArrowLeft, CreditCard } from "lucide-react";
 import type { NextPage } from "next";
 import Link from "next/link";
 import { useState } from "react";
-import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExpenseAnalysis";
+import { AdvancedExpenseAnalysis } from "@/components/AdvancedExpenseAnalysis";
 import { ExpenseCategoriesChart } from "../../dashboard/_components/ExpenseCategoriesChart";
 import { PeriodSelector } from "../_components/PeriodSelector";
 

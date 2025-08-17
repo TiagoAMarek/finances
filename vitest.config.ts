@@ -54,6 +54,9 @@ export default defineConfig({
           testTimeout: 10000,
           hookTimeout: 10000
         },
+        esbuild: {
+          jsxInject: `import React from 'react'`
+        },
         resolve: {
           alias: {
             '@': path.resolve(__dirname, './')

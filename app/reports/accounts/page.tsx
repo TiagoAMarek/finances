@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useTransactions } from "@/hooks/useTransactions";
 import { ExpenseCategoriesChart } from "../../dashboard/_components/ExpenseCategoriesChart";
-import { AdvancedExpenseAnalysis } from "../../dashboard/_components/AdvancedExpenseAnalysis";
+import { AdvancedExpenseAnalysis } from "@/components/AdvancedExpenseAnalysis";
 import { PeriodSelector } from "../_components/PeriodSelector";
 import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";

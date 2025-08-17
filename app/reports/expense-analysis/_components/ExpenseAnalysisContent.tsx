@@ -1,5 +1,5 @@
 import { Transaction } from "@/lib/schemas";
-import { AdvancedExpenseAnalysis } from "../../../dashboard/_components/AdvancedExpenseAnalysis";
+import { AdvancedExpenseAnalysis } from "@/components/AdvancedExpenseAnalysis";
 import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
 
 interface ExpenseAnalysisContentProps {
