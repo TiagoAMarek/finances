@@ -9,8 +9,8 @@ import { ChartLine } from "lucide-react";
 import type { NextPage } from "next";
 import { useState } from "react";
 import { MonthlyPerformanceCards } from "../../dashboard/_components/MonthlyPerformanceCards";
-import { WeeklyBalanceChart } from "../../dashboard/_components/WeeklyBalanceChart";
-import { WeeklyIncomeVsExpenseChart } from "../../dashboard/_components/WeeklyIncomeVsExpenseChart";
+import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
+import { AdvancedExpenseAnalysis } from "@/components/AdvancedExpenseAnalysis";
 import { PeriodSelector } from "../_components/PeriodSelector";
 
 const PerformancePage: NextPage = () => {
@@ -22,7 +22,7 @@ const PerformancePage: NextPage = () => {
     creditCards: [],
   });
 
-  // Usar hook para buscar e filtrar dados
+  // Usar hook para buscar e filtrar dados com filtros coordenados
   const { filteredTransactions, accounts, creditCards, isLoading } =
     useFilteredTransactions({
       accountCardFilters,
@@ -38,12 +38,6 @@ const PerformancePage: NextPage = () => {
     .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
   const monthlyBalance = monthlyIncomes - monthlyExpenses;
-
-  // Calcular saldo total de todas as contas
-  const totalBalance = accounts.reduce(
-    (sum, account) => sum + parseFloat(account.balance),
-    0,
-  );
 
   if (isLoading) {
     return (
@@ -123,13 +117,15 @@ const PerformancePage: NextPage = () => {
 
         {/* Gráficos de Evolução Semanal */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <WeeklyBalanceChart
+          <IncomeVsExpenseChart
             transactions={filteredTransactions}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            totalBalance={totalBalance}
+            periodType="current-month"
+            dateFilter={{
+              selectedMonth,
+              selectedYear,
+            }}
           />
-          <WeeklyIncomeVsExpenseChart
+          <AdvancedExpenseAnalysis
             transactions={filteredTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}

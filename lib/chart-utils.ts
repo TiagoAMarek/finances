@@ -49,14 +49,26 @@ export function applyTransactionFilters(
 ): Transaction[] {
   let filtered = transactions;
 
-  if (filter.accountId !== null && filter.accountId !== undefined) {
-    filtered = filtered.filter((t) => t.accountId === filter.accountId);
+  // Aplicar filtro de conta OU cartão (não AND) - lógica inclusiva
+  const hasAccountFilter =
+    filter.accountId !== null && filter.accountId !== undefined;
+  const hasCreditCardFilter =
+    filter.creditCardId !== null && filter.creditCardId !== undefined;
+
+  if (hasAccountFilter || hasCreditCardFilter) {
+    filtered = filtered.filter((t) => {
+      const matchesAccount = hasAccountFilter
+        ? t.accountId === filter.accountId
+        : false;
+      const matchesCard = hasCreditCardFilter
+        ? t.creditCardId === filter.creditCardId
+        : false;
+      // Incluir transação se corresponde à conta OU ao cartão
+      return matchesAccount || matchesCard;
+    });
   }
 
-  if (filter.creditCardId !== null && filter.creditCardId !== undefined) {
-    filtered = filtered.filter((t) => t.creditCardId === filter.creditCardId);
-  }
-
+  // Manter filtro de data como está
   if (filter.startDate && filter.endDate) {
     filtered = filtered.filter((t) => {
       const transactionDate = new Date(t.date);

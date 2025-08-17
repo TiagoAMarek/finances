@@ -34,8 +34,6 @@ export function ExpenseAnalysisContent({
         <IncomeVsExpenseChart
           transactions={transactions}
           periodType={getPeriodType(periodFilter)}
-          selectedAccountId={null}
-          selectedCreditCardId={null}
         />
       </div>
 

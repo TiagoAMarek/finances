@@ -9,6 +9,7 @@ import {
   filterExpenseTransactions,
   filterTransactionsByPeriod,
   generateExpenseTrendData,
+  generateMonthlyWeeksData,
   calculateExpenseStatistics,
   formatExpenseChartData,
   getExpensePeriodDescription,
@@ -90,10 +91,18 @@ export function useExpenseAnalysis({
   );
 
   // Generate chart data based on period configuration
-  const chartData = useMemo(
-    () => generateExpenseTrendData(filteredExpenseTransactions, config),
-    [filteredExpenseTransactions, config],
-  );
+  const chartData = useMemo(() => {
+    // If both selectedMonth and selectedYear are provided, use weekly data for that month
+    if (selectedMonth !== undefined && selectedYear !== undefined) {
+      return generateMonthlyWeeksData(
+        filteredExpenseTransactions,
+        selectedMonth,
+        selectedYear,
+      );
+    }
+    // Otherwise, use the period filter (3months, 6months, 12months)
+    return generateExpenseTrendData(filteredExpenseTransactions, config);
+  }, [filteredExpenseTransactions, config, selectedMonth, selectedYear]);
 
   // Calculate statistics from chart data
   const statistics = useMemo(
@@ -108,16 +117,43 @@ export function useExpenseAnalysis({
   );
 
   // Generate period description
-  const periodDescription = useMemo(
-    () => getExpensePeriodDescription(periodFilter),
-    [periodFilter],
-  );
+  const periodDescription = useMemo(() => {
+    // If showing weekly data for a specific month, show month description
+    if (selectedMonth !== undefined && selectedYear !== undefined) {
+      const monthDate = new Date(selectedYear, selectedMonth, 1);
+      const monthName = monthDate.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      });
+      return `para ${monthName} (visão semanal)`;
+    }
+    // Otherwise, use the period filter description
+    return getExpensePeriodDescription(periodFilter);
+  }, [periodFilter, selectedMonth, selectedYear]);
 
   // Determine if data is empty
-  const isEmpty = useMemo(
-    () => periodFilteredTransactions.length === 0,
-    [periodFilteredTransactions],
-  );
+  const isEmpty = useMemo(() => {
+    // If showing weekly data for a specific month, check if month has expense transactions
+    if (selectedMonth !== undefined && selectedYear !== undefined) {
+      const monthExpenseTransactions = filteredExpenseTransactions.filter(
+        (t) => {
+          const transactionDate = new Date(t.date);
+          return (
+            transactionDate.getMonth() === selectedMonth &&
+            transactionDate.getFullYear() === selectedYear
+          );
+        },
+      );
+      return monthExpenseTransactions.length === 0;
+    }
+    // Otherwise, use period filtered transactions
+    return periodFilteredTransactions.length === 0;
+  }, [
+    periodFilteredTransactions,
+    filteredExpenseTransactions,
+    selectedMonth,
+    selectedYear,
+  ]);
 
   return {
     chartData,
