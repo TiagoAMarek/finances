@@ -3,6 +3,10 @@ import { mockCreditCards } from '../data/credit-cards';
 
 export const creditCardHandlers = [
   // GET /api/credit_cards - Fetch all credit cards
+  http.get('http://localhost:3000/api/credit_cards', () => {
+    return HttpResponse.json(mockCreditCards);
+  }),
+  // Also handle relative URLs for backward compatibility
   http.get('/api/credit_cards', () => {
     return HttpResponse.json(mockCreditCards);
   }),

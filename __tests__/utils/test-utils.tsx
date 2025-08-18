@@ -48,6 +48,15 @@ Object.defineProperty(window, 'location', {
   writable: true,
 });
 
+// Mock process.env for proper API base URL in tests
+Object.defineProperty(process, 'env', {
+  value: {
+    ...process.env,
+    NEXT_PUBLIC_API_URL: 'http://localhost:3000',
+  },
+  writable: true,
+});
+
 export { mockLocation };
 
 // Create test query client with sensible defaults

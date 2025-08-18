@@ -3,6 +3,10 @@ import { mockAccounts } from '../data/accounts';
 
 export const accountHandlers = [
   // GET /api/accounts - Fetch all accounts
+  http.get('http://localhost:3000/api/accounts', () => {
+    return HttpResponse.json(mockAccounts);
+  }),
+  // Also handle relative URLs for backward compatibility
   http.get('/api/accounts', () => {
     return HttpResponse.json(mockAccounts);
   }),

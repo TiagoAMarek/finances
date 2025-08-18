@@ -53,29 +53,14 @@ const navLinks = [
 
 const reportLinks = [
   {
-    name: "Relatórios",
-    href: "/reports",
-    icon: TrendingUp,
-  },
-  {
-    name: "Performance Mensal",
-    href: "/reports/performance",
-    icon: Activity,
-  },
-  {
     name: "Análise de Gastos",
     href: "/reports/expense-analysis",
     icon: PieChart,
   },
   {
-    name: "Análise por Contas",
-    href: "/reports/accounts",
-    icon: Wallet,
-  },
-  {
-    name: "Análise por Cartões",
-    href: "/reports/credit-cards",
-    icon: CreditCard,
+    name: "Performance Mensal",
+    href: "/reports/performance",
+    icon: Activity,
   },
 ];
 

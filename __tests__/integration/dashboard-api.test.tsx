@@ -1,264 +1,372 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { screen, waitFor, fireEvent } from '@testing-library/react';
-import { renderWithProviders, testHelpers, localStorageMock, mockLocation } from '../utils/test-utils';
-import DashboardPage from '@/app/dashboard/page';
-import { server } from '../mocks/server';
-import { http, HttpResponse } from 'msw';
+import { describe, it, expect, beforeEach } from "vitest";
+import { screen, waitFor } from "@testing-library/react";
+import { renderWithProviders, testHelpers } from "../utils/test-utils";
+import DashboardPage from "@/app/dashboard/page";
+import { server } from "../mocks/server";
+import { http, HttpResponse } from "msw";
+import { BankAccount, Transaction } from "@/lib/schemas";
 
-describe('Dashboard API Integration Tests', () => {
+// ============================================================================
+// Test Constants & Configuration
+// ============================================================================
+
+const TEST_CONSTANTS = {
+  EXPECTED_TOTAL_BALANCE: "29.200,50", // Sum of all mock account balances
+  EXPECTED_MONTHLY_INCOME: "5.500,00", // From mock transaction data
+  BASE_URL: "http://localhost:3000",
+  TIMEOUTS: {
+    DASHBOARD_LOAD: 5000,
+    API_RETRY: 5000,
+    QUICK_OPERATION: 1000,
+    SLOW_OPERATION: 2000,
+    PERFORMANCE_MAX: 5000,
+  },
+} as const;
+
+const ENDPOINTS = {
+  ACCOUNTS: `${TEST_CONSTANTS.BASE_URL}/api/accounts`,
+  CREDIT_CARDS: `${TEST_CONSTANTS.BASE_URL}/api/credit_cards`,
+  TRANSACTIONS: `${TEST_CONSTANTS.BASE_URL}/api/transactions`,
+} as const;
+
+const TEST_DATA = {
+  RECOVERED_ACCOUNT: {
+    id: 1,
+    name: "Conta Recuperada",
+    balance: "1000.00",
+    currency: "BRL",
+    ownerId: 1,
+  } as BankAccount,
+
+  TEST_ACCOUNT: {
+    id: 1,
+    name: "Conta Teste",
+    balance: "1000.00",
+    currency: "BRL",
+    ownerId: 1,
+  } as BankAccount,
+
+  NEW_TRANSACTION: {
+    id: 999,
+    description: "Nova Receita",
+    amount: "1000.00",
+    type: "income" as const,
+    date: new Date().toISOString().split("T")[0],
+    category: "Freelance",
+    ownerId: 1,
+    accountId: 1,
+    creditCardId: null,
+  } as Transaction,
+
+  ERROR_MESSAGES: {
+    TEMPORARY_ERROR: "Erro temporário",
+    TOKEN_EXPIRED: "Token expirado",
+  },
+} as const;
+
+// ============================================================================
+// Test Helpers
+// ============================================================================
+
+/**
+ * Waits for the dashboard to finish loading (skeleton disappears)
+ */
+const waitForDashboardLoad = (
+  timeout = TEST_CONSTANTS.TIMEOUTS.DASHBOARD_LOAD,
+) => {
+  return waitFor(
+    () => {
+      expect(
+        screen.queryByTestId("dashboard-skeleton"),
+      ).not.toBeInTheDocument();
+    },
+    { timeout },
+  );
+};
+
+/**
+ * Expects balance elements to appear on the page
+ */
+const expectBalanceElements = (balanceText: string, expectedCount?: number) => {
+  const balanceRegex = new RegExp(`R\\$\\s*${balanceText.replace(".", "\\.")}`);
+  const elements = screen.getAllByText(balanceRegex);
+
+  if (expectedCount !== undefined) {
+    expect(elements.length).toBe(expectedCount);
+  } else {
+    expect(elements.length).toBeGreaterThan(0);
+  }
+
+  return elements;
+};
+
+/**
+ * Sets up MSW handlers for empty data states
+ */
+const setupEmptyDataHandlers = () => {
+  server.resetHandlers(
+    http.get(ENDPOINTS.ACCOUNTS, () => HttpResponse.json([])),
+    http.get(ENDPOINTS.CREDIT_CARDS, () => HttpResponse.json([])),
+    http.get(ENDPOINTS.TRANSACTIONS, () => HttpResponse.json([])),
+  );
+};
+
+/**
+ * Creates a handler that simulates network delays
+ */
+const createDelayedHandler = (
+  endpoint: string,
+  delay: number,
+  responseData: any = [],
+) => {
+  return http.get(endpoint, async () => {
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    return HttpResponse.json(responseData);
+  });
+};
+
+/**
+ * Creates a handler that fails a specified number of times before succeeding
+ */
+const createRetryHandler = (
+  endpoint: string,
+  failureCount: number,
+  successData: any,
+  errorMessage = TEST_DATA.ERROR_MESSAGES.TEMPORARY_ERROR,
+) => {
+  let attemptCount = 0;
+
+  return http.get(endpoint, () => {
+    attemptCount++;
+    if (attemptCount <= failureCount) {
+      return HttpResponse.json({ detail: errorMessage }, { status: 500 });
+    }
+    return HttpResponse.json(successData);
+  });
+};
+
+/**
+ * Creates a handler that returns an authentication error
+ */
+const createAuthErrorHandler = (endpoint: string) => {
+  return http.get(endpoint, () =>
+    HttpResponse.json(
+      { detail: TEST_DATA.ERROR_MESSAGES.TOKEN_EXPIRED },
+      { status: 401 },
+    ),
+  );
+};
+
+/**
+ * Creates a large dataset for performance testing
+ */
+const createLargeTransactionSet = (size = 1000) => {
+  return Array.from({ length: size }, (_, i) => ({
+    id: i + 1,
+    description: `Transação ${i + 1}`,
+    amount: "100.00",
+    type: "expense" as const,
+    date: new Date().toISOString().split("T")[0],
+    category: "Teste",
+    ownerId: 1,
+    accountId: 1,
+    creditCardId: null,
+  }));
+};
+
+describe("Dashboard API Integration Tests", () => {
   beforeEach(() => {
     testHelpers.resetLocalStorage();
     testHelpers.setAuthenticatedUser();
   });
 
-  describe('Real-time Data Updates', () => {
-    it('should handle new transaction creation and update dashboard', async () => {
+  describe("Real-time Data Updates", () => {
+    it("should handle new transaction creation and update dashboard", async () => {
+      // Given: Dashboard is rendered with initial data
       renderWithProviders(<DashboardPage />);
+      await waitForDashboardLoad();
 
-      // Wait for initial load
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
-      });
+      // Then: Initial balance should be displayed
+      expectBalanceElements(TEST_CONSTANTS.EXPECTED_TOTAL_BALANCE);
 
-      // Get initial balance
-      const initialBalanceText = screen.getByText(/R\$\s*29\.200,50/);
-      expect(initialBalanceText).toBeInTheDocument();
-
-      // Mock a new transaction creation
+      // When: Mock a new transaction creation endpoint
       server.use(
-        http.post('/api/transactions', () => {
+        http.post(ENDPOINTS.TRANSACTIONS, () => {
           return HttpResponse.json({
-            transaction: {
-              id: 999,
-              description: 'Nova Receita',
-              amount: '1000.00',
-              type: 'income',
-              date: new Date().toISOString().split('T')[0],
-              category: 'Freelance',
-              ownerId: 1,
-              accountId: 1,
-              creditCardId: null,
-            }
+            transaction: TEST_DATA.NEW_TRANSACTION,
           });
-        })
+        }),
       );
 
-      // The dashboard should update when new transactions are added
+      // Note: The dashboard should update when new transactions are added
       // (This would typically happen through TanStack Query invalidation)
     });
 
-    it('should handle concurrent API requests gracefully', async () => {
-      // Mock delayed responses to test concurrent behavior
+    it("should handle concurrent API requests gracefully", async () => {
+      // Given: Mock API endpoints with staggered response delays
       server.use(
-        http.get('/api/accounts', async () => {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          return HttpResponse.json([]);
-        }),
-        http.get('/api/credit_cards', async () => {
-          await new Promise(resolve => setTimeout(resolve, 150));
-          return HttpResponse.json([]);
-        }),
-        http.get('/api/transactions', async () => {
-          await new Promise(resolve => setTimeout(resolve, 200));
-          return HttpResponse.json([]);
-        })
+        createDelayedHandler(ENDPOINTS.ACCOUNTS, 100),
+        createDelayedHandler(ENDPOINTS.CREDIT_CARDS, 150),
+        createDelayedHandler(ENDPOINTS.TRANSACTIONS, 200),
       );
 
+      // When: Dashboard is rendered (triggers concurrent API calls)
       renderWithProviders(<DashboardPage />);
 
-      // All requests should complete without race conditions
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
-      }, { timeout: 1000 });
+      // Then: All requests should complete without race conditions
+      await waitForDashboardLoad(TEST_CONSTANTS.TIMEOUTS.QUICK_OPERATION);
     });
   });
 
-  describe('Network Error Scenarios', () => {
-    it('should handle network timeout gracefully', async () => {
+  describe("Network Error Scenarios", () => {
+    it("should handle network timeout gracefully", async () => {
+      // Given: Mock a very slow API response (simulates timeout)
       server.use(
-        http.get('/api/accounts', async () => {
-          await new Promise(resolve => setTimeout(resolve, 10000)); // Simulate timeout
-          return HttpResponse.json([]);
-        })
+        createDelayedHandler(ENDPOINTS.ACCOUNTS, 10000), // 10 second delay
       );
 
+      // When: Dashboard is rendered
       renderWithProviders(<DashboardPage />);
 
-      // Should eventually show some error state or fallback content
-      await waitFor(() => {
-        expect(screen.getByText('Dashboard')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      // Then: Should eventually show fallback content (header at minimum)
+      await waitFor(
+        () => {
+          expect(screen.getByText("Dashboard")).toBeInTheDocument();
+        },
+        { timeout: TEST_CONSTANTS.TIMEOUTS.SLOW_OPERATION },
+      );
     });
 
-    it('should handle intermittent API failures with retry logic', async () => {
-      let attemptCount = 0;
-      
+    it("should retry failed API calls and eventually succeed", async () => {
+      // Given: Mock API that fails twice then succeeds
       server.use(
-        http.get('/api/accounts', () => {
-          attemptCount++;
-          if (attemptCount < 3) {
-            return HttpResponse.json(
-              { detail: 'Erro temporário' },
-              { status: 500 }
-            );
-          }
-          return HttpResponse.json([
-            { id: 1, name: 'Conta Recuperada', balance: '1000.00', currency: 'BRL', ownerId: 1 }
-          ]);
-        })
+        createRetryHandler(ENDPOINTS.ACCOUNTS, 2, [
+          TEST_DATA.RECOVERED_ACCOUNT,
+        ]),
       );
 
+      // When: Dashboard is rendered (triggers API calls with retries)
       renderWithProviders(<DashboardPage />);
 
-      // Should eventually succeed after retries
-      await waitFor(() => {
-        expect(screen.queryByText('Conta Recuperada')).toBeInTheDocument();
-      }, { timeout: 5000 });
+      // Then: Should eventually show the recovered account data
+      await waitFor(
+        () => {
+          expect(screen.queryByText("Conta Recuperada")).toBeInTheDocument();
+        },
+        { timeout: TEST_CONSTANTS.TIMEOUTS.API_RETRY },
+      );
     });
   });
 
-  describe('Data Consistency', () => {
-    it('should maintain data consistency across multiple renders', async () => {
+  describe("Data Consistency", () => {
+    it("should maintain data consistency across multiple renders", async () => {
+      // Given: Dashboard is rendered and data is loaded
       const { rerender } = renderWithProviders(<DashboardPage />);
+      await waitForDashboardLoad();
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
-      });
+      // When: Check initial balance display count
+      const firstRenderElements = expectBalanceElements(
+        TEST_CONSTANTS.EXPECTED_TOTAL_BALANCE,
+      );
 
-      const firstRender = screen.getByText(/R\$\s*29\.200,50/);
-      expect(firstRender).toBeInTheDocument();
-
-      // Rerender the component
+      // And: Component is re-rendered
       rerender(<DashboardPage />);
+      await waitForDashboardLoad();
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
-      });
-
-      // Data should remain consistent
-      const secondRender = screen.getByText(/R\$\s*29\.200,50/);
-      expect(secondRender).toBeInTheDocument();
-    });
-
-    it('should handle empty data states appropriately', async () => {
-      server.use(
-        http.get('/api/accounts', () => HttpResponse.json([])),
-        http.get('/api/credit_cards', () => HttpResponse.json([])),
-        http.get('/api/transactions', () => HttpResponse.json([]))
+      // Then: Same number of balance elements should be displayed
+      expectBalanceElements(
+        TEST_CONSTANTS.EXPECTED_TOTAL_BALANCE,
+        firstRenderElements.length,
       );
-
-      renderWithProviders(<DashboardPage />);
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
-      });
-
-      // Should show appropriate empty states or zero values
-      expect(screen.getByText(/R\$\s*0,00/) || 
-        screen.queryByText('Nenhuma conta encontrada') ||
-        screen.queryByText('Nenhum dado disponível')).toBeTruthy();
     });
-  });
 
-  describe('Performance and Caching', () => {
-    it('should cache API responses effectively', async () => {
-      let apiCallCount = 0;
+    it("should display appropriate empty states when no data exists", async () => {
+      // Given: Mock APIs return empty data
+      setupEmptyDataHandlers();
 
-      server.use(
-        http.get('/api/accounts', () => {
-          apiCallCount++;
-          return HttpResponse.json([
-            { id: 1, name: 'Conta Teste', balance: '1000.00', currency: 'BRL', ownerId: 1 }
-          ]);
-        })
+      // When: Dashboard is rendered
+      renderWithProviders(<DashboardPage />);
+      await waitForDashboardLoad();
+
+      // Then: Empty state message should be displayed
+      const emptyStateText = await screen.findByText(
+        /nenhuma conta cadastrada/i,
       );
-
-      const { rerender } = renderWithProviders(<DashboardPage />);
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
-      });
-
-      const initialCallCount = apiCallCount;
-
-      // Rerender should not trigger new API calls due to caching
-      rerender(<DashboardPage />);
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
-      });
-
-      // API should not be called again due to TanStack Query caching
-      expect(apiCallCount).toBe(initialCallCount);
+      expect(emptyStateText).toBeInTheDocument();
     });
 
-    it('should handle large datasets efficiently', async () => {
-      // Mock large dataset
-      const largeTransactionSet = Array.from({ length: 1000 }, (_, i) => ({
-        id: i + 1,
-        description: `Transação ${i + 1}`,
-        amount: '100.00',
-        type: 'expense' as const,
-        date: new Date().toISOString().split('T')[0],
-        category: 'Teste',
-        ownerId: 1,
-        accountId: 1,
-        creditCardId: null,
-      }));
+    describe("Performance and Caching", () => {
+      it("should cache API responses and avoid redundant calls", async () => {
+        // Given: Mock API that tracks call count
+        let apiCallCount = 0;
+        server.use(
+          http.get(ENDPOINTS.ACCOUNTS, () => {
+            apiCallCount++;
+            return HttpResponse.json([TEST_DATA.TEST_ACCOUNT]);
+          }),
+        );
 
-      server.use(
-        http.get('/api/transactions', () => {
-          return HttpResponse.json(largeTransactionSet);
-        })
-      );
+        // When: Dashboard is rendered and data is loaded
+        const { rerender } = renderWithProviders(<DashboardPage />);
+        await waitForDashboardLoad();
+        const initialCallCount = apiCallCount;
 
-      const startTime = Date.now();
-      renderWithProviders(<DashboardPage />);
+        // And: Component is re-rendered (should use cached data)
+        rerender(<DashboardPage />);
+        await waitForDashboardLoad();
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('dashboard-skeleton')).not.toBeInTheDocument();
+        // Then: API should not be called again due to TanStack Query caching
+        expect(apiCallCount).toBe(initialCallCount);
       });
 
-      const endTime = Date.now();
-      const renderTime = endTime - startTime;
+      it("should handle large datasets efficiently", async () => {
+        // Given: Mock API with large transaction dataset
+        const largeTransactionSet = createLargeTransactionSet(1000);
+        server.use(
+          http.get(ENDPOINTS.TRANSACTIONS, () => {
+            return HttpResponse.json(largeTransactionSet);
+          }),
+        );
 
-      // Should render within reasonable time even with large dataset
-      expect(renderTime).toBeLessThan(5000); // 5 seconds max
-    });
-  });
+        // When: Dashboard renders with large dataset
+        const startTime = Date.now();
+        renderWithProviders(<DashboardPage />);
+        await waitForDashboardLoad();
+        const renderTime = Date.now() - startTime;
 
-  describe('Authentication Integration', () => {
-    it('should handle authentication errors properly', async () => {
-      server.use(
-        http.get('/api/accounts', () => {
-          return HttpResponse.json(
-            { detail: 'Token expirado' },
-            { status: 401 }
-          );
-        })
-      );
-
-      renderWithProviders(<DashboardPage />);
-
-      // Should handle 401 gracefully - either redirect or show error
-      await waitFor(() => {
-        // The component should still render even with auth errors
-        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+        // Then: Should render within acceptable performance limits
+        expect(renderTime).toBeLessThan(
+          TEST_CONSTANTS.TIMEOUTS.PERFORMANCE_MAX,
+        );
       });
     });
 
-    it('should refresh data when user logs back in', async () => {
-      // Start without authentication
-      testHelpers.clearAuthentication();
+    describe("Authentication Integration", () => {
+      it("should gracefully handle authentication errors", async () => {
+        // Given: Mock API returns authentication error
+        server.use(createAuthErrorHandler(ENDPOINTS.ACCOUNTS));
 
-      renderWithProviders(<DashboardPage />);
+        // When: Dashboard is rendered
+        renderWithProviders(<DashboardPage />);
 
-      // Set authentication (simulating login)
-      testHelpers.setAuthenticatedUser();
+        // Then: Should handle 401 gracefully (component still renders)
+        await waitFor(() => {
+          expect(screen.getByText("Dashboard")).toBeInTheDocument();
+        });
+      });
 
-      // Should trigger data refresh
-      await waitFor(() => {
-        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      it("should refresh data when user authentication changes", async () => {
+        // Given: Start without authentication
+        testHelpers.clearAuthentication();
+
+        // When: Dashboard is rendered, then user logs in
+        renderWithProviders(<DashboardPage />);
+        testHelpers.setAuthenticatedUser();
+
+        // Then: Should trigger data refresh and show dashboard content
+        await waitFor(() => {
+          expect(screen.getByText("Dashboard")).toBeInTheDocument();
+        });
       });
     });
   });

@@ -3,6 +3,10 @@ import { mockTransactions } from '../data/transactions';
 
 export const transactionHandlers = [
   // GET /api/transactions - Fetch all transactions
+  http.get('http://localhost:3000/api/transactions', () => {
+    return HttpResponse.json(mockTransactions);
+  }),
+  // Also handle relative URLs for backward compatibility
   http.get('/api/transactions', () => {
     return HttpResponse.json(mockTransactions);
   }),
