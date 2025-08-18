@@ -1,68 +1,18 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
-import { renderWithProviders, testHelpers } from "../utils/test-utils";
 import DashboardPage from "@/app/dashboard/page";
-import { server } from "../mocks/server";
+import { screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
-import { BankAccount, Transaction } from "@/lib/schemas";
-
-// ============================================================================
-// Test Constants & Configuration
-// ============================================================================
-
-const TEST_CONSTANTS = {
-  EXPECTED_TOTAL_BALANCE: "29.200,50", // Sum of all mock account balances
-  EXPECTED_MONTHLY_INCOME: "5.500,00", // From mock transaction data
-  BASE_URL: "http://localhost:3000",
-  TIMEOUTS: {
-    DASHBOARD_LOAD: 5000,
-    API_RETRY: 5000,
-    QUICK_OPERATION: 1000,
-    SLOW_OPERATION: 2000,
-    PERFORMANCE_MAX: 5000,
-  },
-} as const;
-
-const ENDPOINTS = {
-  ACCOUNTS: `${TEST_CONSTANTS.BASE_URL}/api/accounts`,
-  CREDIT_CARDS: `${TEST_CONSTANTS.BASE_URL}/api/credit_cards`,
-  TRANSACTIONS: `${TEST_CONSTANTS.BASE_URL}/api/transactions`,
-} as const;
-
-const TEST_DATA = {
-  RECOVERED_ACCOUNT: {
-    id: 1,
-    name: "Conta Recuperada",
-    balance: "1000.00",
-    currency: "BRL",
-    ownerId: 1,
-  } as BankAccount,
-
-  TEST_ACCOUNT: {
-    id: 1,
-    name: "Conta Teste",
-    balance: "1000.00",
-    currency: "BRL",
-    ownerId: 1,
-  } as BankAccount,
-
-  NEW_TRANSACTION: {
-    id: 999,
-    description: "Nova Receita",
-    amount: "1000.00",
-    type: "income" as const,
-    date: new Date().toISOString().split("T")[0],
-    category: "Freelance",
-    ownerId: 1,
-    accountId: 1,
-    creditCardId: null,
-  } as Transaction,
-
-  ERROR_MESSAGES: {
-    TEMPORARY_ERROR: "Erro temporário",
-    TOKEN_EXPIRED: "Token expirado",
-  },
-} as const;
+import { beforeEach, describe, expect, it } from "vitest";
+import { server } from "../mocks/server";
+import { ENDPOINTS } from "../utils/endpoints";
+import {
+  createAuthErrorHandler,
+  createDelayedHandler,
+  createLargeTransactionSet,
+  createRetryHandler,
+  setupEmptyDataHandlers,
+} from "../utils/integration-tests-helpers";
+import { renderWithProviders, testHelpers } from "../utils/test-utils";
+import { TEST_CONSTANTS, TEST_DATA } from "./fixtures/dashboard-api";
 
 // ============================================================================
 // Test Helpers
@@ -98,80 +48,6 @@ const expectBalanceElements = (balanceText: string, expectedCount?: number) => {
   }
 
   return elements;
-};
-
-/**
- * Sets up MSW handlers for empty data states
- */
-const setupEmptyDataHandlers = () => {
-  server.resetHandlers(
-    http.get(ENDPOINTS.ACCOUNTS, () => HttpResponse.json([])),
-    http.get(ENDPOINTS.CREDIT_CARDS, () => HttpResponse.json([])),
-    http.get(ENDPOINTS.TRANSACTIONS, () => HttpResponse.json([])),
-  );
-};
-
-/**
- * Creates a handler that simulates network delays
- */
-const createDelayedHandler = (
-  endpoint: string,
-  delay: number,
-  responseData: any = [],
-) => {
-  return http.get(endpoint, async () => {
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    return HttpResponse.json(responseData);
-  });
-};
-
-/**
- * Creates a handler that fails a specified number of times before succeeding
- */
-const createRetryHandler = (
-  endpoint: string,
-  failureCount: number,
-  successData: any,
-  errorMessage = TEST_DATA.ERROR_MESSAGES.TEMPORARY_ERROR,
-) => {
-  let attemptCount = 0;
-
-  return http.get(endpoint, () => {
-    attemptCount++;
-    if (attemptCount <= failureCount) {
-      return HttpResponse.json({ detail: errorMessage }, { status: 500 });
-    }
-    return HttpResponse.json(successData);
-  });
-};
-
-/**
- * Creates a handler that returns an authentication error
- */
-const createAuthErrorHandler = (endpoint: string) => {
-  return http.get(endpoint, () =>
-    HttpResponse.json(
-      { detail: TEST_DATA.ERROR_MESSAGES.TOKEN_EXPIRED },
-      { status: 401 },
-    ),
-  );
-};
-
-/**
- * Creates a large dataset for performance testing
- */
-const createLargeTransactionSet = (size = 1000) => {
-  return Array.from({ length: size }, (_, i) => ({
-    id: i + 1,
-    description: `Transação ${i + 1}`,
-    amount: "100.00",
-    type: "expense" as const,
-    date: new Date().toISOString().split("T")[0],
-    category: "Teste",
-    ownerId: 1,
-    accountId: 1,
-    creditCardId: null,
-  }));
 };
 
 describe("Dashboard API Integration Tests", () => {

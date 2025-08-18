@@ -1,12 +1,12 @@
-import React from 'react';
-import { render, RenderOptions } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { beforeAll, afterEach, afterAll, vi } from 'vitest';
-import { server } from '../mocks/server';
+import React from "react";
+import { render, RenderOptions } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { beforeAll, afterEach, afterAll, vi } from "vitest";
+import { server } from "../mocks/server";
 
 // MSW server setup for tests
 beforeAll(() => {
-  server.listen({ onUnhandledRequest: 'error' });
+  server.listen({ onUnhandledRequest: "error" });
 });
 
 afterEach(() => {
@@ -25,34 +25,45 @@ export const localStorageMock = {
   clear: vi.fn(),
 };
 
-Object.defineProperty(window, 'localStorage', {
+Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
 // Mock window.location for auth redirects
 const mockLocation = {
-  href: '',
+  href: "",
   assign: vi.fn(),
   replace: vi.fn(),
   reload: vi.fn(),
-  origin: 'http://localhost:3000',
-  protocol: 'http:',
-  host: 'localhost:3000',
-  pathname: '/',
-  search: '',
-  hash: '',
+  origin: "http://localhost:3000",
+  protocol: "http:",
+  host: "localhost:3000",
+  pathname: "/",
+  search: "",
+  hash: "",
 };
 
-Object.defineProperty(window, 'location', {
+Object.defineProperty(window, "location", {
   value: mockLocation,
   writable: true,
 });
 
+// Make href setter work properly
+Object.defineProperty(mockLocation, "href", {
+  get() {
+    return this._href || "";
+  },
+  set(value) {
+    this._href = value;
+  },
+  configurable: true,
+});
+
 // Mock process.env for proper API base URL in tests
-Object.defineProperty(process, 'env', {
+Object.defineProperty(process, "env", {
   value: {
     ...process.env,
-    NEXT_PUBLIC_API_URL: 'http://localhost:3000',
+    NEXT_PUBLIC_API_URL: "http://localhost:3000",
   },
   writable: true,
 });
@@ -81,23 +92,21 @@ interface TestProvidersProps {
   queryClient?: QueryClient;
 }
 
-export const TestProviders: React.FC<TestProvidersProps> = ({ 
-  children, 
-  queryClient = createTestQueryClient() 
+export const TestProviders: React.FC<TestProvidersProps> = ({
+  children,
+  queryClient = createTestQueryClient(),
 }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
 // Custom render function with providers
 export const renderWithProviders = (
   ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'> & {
+  options?: Omit<RenderOptions, "wrapper"> & {
     queryClient?: QueryClient;
-  }
+  },
 ) => {
   const { queryClient, ...renderOptions } = options || {};
 
@@ -111,25 +120,27 @@ export const renderWithProviders = (
 // Test helpers for common operations
 export const testHelpers = {
   // Set authenticated user
-  setAuthenticatedUser: (token = 'mock-jwt-token') => {
-    localStorageMock.getItem.mockImplementation((key) => 
-      key === 'access_token' ? token : null
+  setAuthenticatedUser: (token = "mock-jwt-token") => {
+    localStorageMock.getItem.mockImplementation((key) =>
+      key === "access_token" ? token : null,
     );
   },
-  
+
   // Clear authentication
   clearAuthentication: () => {
     localStorageMock.getItem.mockReturnValue(null);
   },
-  
+
   // Reset localStorage mock
   resetLocalStorage: () => {
     localStorageMock.getItem.mockClear();
     localStorageMock.setItem.mockClear();
     localStorageMock.removeItem.mockClear();
     localStorageMock.clear.mockClear();
+    // Reset mockLocation href
+    mockLocation.href = "";
   },
-  
+
   // Wait for queries to settle
   waitForQueries: async (queryClient: QueryClient) => {
     await queryClient.getQueryCache().clear();
@@ -137,7 +148,7 @@ export const testHelpers = {
 };
 
 // Re-export everything from testing-library
-export * from '@testing-library/react';
+export * from "@testing-library/react";
 
 // Custom matchers - extend this as needed
 export const customMatchers = {
@@ -145,14 +156,17 @@ export const customMatchers = {
     const pass = received >= floor && received <= ceiling;
     if (pass) {
       return {
-        message: () => `expected ${received} not to be within range ${floor} - ${ceiling}`,
+        message: () =>
+          `expected ${received} not to be within range ${floor} - ${ceiling}`,
         pass: true,
       };
     } else {
       return {
-        message: () => `expected ${received} to be within range ${floor} - ${ceiling}`,
+        message: () =>
+          `expected ${received} to be within range ${floor} - ${ceiling}`,
         pass: false,
       };
     }
   },
 };
+
