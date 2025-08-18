@@ -90,7 +90,7 @@ const CustomTooltip = memo<TooltipProps>(function CustomTooltip({
 export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
   function ExpenseAnalysisChart({ data, height = 350 }) {
     return (
-      <div className={`h-[${height}px] p-2`}>
+      <div className="p-2" style={{ height: `${height}px` }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}

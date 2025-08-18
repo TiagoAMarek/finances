@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
 import { QueryProvider } from "../lib/query-provider";
+import { MSWProvider } from "../src/components/MSWProvider";
 import "../styles/globals.css";
 
 export default function RootLayout({
@@ -15,20 +16,22 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <QueryProvider>
-            <AppLayout>
-              {children}
-              <Analytics />
-            </AppLayout>
-            <Toaster />
-          </QueryProvider>
-        </ThemeProvider>
+        <MSWProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <QueryProvider>
+              <AppLayout>
+                {children}
+                <Analytics />
+              </AppLayout>
+              <Toaster />
+            </QueryProvider>
+          </ThemeProvider>
+        </MSWProvider>
       </body>
     </html>
   );

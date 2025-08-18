@@ -39,6 +39,16 @@ const PerformancePage: NextPage = () => {
 
   const monthlyBalance = monthlyIncomes - monthlyExpenses;
 
+  // Extrair primeiro ID selecionado (ou null se nenhum)
+  const selectedAccountId =
+    accountCardFilters.accounts.length > 0
+      ? accountCardFilters.accounts[0]
+      : null;
+  const selectedCreditCardId =
+    accountCardFilters.creditCards.length > 0
+      ? accountCardFilters.creditCards[0]
+      : null;
+
   if (isLoading) {
     return (
       <>
@@ -129,6 +139,8 @@ const PerformancePage: NextPage = () => {
             transactions={filteredTransactions}
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
+            selectedAccountId={selectedAccountId}
+            selectedCreditCardId={selectedCreditCardId}
           />
         </div>
       </div>

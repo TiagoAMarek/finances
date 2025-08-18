@@ -32,16 +32,6 @@ export interface IncomeVsExpenseChartProps {
 
   /** Account filter configuration */
   accountFilter?: AccountFilter;
-
-  // Legacy props for backward compatibility - will be deprecated
-  /** @deprecated Use dateFilter.selectedMonth instead */
-  selectedMonth?: number;
-  /** @deprecated Use dateFilter.selectedYear instead */
-  selectedYear?: number;
-  /** @deprecated Use accountFilter.selectedAccountId instead */
-  selectedAccountId?: number | null;
-  /** @deprecated Use accountFilter.selectedCreditCardId instead */
-  selectedCreditCardId?: number | null;
 }
 
 /**

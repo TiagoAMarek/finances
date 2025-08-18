@@ -97,7 +97,10 @@ export const DashboardSkeletonLoader = memo(function DashboardSkeletonLoader() {
         action={<Skeleton className="h-9 w-32" />}
       />
 
-      <div className="space-y-8 px-4 lg:px-6 pb-8">
+      <div
+        className="space-y-8 px-4 lg:px-6 pb-8"
+        data-testid="dashboard-skeleton"
+      >
         {/* Loading Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (

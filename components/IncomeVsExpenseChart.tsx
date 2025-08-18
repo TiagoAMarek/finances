@@ -31,38 +31,21 @@ export const IncomeVsExpenseChart = memo<IncomeVsExpenseChartProps>(
     periodType = "6-months",
     dateFilter,
     accountFilter,
-    // Legacy props for backward compatibility
-    selectedMonth,
-    selectedYear,
-    selectedAccountId,
-    selectedCreditCardId,
   }) {
-    // Merge legacy props with new filter objects for backward compatibility
     const effectiveDateFilter = useMemo(() => {
       if (dateFilter) {
         return dateFilter;
       }
-      if (selectedMonth !== undefined && selectedYear !== undefined) {
-        return { selectedMonth, selectedYear };
-      }
       return undefined;
-    }, [dateFilter, selectedMonth, selectedYear]);
+    }, [dateFilter]);
 
     const effectiveAccountFilter = useMemo(() => {
       if (accountFilter) {
         return accountFilter;
       }
-      if (
-        selectedAccountId !== undefined ||
-        selectedCreditCardId !== undefined
-      ) {
-        return {
-          selectedAccountId,
-          selectedCreditCardId,
-        };
-      }
+
       return {};
-    }, [accountFilter, selectedAccountId, selectedCreditCardId]);
+    }, [accountFilter]);
 
     // Create chart configuration
     const chartConfig = useMemo(
