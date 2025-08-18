@@ -41,8 +41,8 @@ import {
   ArrowDownIcon,
 } from "lucide-react";
 import { Transaction } from "@/lib/schemas";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
+import { useGetAccounts } from "@/features/accounts/hooks/data";
+import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -66,8 +66,8 @@ export function TransactionsTable({
     useState<Transaction | null>(null);
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  const { data: accounts = [] } = useAccounts();
-  const { data: creditCards = [] } = useCreditCards();
+  const { data: accounts = [] } = useGetAccounts();
+  const { data: creditCards = [] } = useGetCreditCards();
 
   const formatCurrency = (value: string) => {
     return new Intl.NumberFormat("pt-BR", {

@@ -18,12 +18,12 @@ import {
   TagIcon,
   XIcon,
 } from "lucide-react";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
+import { useGetAccounts } from "@/features/accounts/hooks/data";
+import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 
 export interface TransactionFilters {
   search: string;
-  type: "all" | "income" | "expense";
+  type: "all" | "income" | "expense" | "transfer";
   category: string;
   accountId: string;
   creditCardId: string;
@@ -43,8 +43,8 @@ export function TransactionFiltersComponent({
   categories,
 }: TransactionFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { data: accounts = [] } = useAccounts();
-  const { data: creditCards = [] } = useCreditCards();
+  const { data: accounts = [] } = useGetAccounts();
+  const { data: creditCards = [] } = useGetCreditCards();
 
   const updateFilter = (key: keyof TransactionFilters, value: string) => {
     onFiltersChange({

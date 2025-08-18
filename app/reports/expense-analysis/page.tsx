@@ -4,14 +4,14 @@ import { AccountCardFilter } from "@/components/AccountCardFilter";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FilterState } from "@/hooks/useAccountCardFilters";
-import { useFilteredTransactions } from "@/hooks/useFilteredTransactions";
 import { ArrowLeft, PieChart } from "lucide-react";
 import type { NextPage } from "next";
 import Link from "next/link";
 import { useState } from "react";
 import { ExpenseAnalysisContent } from "./_components/ExpenseAnalysisContent";
 import { ExpenseAnalysisPageSkeleton } from "./_skeleton";
+import { FilterState } from "@/features/accounts/hooks/ui";
+import { useFilteredTransactions } from "@/features/transactions/hooks/ui";
 
 const ExpenseAnalysisPage: NextPage = () => {
   // Estados dos filtros

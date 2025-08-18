@@ -4,22 +4,22 @@ This is a personal finance management application built with Next.js, React, and
 
 ## Key Technologies
 
-*   **Framework:** Next.js
-*   **Language:** TypeScript
-*   **UI:** React, Tailwind CSS, shadcn/ui
-*   **Database:** PostgreSQL
-*   **ORM:** Drizzle ORM
-*   **Testing:** Vitest, React Testing Library
-*   **Linting:** ESLint
-*   **Package Manager:** pnpm
+- **Framework:** Next.js
+- **Language:** TypeScript
+- **UI:** React, Tailwind CSS, shadcn/ui
+- **Database:** PostgreSQL
+- **ORM:** Drizzle ORM
+- **Testing:** Vitest, React Testing Library
+- **Linting:** ESLint
+- **Package Manager:** pnpm
 
 # Building and Running
 
 ## Prerequisites
 
-*   Node.js (v20 or later)
-*   pnpm
-*   PostgreSQL
+- Node.js (v20 or later)
+- pnpm
+- PostgreSQL
 
 ## Installation
 

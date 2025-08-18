@@ -41,8 +41,6 @@ export function ExpenseAnalysisContent({
       <div className="space-y-4">
         <AdvancedExpenseAnalysis
           transactions={transactions}
-          selectedMonth={new Date().getMonth()}
-          selectedYear={new Date().getFullYear()}
           selectedAccountId={null}
           selectedCreditCardId={null}
           periodFilter={periodFilter}

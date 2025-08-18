@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin } from "@/features/auth/hooks/data";
 
 const LoginPage: NextPage = () => {
   const [email, setEmail] = useState("");

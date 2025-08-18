@@ -9,7 +9,7 @@ import {
   useChartDescription,
   useChartTotals,
   useIncomeVsExpenseChartData,
-} from "@/hooks/useChartData";
+} from "@/features/reports/hooks/ui/useChartData";
 import { TransactionFilter } from "@/lib/chart-utils";
 import { memo, useMemo } from "react";
 import { Chart } from "./IncomeVsExpenseChart/Chart";

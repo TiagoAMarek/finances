@@ -22,7 +22,11 @@ import { Card, CardContent } from "@/components/ui/card";
 interface CreateCardModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { name: string; limit: string }) => void;
+  onSubmit: (data: {
+    name: string;
+    limit: string;
+    currentBill: string;
+  }) => void;
   isLoading: boolean;
 }
 
@@ -34,12 +38,14 @@ export function CreateCardModal({
 }: CreateCardModalProps) {
   const [name, setName] = useState("");
   const [limit, setLimit] = useState<number>(0);
+  const [currentBill, setCurrentBill] = useState<number>(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       name,
       limit: limit.toString(),
+      currentBill: currentBill.toString(),
     });
     setName("");
     setLimit(0);
@@ -48,6 +54,7 @@ export function CreateCardModal({
   const resetForm = () => {
     setName("");
     setLimit(0);
+    setCurrentBill(0);
   };
 
   const handleClose = () => {
@@ -129,6 +136,36 @@ export function CreateCardModal({
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Informe o limite disponível do seu cartão de crédito
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="currentBill"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
+                  <DollarSignIcon className="h-4 w-4" />
+                  Fatura Atual
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                    R$
+                  </span>
+                  <Input
+                    type="number"
+                    id="currentBill"
+                    value={currentBill || ""}
+                    onChange={(e) =>
+                      setCurrentBill(parseFloat(e.target.value) || 0)
+                    }
+                    placeholder="0,00"
+                    className="h-11 pl-10"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Valor da fatura atual do cartão (opcional)
                 </p>
               </div>
 

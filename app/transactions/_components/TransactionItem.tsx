@@ -21,8 +21,8 @@ import {
   BanknoteIcon,
 } from "lucide-react";
 import { Transaction } from "@/lib/schemas";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
+import { useGetAccounts } from "@/features/accounts/hooks/data";
+import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -39,8 +39,8 @@ export function TransactionItem({
 }: TransactionItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const { data: accounts = [] } = useAccounts();
-  const { data: creditCards = [] } = useCreditCards();
+  const { data: accounts = [] } = useGetAccounts();
+  const { data: creditCards = [] } = useGetCreditCards();
 
   const account = accounts.find((acc) => acc.id === transaction.accountId);
   const creditCard = creditCards.find(

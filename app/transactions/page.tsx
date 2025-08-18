@@ -3,17 +3,17 @@
 import type { NextPage } from "next";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTransactions } from "@/hooks/useTransactions";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
+import { useGetTransactions } from "@/features/transactions/hooks/data/useGetTransactions";
+import { useGetAccounts } from "@/features/accounts/hooks/data/useGetAccounts";
+import { useGetCreditCards } from "@/features/credit-cards/hooks/data/useGetCreditCards";
 import { PageHeader } from "@/components/PageHeader";
 import { QuickCreateButton } from "@/components/QuickCreateButton";
 import { CreateTransactionModal } from "./_components/CreateTransactionModal";
 import { EditTransactionModal } from "./_components/EditTransactionModal";
 import { TransactionsList } from "./_components/TransactionsList";
 import { TransactionFiltersComponent } from "./_components/TransactionFilters";
-import { useTransactionActions } from "./_hooks/useTransactionActions";
-import { useTransactionFilters } from "./_hooks/useTransactionFilters";
+import { useTransactionActions } from "@/features/transactions/hooks/ui/useTransactionActions";
+import { useTransactionFilters } from "@/features/transactions/hooks/ui/useTransactionFilters";
 
 const TransactionsPage: NextPage = () => {
   const {
@@ -21,17 +21,17 @@ const TransactionsPage: NextPage = () => {
     isLoading: isLoadingTransactions,
     isError: isErrorTransactions,
     error: transactionsError,
-  } = useTransactions();
+  } = useGetTransactions();
   const {
     isLoading: isLoadingAccounts,
     isError: isErrorAccounts,
     error: accountsError,
-  } = useAccounts();
+  } = useGetAccounts();
   const {
     isLoading: isLoadingCreditCards,
     isError: isErrorCreditCards,
     error: creditCardsError,
-  } = useCreditCards();
+  } = useGetCreditCards();
 
   const {
     handleCreate,

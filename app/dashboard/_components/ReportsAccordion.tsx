@@ -16,7 +16,7 @@ import {
 import { DashboardAccordionTrigger } from "./DashboardAccordionTrigger";
 import { FinancialInsights } from "./FinancialInsights";
 import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
-import { useCurrentMonth } from "../_hooks/useDashboardData";
+import { useCurrentMonth } from "@/features/dashboard/hooks/ui";
 
 /**
  * Props for ReportsAccordion component

@@ -1,8 +1,9 @@
 # AGENTS.md
 
 ## Build/Lint/Test Commands
+
 - `pnpm dev` - Start development server
-- `pnpm build` - Build for production  
+- `pnpm build` - Build for production
 - `pnpm lint` - Run ESLint with Next.js, TypeScript, and Prettier rules
 - `pnpm typecheck` - Run TypeScript compiler checks
 - `pnpm test` - Run all tests (Vitest with server and client projects)
@@ -14,6 +15,7 @@
 - `pnpm drizzle-kit push` - Push schema changes to database
 
 ## Code Style Guidelines
+
 - **Imports**: Use `@/` alias for root imports (components, lib, utils)
 - **Types**: All types inferred from Zod schemas in `@/lib/schemas` - never define types manually
 - **API**: Use `fetchWithAuth()` from `@/utils/api` for all authenticated requests

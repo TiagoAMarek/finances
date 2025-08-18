@@ -3,15 +3,15 @@
 import type { NextPage } from "next";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCreditCards } from "@/hooks/useCreditCards";
+import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 import { PageHeader } from "@/components/PageHeader";
-import { useCreditCardActions } from "./_hooks/useCreditCardActions";
+import { useCreditCardActions } from "@/features/credit-cards/hooks/ui";
 import { CreateCardModal } from "./_components/CreateCardModal";
 import { EditCardModal } from "./_components/EditCardModal";
 import { CreditCardsList } from "./_components/CreditCardsList";
 
 const CreditCardsPage: NextPage = () => {
-  const { data: creditCards = [], isLoading, error } = useCreditCards();
+  const { data: creditCards = [], isLoading, error } = useGetCreditCards();
   const {
     handleCreate,
     handleEdit,

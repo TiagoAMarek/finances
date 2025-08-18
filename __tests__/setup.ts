@@ -1,8 +1,8 @@
-import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
 // Mock next/navigation
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
@@ -11,18 +11,18 @@ vi.mock('next/navigation', () => ({
     refresh: vi.fn(),
     prefetch: vi.fn(),
   }),
-  usePathname: () => '/dashboard',
+  usePathname: () => "/dashboard",
   useSearchParams: () => new URLSearchParams(),
 }));
 
 // Mock next/image
-vi.mock('next/image', () => ({
+vi.mock("next/image", () => ({
   default: (props: any) => {
     const { src, alt, ...rest } = props;
     // Return a simple object representation for tests
     return {
-      type: 'img',
-      props: { src, alt, ...rest }
+      type: "img",
+      props: { src, alt, ...rest },
     };
   },
 }));
@@ -46,7 +46,7 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 global.HTMLCanvasElement.prototype.getContext = vi.fn();
 
 // Mock sonner toast
-vi.mock('sonner', () => ({
+vi.mock("sonner", () => ({
   toast: {
     success: vi.fn(),
     error: vi.fn(),

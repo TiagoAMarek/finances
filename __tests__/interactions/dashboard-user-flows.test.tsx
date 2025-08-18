@@ -279,8 +279,8 @@ describe("Dashboard User Interaction Flows", () => {
           matches: query.includes("prefers-contrast"),
           media: query,
           onchange: null,
-          addListener: () => { },
-          removeListener: () => { },
+          addListener: () => {},
+          removeListener: () => {},
         }),
       });
 

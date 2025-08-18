@@ -2,16 +2,16 @@
 
 import type { NextPage } from "next";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAccounts } from "@/hooks/useAccounts";
+import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { PageHeader } from "@/components/PageHeader";
 import { CreateAccountModal } from "./_components/CreateAccountModal";
 import { EditAccountModal } from "./_components/EditAccountModal";
 import { AccountsList } from "./_components/AccountsList";
 import { ErrorAlerts } from "./_components/ErrorAlerts";
-import { useAccountActions } from "./_hooks/useAccountActions";
+import { useAccountActions } from "@/features/accounts/hooks/ui";
 
 const AccountsPage: NextPage = () => {
-  const { data: accounts = [], isLoading, error } = useAccounts();
+  const { data: accounts = [], isLoading, error } = useGetAccounts();
   const {
     handleCreate,
     handleEdit,

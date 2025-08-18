@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { memo } from "react";
-import { useExpenseAnalysis } from "@/hooks/useExpenseAnalysis";
+import { useExpenseAnalysis } from "@/features/reports/hooks/ui/useExpenseAnalysis";
 import { ExpenseAnalysisChart } from "./AdvancedExpenseAnalysis/ExpenseAnalysisChart";
 import { ExpenseStatistics } from "./AdvancedExpenseAnalysis/ExpenseStatistics";
 import { EmptyExpenseState } from "./AdvancedExpenseAnalysis/EmptyExpenseState";

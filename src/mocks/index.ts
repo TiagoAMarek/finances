@@ -35,4 +35,3 @@ export function isMockingEnabled(): boolean {
     process.env.NEXT_PUBLIC_USE_MOCKS === "true"
   );
 }
-

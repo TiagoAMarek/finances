@@ -1,16 +1,15 @@
 "use client";
 
-import { PageHeader } from "@/components/PageHeader";
 import { AccountCardFilter } from "@/components/AccountCardFilter";
-import { FilterState } from "@/hooks/useAccountCardFilters";
+import { AdvancedExpenseAnalysis } from "@/components/AdvancedExpenseAnalysis";
+import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
+import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFilteredTransactions } from "@/hooks/useFilteredTransactions";
+import { FilterState, useFilteredTransactions } from "@/features";
 import { ChartLine } from "lucide-react";
 import type { NextPage } from "next";
 import { useState } from "react";
 import { MonthlyPerformanceCards } from "../../dashboard/_components/MonthlyPerformanceCards";
-import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
-import { AdvancedExpenseAnalysis } from "@/components/AdvancedExpenseAnalysis";
 import { PeriodSelector } from "../_components/PeriodSelector";
 
 const PerformancePage: NextPage = () => {

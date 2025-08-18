@@ -1,23 +1,20 @@
 "use client";
 
-import * as React from "react";
-import { BankAccount, CreditCard } from "@/lib/schemas";
-import {
-  useAccountCardFilters,
-  FilterState,
-} from "@/hooks/useAccountCardFilters";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Toggle } from "@/components/ui/toggle";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Filter, Banknote, CreditCard as CreditCardIcon } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Toggle } from "@/components/ui/toggle";
+import { FilterState, useAccountCardFilters } from "@/features";
+import { BankAccount, CreditCard } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
+import { Banknote, CreditCard as CreditCardIcon, Filter } from "lucide-react";
+import * as React from "react";
 
 interface AccountCardFilterProps {
   accounts: BankAccount[];

@@ -29,8 +29,8 @@ import {
   TagIcon,
 } from "lucide-react";
 import { Transaction } from "@/lib/schemas";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
+import { useGetAccounts } from "@/features/accounts/hooks/data";
+import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 
 interface EditTransactionModalProps {
   transaction: Transaction | null;
@@ -60,8 +60,8 @@ export function EditTransactionModal({
     null,
   );
 
-  const { data: accounts = [] } = useAccounts();
-  const { data: creditCards = [] } = useCreditCards();
+  const { data: accounts = [] } = useGetAccounts();
+  const { data: creditCards = [] } = useGetCreditCards();
 
   useEffect(() => {
     if (transaction) {

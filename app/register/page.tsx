@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useRegister } from "@/hooks/useAuth";
+import { useRegister } from "@/features/auth/hooks/data";
 
 const RegisterPage: NextPage = () => {
   const [name, setName] = useState("");
