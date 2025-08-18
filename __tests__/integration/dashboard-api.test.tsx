@@ -72,7 +72,7 @@ const TEST_DATA = {
  * Waits for the dashboard to finish loading (skeleton disappears)
  */
 const waitForDashboardLoad = (
-  timeout = TEST_CONSTANTS.TIMEOUTS.DASHBOARD_LOAD,
+  timeout: number = TEST_CONSTANTS.TIMEOUTS.DASHBOARD_LOAD,
 ) => {
   return waitFor(
     () => {

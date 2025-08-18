@@ -13,7 +13,7 @@ export const creditCardHandlers = [
 
   // POST /api/credit_cards - Create new credit card
   http.post('/api/credit_cards', async ({ request }) => {
-    const newCard = await request.json();
+    const newCard = await request.json() as any;
     const creditCard = {
       id: Math.max(...mockCreditCards.map(c => c.id)) + 1,
       ...newCard,
@@ -30,7 +30,7 @@ export const creditCardHandlers = [
   // PUT /api/credit_cards/:id - Update credit card
   http.put('/api/credit_cards/:id', async ({ request, params }) => {
     const cardId = parseInt(params.id as string);
-    const updatedData = await request.json();
+    const updatedData = await request.json() as any;
     const cardIndex = mockCreditCards.findIndex(c => c.id === cardId);
     
     if (cardIndex === -1) {

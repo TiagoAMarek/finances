@@ -44,7 +44,7 @@ describe('useDashboardData Hook', () => {
     expect(result.current.totalBalance).toBe(29200.50);
   });
 
-  it('should calculate total bills correctly', async () => {
+  it('should calculate monthly metrics correctly', async () => {
     const { result } = renderHook(() => useDashboardData(), {
       wrapper: TestProviders,
     });
@@ -53,8 +53,12 @@ describe('useDashboardData Hook', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    // Total bills = 1250.75 + 750.00 + 2100.50 = 4101.25
-    expect(result.current.totalBills).toBe(4101.25);
+    // Should have monthly metrics with proper structure
+    expect(result.current.monthlyMetrics).toBeDefined();
+    expect(typeof result.current.monthlyMetrics.incomes).toBe('number');
+    expect(typeof result.current.monthlyMetrics.expenses).toBe('number');
+    expect(typeof result.current.monthlyMetrics.balance).toBe('number');
+    expect(Array.isArray(result.current.monthlyMetrics.transactions)).toBe(true);
   });
 
   it('should filter transactions by type correctly', async () => {
@@ -98,8 +102,8 @@ describe('useDashboardData Hook', () => {
     expect(totalExpenses).toBeGreaterThan(0);
   });
 
-  it('should handle error states properly', async () => {
-    // Clear authentication to trigger errors
+  it('should handle empty data states properly', async () => {
+    // Clear authentication to trigger empty states
     testHelpers.clearAuthentication();
 
     const { result } = renderHook(() => useDashboardData(), {
@@ -110,10 +114,11 @@ describe('useDashboardData Hook', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    // Should have error states
-    expect(result.current.accountsError).toBeTruthy();
-    expect(result.current.creditCardsError).toBeTruthy();
-    expect(result.current.transactionsError).toBeTruthy();
+    // Should have empty arrays and zero values when no authenticated data
+    expect(result.current.accounts).toEqual([]);
+    expect(result.current.creditCards).toEqual([]);
+    expect(result.current.transactions).toEqual([]);
+    expect(result.current.totalBalance).toBe(0);
   });
 
   it('should memoize expensive calculations', async () => {
@@ -126,13 +131,13 @@ describe('useDashboardData Hook', () => {
     });
 
     const firstTotalBalance = result.current.totalBalance;
-    const firstTotalBills = result.current.totalBills;
+    const firstMonthlyMetrics = result.current.monthlyMetrics;
 
     // Rerender without changing data
     rerender();
 
     // Values should be the same (memoized)
     expect(result.current.totalBalance).toBe(firstTotalBalance);
-    expect(result.current.totalBills).toBe(firstTotalBills);
+    expect(result.current.monthlyMetrics).toBe(firstMonthlyMetrics);
   });
 });

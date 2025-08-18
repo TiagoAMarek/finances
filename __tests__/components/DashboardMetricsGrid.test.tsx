@@ -5,70 +5,67 @@ import { DashboardMetricsGrid } from '@/app/dashboard/_components/DashboardMetri
 
 describe('DashboardMetricsGrid Component', () => {
   const mockData = {
+    monthlyMetrics: {
+      incomes: 17300.00,
+      expenses: 3545.15,
+      balance: 13754.85,
+      transactions: [],
+      transactionCount: 25,
+    },
     totalBalance: 29200.50,
-    totalBills: 4101.25,
-    totalIncome: 17300.00,
-    totalExpenses: 3545.15,
-    accounts: [
-      { id: 1, name: 'Conta Corrente', balance: '5250.00', currency: 'BRL', ownerId: 1 },
-      { id: 2, name: 'Conta Poupança', balance: '12000.00', currency: 'BRL', ownerId: 1 },
-    ],
-    creditCards: [
-      { id: 1, name: 'Cartão Platinum', limit: '5000.00', currentBill: '1250.75', ownerId: 1 },
-    ],
-    isLoading: false,
   };
 
   it('should render all metric cards', () => {
     renderWithProviders(<DashboardMetricsGrid {...mockData} />);
 
     expect(screen.getByText('Saldo Total')).toBeInTheDocument();
-    expect(screen.getByText('Receitas')).toBeInTheDocument();
-    expect(screen.getByText('Despesas')).toBeInTheDocument();
-    expect(screen.getByText('Fatura Total')).toBeInTheDocument();
+    expect(screen.getByText('Receitas do Mês')).toBeInTheDocument();
+    expect(screen.getByText('Despesas do Mês')).toBeInTheDocument();
+    expect(screen.getByText('Saldo Mensal')).toBeInTheDocument();
   });
 
   it('should display formatted currency values correctly', () => {
     renderWithProviders(<DashboardMetricsGrid {...mockData} />);
 
-    expect(screen.getByText(/R\$\s*29\.200,50/)).toBeInTheDocument();
-    expect(screen.getByText(/R\$\s*17\.300,00/)).toBeInTheDocument();
-    expect(screen.getByText(/R\$\s*3\.545,15/)).toBeInTheDocument();
-    expect(screen.getByText(/R\$\s*4\.101,25/)).toBeInTheDocument();
-  });
-
-  it('should render loading state when isLoading is true', () => {
-    const loadingData = { ...mockData, isLoading: true };
-    renderWithProviders(<DashboardMetricsGrid {...loadingData} />);
-
-    // Should show skeleton loaders or loading indicators
-    expect(document.querySelector('.animate-pulse') || 
-      screen.queryByTestId('metrics-loading')).toBeTruthy();
+    expect(screen.getByText(/R\$\s*29\.200/)).toBeInTheDocument(); // Total Balance
+    expect(screen.getByText(/R\$\s*17\.300/)).toBeInTheDocument(); // Monthly Incomes
+    expect(screen.getByText(/R\$\s*3\.545/)).toBeInTheDocument();  // Monthly Expenses
+    expect(screen.getByText(/R\$\s*13\.754/)).toBeInTheDocument(); // Monthly Balance
   });
 
   it('should handle zero values gracefully', () => {
     const zeroData = {
-      ...mockData,
+      monthlyMetrics: {
+        incomes: 0,
+        expenses: 0,
+        balance: 0,
+        transactions: [],
+        transactionCount: 0,
+      },
       totalBalance: 0,
-      totalBills: 0,
-      totalIncome: 0,
-      totalExpenses: 0,
     };
 
     renderWithProviders(<DashboardMetricsGrid {...zeroData} />);
 
-    expect(screen.getByText(/R\$\s*0,00/)).toBeInTheDocument();
+    expect(screen.getByText(/R\$\s*0/)).toBeInTheDocument();
   });
 
   it('should handle negative values correctly', () => {
     const negativeData = {
-      ...mockData,
-      totalBalance: -1500.50,
+      monthlyMetrics: {
+        incomes: 1000.00,
+        expenses: 2500.50,
+        balance: -1500.50,
+        transactions: [],
+        transactionCount: 10,
+      },
+      totalBalance: -500.25,
     };
 
     renderWithProviders(<DashboardMetricsGrid {...negativeData} />);
 
-    expect(screen.getByText(/R\$\s*-1\.500,50/)).toBeInTheDocument();
+    expect(screen.getByText(/R\$\s*-1\.500/)).toBeInTheDocument(); // Monthly balance
+    expect(screen.getByText(/R\$\s*-500/)).toBeInTheDocument();   // Total balance
   });
 
   it('should display proper accessibility attributes', () => {

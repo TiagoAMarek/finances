@@ -9,9 +9,7 @@ import {
   Banknote,
   LogOut,
   User,
-  TrendingUp,
   PieChart,
-  Wallet,
   Activity,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

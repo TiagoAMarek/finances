@@ -123,11 +123,11 @@ describe("IncomeVsExpenseChart", () => {
     expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
   });
 
-  it("deve filtrar transações por conta quando selectedAccountId for fornecido", () => {
+  it("deve filtrar transações por conta quando accountFilter.selectedAccountId for fornecido", () => {
     render(
       <IncomeVsExpenseChart
         transactions={mockTransactions}
-        selectedAccountId={1}
+        accountFilter={{ selectedAccountId: 1 }}
       />,
     );
 
@@ -136,11 +136,11 @@ describe("IncomeVsExpenseChart", () => {
     expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
   });
 
-  it("deve filtrar transações por cartão quando selectedCreditCardId for fornecido", () => {
+  it("deve filtrar transações por cartão quando accountFilter.selectedCreditCardId for fornecido", () => {
     render(
       <IncomeVsExpenseChart
         transactions={mockTransactions}
-        selectedCreditCardId={1}
+        accountFilter={{ selectedCreditCardId: 1 }}
       />,
     );
 
@@ -162,15 +162,13 @@ describe("IncomeVsExpenseChart", () => {
     expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
   });
 
-  it("deve priorizar dateFilter sobre selectedMonth/selectedYear individuais", () => {
+  it("deve usar dateFilter quando fornecido", () => {
     const dateFilter = { selectedMonth: 0, selectedYear: 2024 };
 
     render(
       <IncomeVsExpenseChart
         transactions={mockTransactions}
-        selectedMonth={5} // Junho - deve ser ignorado
-        selectedYear={2023} // 2023 - deve ser ignorado
-        dateFilter={dateFilter} // Janeiro 2024 - deve ter prioridade
+        dateFilter={dateFilter}
       />,
     );
 
@@ -178,12 +176,11 @@ describe("IncomeVsExpenseChart", () => {
     expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
   });
 
-  it("deve usar selectedMonth/selectedYear quando dateFilter não for fornecido", () => {
+  it("deve usar periodType para alterar comportamento do gráfico", () => {
     render(
       <IncomeVsExpenseChart
         transactions={mockTransactions}
-        selectedMonth={0} // Janeiro
-        selectedYear={2024}
+        periodType="3-months"
       />,
     );
 
@@ -490,7 +487,7 @@ describe("IncomeVsExpenseChart", () => {
       render(
         <IncomeVsExpenseChart
           transactions={mockTransactions}
-          selectedAccountId={1}
+          accountFilter={{ selectedAccountId: 1 }}
           dateFilter={dateFilter}
         />,
       );
@@ -505,7 +502,7 @@ describe("IncomeVsExpenseChart", () => {
       render(
         <IncomeVsExpenseChart
           transactions={mockTransactions}
-          selectedCreditCardId={2}
+          accountFilter={{ selectedCreditCardId: 2 }}
           dateFilter={dateFilter}
         />,
       );

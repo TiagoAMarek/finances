@@ -92,10 +92,14 @@ export const ReportsAccordion = memo<ReportsAccordionProps>(
               <div>
                 <IncomeVsExpenseChart
                   transactions={transactions}
-                  selectedMonth={currentMonth}
-                  selectedYear={currentYear}
-                  selectedAccountId={null}
-                  selectedCreditCardId={null}
+                  dateFilter={{
+                    selectedMonth: currentMonth,
+                    selectedYear: currentYear,
+                  }}
+                  accountFilter={{
+                    selectedAccountId: null,
+                    selectedCreditCardId: null,
+                  }}
                 />
               </div>
             </div>

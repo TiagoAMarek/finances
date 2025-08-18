@@ -13,7 +13,7 @@ export const accountHandlers = [
 
   // POST /api/accounts - Create new account
   http.post('/api/accounts', async ({ request }) => {
-    const newAccount = await request.json();
+    const newAccount = await request.json() as any;
     const account = {
       id: Math.max(...mockAccounts.map(a => a.id)) + 1,
       ...newAccount,
@@ -30,7 +30,7 @@ export const accountHandlers = [
   // PUT /api/accounts/:id - Update account
   http.put('/api/accounts/:id', async ({ request, params }) => {
     const accountId = parseInt(params.id as string);
-    const updatedData = await request.json();
+    const updatedData = await request.json() as any;
     const accountIndex = mockAccounts.findIndex(a => a.id === accountId);
     
     if (accountIndex === -1) {

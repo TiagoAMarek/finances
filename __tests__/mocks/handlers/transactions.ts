@@ -13,7 +13,7 @@ export const transactionHandlers = [
 
   // POST /api/transactions - Create new transaction
   http.post('/api/transactions', async ({ request }) => {
-    const newTransaction = await request.json();
+    const newTransaction = await request.json() as any;
     const transaction = {
       id: Math.max(...mockTransactions.map(t => t.id)) + 1,
       ...newTransaction,
@@ -29,7 +29,7 @@ export const transactionHandlers = [
   // PUT /api/transactions/:id - Update transaction
   http.put('/api/transactions/:id', async ({ request, params }) => {
     const transactionId = parseInt(params.id as string);
-    const updatedData = await request.json();
+    const updatedData = await request.json() as any;
     const transactionIndex = mockTransactions.findIndex(t => t.id === transactionId);
     
     if (transactionIndex === -1) {
