@@ -39,7 +39,7 @@ export default defineConfig({
           name: 'client',
           environment: 'jsdom',
           globals: true,
-          setupFiles: ['./tests/setup.ts'],
+          setupFiles: ['./tests/setup.ts', './__tests__/setup.ts'],
           include: [
             '__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
             'components/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
