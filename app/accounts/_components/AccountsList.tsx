@@ -1,13 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  CreditCardIcon,
-  Banknote,
-  TrendingUpIcon,
-  TrendingDownIcon,
-} from "lucide-react";
+import { CreditCardIcon, Banknote } from "lucide-react";
 import { BankAccount } from "@/lib/schemas";
 import { AccountItem } from "./AccountItem";
 
@@ -21,74 +15,47 @@ interface AccountsListProps {
 
 function AccountsListSkeleton() {
   return (
-    <div className="space-y-6">
-      {/* Summary Statistics Skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-border">
-        {/* Saldo Total Skeleton */}
-        <div className="text-center md:text-left py-2 md:py-0">
-          <Skeleton className="h-4 w-20 mb-2 mx-auto md:mx-0" />
-          <Skeleton className="h-8 w-32 mx-auto md:mx-0" />
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-5 w-5 rounded" />
+          <Skeleton className="h-6 w-48" />
         </div>
-
-        {/* Contas Positivas Skeleton */}
-        <div className="text-center md:text-left py-2 md:py-0 md:px-8">
-          <Skeleton className="h-4 w-28 mb-2 mx-auto md:mx-0" />
-          <div className="flex items-center justify-center md:justify-start gap-2">
-            <Skeleton className="h-5 w-5" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-
-        {/* Contas Negativas Skeleton */}
-        <div className="text-center md:text-left py-2 md:py-0 md:px-8">
-          <Skeleton className="h-4 w-28 mb-2 mx-auto md:mx-0" />
-          <div className="flex items-center justify-center md:justify-start gap-2">
-            <Skeleton className="h-5 w-5" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
+        <Skeleton className="h-5 w-16 rounded-full" />
       </div>
 
-      <Separator />
-
-      {/* Accounts List Skeleton */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-5 w-5 rounded" />
-            <Skeleton className="h-6 w-48" />
-          </div>
-          <Skeleton className="h-5 w-16 rounded-full" />
-        </div>
-
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {/* Header skeleton */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 flex-1">
-                    <Skeleton className="h-12 w-12 rounded-xl" />
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-5 w-32" />
-                        <Skeleton className="h-4 w-8 rounded-full" />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Skeleton className="h-4 w-4" />
-                        <Skeleton className="h-6 w-24" />
-                      </div>
-                      <Skeleton className="h-3 w-40" />
-                    </div>
+                  <div className="flex items-center gap-3 flex-1">
+                    <Skeleton className="h-10 w-10 rounded-lg" />
+                    <Skeleton className="h-5 w-32" />
                   </div>
-                  <div className="flex gap-2">
-                    <Skeleton className="h-9 w-16" />
-                    <Skeleton className="h-9 w-16" />
-                  </div>
+                  <Skeleton className="h-4 w-16 rounded-full" />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+
+                {/* Balance skeleton */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-6 w-24" />
+                  </div>
+                  <Skeleton className="h-3 w-40" />
+                </div>
+
+                {/* Actions skeleton */}
+                <div className="flex gap-2 pt-2">
+                  <Skeleton className="h-8 flex-1" />
+                  <Skeleton className="h-8 flex-1" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
@@ -131,116 +98,30 @@ export function AccountsList({
     return <EmptyState />;
   }
 
-  // Calculate summary statistics
-  const totalBalance = accounts.reduce(
-    (sum, account) => sum + parseFloat(account.balance),
-    0,
-  );
-  const positiveAccounts = accounts.filter(
-    (account) => parseFloat(account.balance) >= 0,
-  );
-  const negativeAccounts = accounts.filter(
-    (account) => parseFloat(account.balance) < 0,
-  );
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Summary Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-border">
-        {/* Saldo Total */}
-        <div className="text-center py-2 md:py-0">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div
-              className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                totalBalance >= 0 ? "bg-primary/10" : "bg-gray-500/10"
-              }`}
-            >
-              <CreditCardIcon
-                className={`h-4 w-4 ${
-                  totalBalance >= 0 ? "text-primary" : "text-gray-500"
-                }`}
-              />
-            </div>
-            <p className="text-sm font-medium text-muted-foreground">
-              Saldo Total
-            </p>
-          </div>
-          <p
-            className={`text-2xl font-bold ${
-              totalBalance >= 0
-                ? "text-green-600 dark:text-green-400"
-                : "text-red-600 dark:text-red-400"
-            }`}
-          >
-            {formatCurrency(totalBalance)}
-          </p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CreditCardIcon className="h-5 w-5 text-foreground" />
+          <h2 className="text-xl font-semibold text-foreground">
+            Suas Contas Bancárias
+          </h2>
         </div>
-
-        {/* Contas Positivas */}
-        <div className="text-center py-2 md:py-0 md:px-8">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10">
-              <TrendingUpIcon className="h-4 w-4 text-green-500" />
-            </div>
-            <p className="text-sm font-medium text-muted-foreground">
-              Contas Positivas
-            </p>
-          </div>
-          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-            {positiveAccounts.length}
-          </p>
-        </div>
-
-        {/* Contas Negativas */}
-        <div className="text-center py-2 md:py-0 md:px-8">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
-              <TrendingDownIcon className="h-4 w-4 text-red-500" />
-            </div>
-            <p className="text-sm font-medium text-muted-foreground">
-              Contas Negativas
-            </p>
-          </div>
-          <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-            {negativeAccounts.length}
-          </p>
-        </div>
+        <Badge variant="secondary" className="text-xs">
+          {accounts.length} {accounts.length === 1 ? "conta" : "contas"}
+        </Badge>
       </div>
 
-      <Separator />
-
-      {/* Accounts List */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CreditCardIcon className="h-5 w-5 text-foreground" />
-            <h2 className="text-xl font-semibold text-foreground">
-              Suas Contas Bancárias
-            </h2>
-          </div>
-          <Badge variant="secondary" className="text-xs">
-            {accounts.length} {accounts.length === 1 ? "conta" : "contas"}
-          </Badge>
-        </div>
-
-        <div className="space-y-3">
-          {accounts.map((account) => (
-            <AccountItem
-              key={account.id}
-              account={account}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              isDeleting={isDeleting}
-            />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {accounts.map((account) => (
+          <AccountItem
+            key={account.id}
+            account={account}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            isDeleting={isDeleting}
+          />
+        ))}
       </div>
     </div>
   );

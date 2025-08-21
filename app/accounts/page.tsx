@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { CreateAccountModal } from "./_components/CreateAccountModal";
 import { EditAccountModal } from "./_components/EditAccountModal";
 import { AccountsList } from "./_components/AccountsList";
+import { AccountsMetricsGrid } from "./_components/AccountsMetricsGrid";
 import { ErrorAlerts } from "./_components/ErrorAlerts";
 import { useAccountActions } from "@/features/accounts/hooks/ui";
 
@@ -34,7 +35,16 @@ const AccountsPage: NextPage = () => {
           description="Gerencie suas contas bancárias e saldos"
           action={<Skeleton className="h-9 w-28" />}
         />
-        <div className="space-y-6 px-4 lg:px-6 pb-4 lg:pb-6">
+        <div className="space-y-8 px-4 lg:px-6 pb-8">
+          {/* Metrics Cards Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ))}
+          </div>
+
           <AccountsList
             accounts={[]}
             isLoading={true}
@@ -62,8 +72,11 @@ const AccountsPage: NextPage = () => {
         }
       />
 
-      <div className="space-y-6 px-4 lg:px-6 pb-4 lg:pb-6">
+      <div className="space-y-8 px-4 lg:px-6 pb-8">
         <ErrorAlerts errors={{ ...errors, general: error }} />
+
+        {/* Metrics Cards */}
+        <AccountsMetricsGrid accounts={accounts} />
 
         <AccountsList
           accounts={accounts}

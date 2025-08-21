@@ -68,7 +68,7 @@ const TransactionsPage: NextPage = () => {
           description="Gerencie suas receitas, despesas e transferências"
           action={<Skeleton className="h-9 w-32" />}
         />
-        <div className="px-4 lg:px-6 pb-4 lg:pb-6">
+        <div className="space-y-8 px-4 lg:px-6 pb-8">
           <TransactionsList
             transactions={[]}
             isLoading={true}
@@ -113,14 +113,14 @@ const TransactionsPage: NextPage = () => {
           </QuickCreateButton>
         }
       />
-      <div className="px-4 lg:px-6 pb-4 lg:pb-6">
+      <div className="space-y-8 px-4 lg:px-6 pb-8">
         {pageError && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{pageError.message}</AlertDescription>
           </Alert>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           <TransactionFiltersComponent
             filters={filters}
             onFiltersChange={setFilters}
