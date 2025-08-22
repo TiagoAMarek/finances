@@ -10,9 +10,9 @@ export default defineConfig({
           name: "server",
           environment: "node",
           globals: true,
-          setupFiles: ["./tests/setup.ts"],
+          setupFiles: ["./tests-api/setup.ts"],
           include: [
-            "tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts}",
+            "tests-api/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts}",
             "app/api/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts}",
           ],
           exclude: ["node_modules/**", "dist/**", ".next/**", "coverage/**"],
@@ -34,7 +34,7 @@ export default defineConfig({
           name: "client",
           environment: "jsdom",
           globals: true,
-          setupFiles: ["./tests/setup.ts", "./__tests__/setup.ts"],
+          setupFiles: ["./__tests__/setup.ts"],
           include: [
             "__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
             "components/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
@@ -68,12 +68,15 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html"],
       exclude: [
-        "node_modules/",
-        "tests/",
         "**/*.config.*",
         "**/*.d.ts",
-        "coverage/**",
+        "**/fixtures/**",
+        "**/mocks/**",
         ".next/**",
+        "__tests__/",
+        "coverage/**",
+        "node_modules/",
+        "tests-api/",
       ],
       thresholds: {
         global: {

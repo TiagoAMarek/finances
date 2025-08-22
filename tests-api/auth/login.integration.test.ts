@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { POST } from "@/app/api/auth/login/route";
 import Database from "better-sqlite3";
+import { createNextRequest } from "../helpers/auth-helpers";
 import {
   createIntegrationTestDb,
-  createTestUser,
   cleanupTestDb,
-} from "../../../helpers/integration-db-helpers";
-import { createNextRequest } from "../../../helpers/auth-helpers";
+  createTestUser,
+} from "../helpers/integration-db-helpers";
 
 let testDb: any;
 let sqlite: Database.Database;

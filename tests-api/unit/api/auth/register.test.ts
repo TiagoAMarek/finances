@@ -4,7 +4,6 @@ import { createMockRequest } from "../../../helpers/auth-helpers";
 
 // Mock database responses
 let mockDbSelect: any;
-let mockDbInsert: any;
 let insertReturnValue: any;
 
 // Mock the database module
