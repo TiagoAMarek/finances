@@ -205,13 +205,14 @@ export function TransactionFiltersComponent({
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="h-8 px-3"
+              className="h-8 px-3 transition-all hover:bg-accent"
+              aria-label={isExpanded ? "Recolher filtros" : "Expandir filtros"}
             >
-              {isExpanded ? (
-                <ChevronUpIcon className="h-4 w-4" />
-              ) : (
+              <div
+                className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : "rotate-0"}`}
+              >
                 <ChevronDownIcon className="h-4 w-4" />
-              )}
+              </div>
             </Button>
           </div>
         </div>
@@ -289,9 +290,13 @@ export function TransactionFiltersComponent({
         </div>
 
         {/* Expanded Filters */}
-        {isExpanded && (
-          <div className="animate-in slide-in-from-top-2 duration-200">
-            <Separator className="my-4" />
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isExpanded ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="pt-4">
+            <Separator className="mb-4" />
             <div className="space-y-6">
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
@@ -434,7 +439,7 @@ export function TransactionFiltersComponent({
               </div>
             </div>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

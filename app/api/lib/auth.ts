@@ -59,6 +59,9 @@ export function createErrorResponse(message: string, status: number = 400) {
   });
 }
 
+export type ApiSuccess<T = unknown> = T;
+export type ApiError = { detail: string };
+
 export function createSuccessResponse(data: unknown, status: number = 200) {
   return new Response(JSON.stringify(data), {
     status,

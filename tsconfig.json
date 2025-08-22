@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,17 +23,43 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@/features/*": ["./features/*"],
-      "@/features/auth/*": ["./features/auth/*"],
-      "@/features/accounts/*": ["./features/accounts/*"],
-      "@/features/transactions/*": ["./features/transactions/*"],
-      "@/features/credit-cards/*": ["./features/credit-cards/*"],
-      "@/features/dashboard/*": ["./features/dashboard/*"],
-      "@/features/reports/*": ["./features/reports/*"],
-      "@/features/shared/*": ["./features/shared/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@/features/*": [
+        "./features/*"
+      ],
+      "@/features/auth/*": [
+        "./features/auth/*"
+      ],
+      "@/features/accounts/*": [
+        "./features/accounts/*"
+      ],
+      "@/features/transactions/*": [
+        "./features/transactions/*"
+      ],
+      "@/features/credit-cards/*": [
+        "./features/credit-cards/*"
+      ],
+      "@/features/dashboard/*": [
+        "./features/dashboard/*"
+      ],
+      "@/features/reports/*": [
+        "./features/reports/*"
+      ],
+      "@/features/shared/*": [
+        "./features/shared/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/examples"
+  ]
 }

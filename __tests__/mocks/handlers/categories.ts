@@ -63,7 +63,7 @@ export const categoryHandlers = [
   /**
    * GET /api/categories - List Categories
    */
-  http.get("/api/categories", async ({ request }) => {
+  http.get(/\/api\/categories(?:\/.*)?$/, async ({ request }) => {
     // Check authorization
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -93,6 +93,9 @@ export const categoryHandlers = [
     }
 
     const requestBody = await request.json();
+
+    // Ensure requestBody is an object before spreading
+    const safeRequestBody = (requestBody && typeof requestBody === 'object') ? (requestBody as Record<string, unknown>) : {};
     
     // Simulate processing delay
     await new Promise(resolve => setTimeout(resolve, 150));
@@ -100,21 +103,21 @@ export const categoryHandlers = [
     // Create new category
     const newCategory = {
       id: mockCategories.length + 1,
-      ...requestBody,
+      ...safeRequestBody,
       isDefault: false,
       ownerId: 1,
       createdAt: new Date().toISOString()
     };
 
-    mockCategories.push(newCategory);
+    mockCategories.push(newCategory as any);
 
-    return HttpResponse.json(newCategory, { status: 201 });
+    return HttpResponse.json(newCategory as any, { status: 201 });
   }),
 
   /**
    * GET /api/categories/defaults - List Default Categories
    */
-  http.get("/api/categories/defaults", async ({ request }) => {
+  http.get(/\/api\/categories\/defaults(?:\/.*)?$/, async ({ request }) => {
     // Check authorization
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -159,9 +162,10 @@ export const categoryHandlers = [
       );
     }
 
+    const safeUpdate = (requestBody && typeof requestBody === 'object') ? (requestBody as Partial<typeof mockCategories[number]>) : {};
     mockCategories[categoryIndex] = {
       ...mockCategories[categoryIndex],
-      ...requestBody
+      ...safeUpdate
     };
 
     return HttpResponse.json(mockCategories[categoryIndex], { status: 200 });

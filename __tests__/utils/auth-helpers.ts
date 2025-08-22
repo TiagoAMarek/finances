@@ -1,11 +1,24 @@
-import { server } from "../mocks/server";
+import type {
+  ApiErrorResponse,
+  LoginInput,
+  LoginResponse,
+  RegisterInput,
+  RegisterResponse,
+} from "@/lib/schemas";
+import { expect } from "vitest";
+import {
+  authScenarios,
+  mockTokens,
+  mockUsers,
+  registrationScenarios,
+} from "../mocks/data/auth";
 import { authErrorHandlers } from "../mocks/handlers/auth";
-import { mockTokens, mockUsers, authScenarios, registrationScenarios } from "../mocks/data/auth";
+import { server } from "../mocks/server";
 import { localStorageMock } from "./test-utils";
 
 /**
  * Authentication test utilities and helpers
- * 
+ *
  * Provides convenient functions for testing authentication flows,
  * managing auth state, and simulating various auth scenarios.
  */
@@ -19,15 +32,15 @@ export const authTestHelpers = {
    * Set up authenticated user state in localStorage
    */
   loginUser: (userEmail: string = "test@example.com") => {
-    const user = mockUsers.find(u => u.email === userEmail);
+    const user = mockUsers.find((u) => u.email === userEmail);
     if (!user) {
       throw new Error(`Mock user not found: ${userEmail}`);
     }
-    
-    localStorageMock.getItem.mockImplementation((key: string) => 
-      key === "access_token" ? user.token : null
+
+    localStorageMock.getItem.mockImplementation((key: string) =>
+      key === "access_token" ? user.token : null,
     );
-    
+
     return {
       userId: user.id,
       email: user.email,
@@ -54,10 +67,10 @@ export const authTestHelpers = {
    * Set up expired token scenario
    */
   loginExpiredUser: () => {
-    localStorageMock.getItem.mockImplementation((key: string) => 
-      key === "access_token" ? mockTokens.expiredToken : null
+    localStorageMock.getItem.mockImplementation((key: string) =>
+      key === "access_token" ? mockTokens.expiredToken : null,
     );
-    
+
     return {
       userId: 3,
       email: "expired@example.com",
@@ -101,7 +114,7 @@ export const authTestHelpers = {
   /**
    * Expect successful login response structure
    */
-  expectSuccessfulLoginResponse: (response: any) => {
+  expectSuccessfulLoginResponse: (response: LoginResponse) => {
     expect(response).toHaveProperty("access_token");
     expect(typeof response.access_token).toBe("string");
     expect(response.access_token.length).toBeGreaterThan(0);
@@ -110,8 +123,11 @@ export const authTestHelpers = {
   /**
    * Expect successful registration response structure
    */
-  expectSuccessfulRegistrationResponse: (response: any) => {
-    expect(response).toHaveProperty("message", "Usuário registrado com sucesso");
+  expectSuccessfulRegistrationResponse: (response: RegisterResponse) => {
+    expect(response).toHaveProperty(
+      "message",
+      "Usuário registrado com sucesso",
+    );
     expect(response).toHaveProperty("user");
     expect(response.user).toHaveProperty("id");
     expect(response.user).toHaveProperty("email");
@@ -122,7 +138,10 @@ export const authTestHelpers = {
   /**
    * Expect error response structure
    */
-  expectErrorResponse: (response: any, expectedMessage?: string) => {
+  expectErrorResponse: (
+    response: ApiErrorResponse,
+    expectedMessage?: string,
+  ) => {
     expect(response).toHaveProperty("detail");
     if (expectedMessage) {
       expect(response.detail).toBe(expectedMessage);
@@ -177,26 +196,28 @@ export const authTestHelpers = {
    */
   fillLoginForm: (getByLabelText: any, getByRole?: any) => {
     const credentials = authTestHelpers.getValidCredentials();
-    
+
     const emailInput = getByLabelText(/email/i);
     const passwordInput = getByLabelText(/senha|password/i);
-    
+
     // Clear existing values
     emailInput.value = "";
     passwordInput.value = "";
-    
+
     // Fill with valid credentials
     emailInput.value = credentials.email;
     passwordInput.value = credentials.password;
-    
+
     // Trigger change events
     emailInput.dispatchEvent(new Event("input", { bubbles: true }));
     passwordInput.dispatchEvent(new Event("input", { bubbles: true }));
-    
+
     return {
       emailInput,
       passwordInput,
-      submitButton: getByRole ? getByRole("button", { name: /entrar|login/i }) : null,
+      submitButton: getByRole
+        ? getByRole("button", { name: /entrar|login/i })
+        : null,
     };
   },
 
@@ -205,26 +226,28 @@ export const authTestHelpers = {
    */
   fillRegistrationForm: (getByLabelText: any, getByRole?: any) => {
     const registrationData = authTestHelpers.getValidRegistrationData();
-    
+
     const emailInput = getByLabelText(/email/i);
     const passwordInput = getByLabelText(/senha|password/i);
-    
+
     // Clear existing values
     emailInput.value = "";
     passwordInput.value = "";
-    
+
     // Fill with valid data
     emailInput.value = registrationData.email;
     passwordInput.value = registrationData.password;
-    
+
     // Trigger change events
     emailInput.dispatchEvent(new Event("input", { bubbles: true }));
     passwordInput.dispatchEvent(new Event("input", { bubbles: true }));
-    
+
     return {
       emailInput,
       passwordInput,
-      submitButton: getByRole ? getByRole("button", { name: /registrar|register/i }) : null,
+      submitButton: getByRole
+        ? getByRole("button", { name: /registrar|register/i })
+        : null,
     };
   },
 
@@ -244,7 +267,7 @@ export const authTestHelpers = {
    * Check if token belongs to specific user
    */
   expectTokenForUser: (token: string, expectedUserId: number) => {
-    const user = mockUsers.find(u => u.id === expectedUserId);
+    const user = mockUsers.find((u) => u.id === expectedUserId);
     expect(user).toBeTruthy();
     expect(token).toBe(user?.token);
   },
@@ -256,17 +279,25 @@ export const authTestHelpers = {
   /**
    * Simulate complete login flow
    */
-  performLoginFlow: async (fetchFunction: Function, credentials?: any) => {
+  performLoginFlow: async (
+    fetchFunction: (
+      input: RequestInfo,
+      init?: RequestInit,
+    ) => Promise<Response>,
+    credentials?: LoginInput,
+  ) => {
     const creds = credentials || authTestHelpers.getValidCredentials();
-    
+
     const response = await fetchFunction("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(creds),
     });
-    
+
     return {
       response,
-      data: response.ok ? await response.json() : await response.json().catch(() => ({})),
+      data: response.ok
+        ? ((await response.json()) as LoginResponse)
+        : await response.json().catch(() => ({})),
       status: response.status,
     };
   },
@@ -274,17 +305,25 @@ export const authTestHelpers = {
   /**
    * Simulate complete registration flow
    */
-  performRegistrationFlow: async (fetchFunction: Function, registrationData?: any) => {
+  performRegistrationFlow: async (
+    fetchFunction: (
+      input: RequestInfo,
+      init?: RequestInit,
+    ) => Promise<Response>,
+    registrationData?: RegisterInput,
+  ) => {
     const data = registrationData || authTestHelpers.getValidRegistrationData();
-    
+
     const response = await fetchFunction("/api/auth/register", {
-      method: "POST", 
+      method: "POST",
       body: JSON.stringify(data),
     });
-    
+
     return {
       response,
-      data: response.ok ? await response.json() : await response.json().catch(() => ({})),
+      data: response.ok
+        ? ((await response.json()) as RegisterResponse)
+        : await response.json().catch(() => ({})),
       status: response.status,
     };
   },
@@ -292,30 +331,39 @@ export const authTestHelpers = {
   /**
    * Test authenticated request
    */
-  performAuthenticatedRequest: async (fetchFunction: Function, endpoint: string, options?: any) => {
+  performAuthenticatedRequest: async (
+    fetchFunction: (
+      input: RequestInfo,
+      init?: RequestInit,
+    ) => Promise<Response>,
+    endpoint: string,
+    options?: RequestInit,
+  ) => {
     // Set up authentication
     const authUser = authTestHelpers.loginUser();
-    
+
     const response = await fetchFunction(endpoint, {
-      ...options,
+      ...(options ?? {}),
       headers: {
-        'Authorization': `Bearer ${authUser.token}`,
-        ...options?.headers,
+        Authorization: `Bearer ${authUser.token}`,
+        ...((options as any)?.headers ?? {}),
       },
     });
-    
+
     return {
       response,
-      data: response.ok ? await response.json() : await response.json().catch(() => ({})),
+      data: response.ok
+        ? await response.json()
+        : await response.json().catch(() => ({})),
       status: response.status,
     };
   },
 };
 
 // Export commonly used auth data for direct access
-export { 
-  mockTokens, 
-  mockUsers, 
-  authScenarios, 
-  registrationScenarios 
+export {
+  authScenarios,
+  mockTokens,
+  mockUsers,
+  registrationScenarios,
 } from "../mocks/data/auth";
