@@ -1,12 +1,11 @@
+import { Category } from "@/lib/schemas";
 import { http, HttpResponse } from "msw";
 
 /**
  * MSW handlers for categories endpoints
  * Provides mock data for categories API routes during testing and development
  */
-
-// Mock categories data
-const mockCategories = [
+const mockCategories: Category[] = [
   {
     id: 1,
     name: "Salário",
@@ -15,27 +14,27 @@ const mockCategories = [
     icon: "💰",
     isDefault: true,
     ownerId: 1,
-    createdAt: "2024-01-01T00:00:00Z"
+    createdAt: "2024-01-01T00:00:00Z",
   },
   {
     id: 2,
     name: "Alimentação",
-    type: "expense", 
+    type: "expense",
     color: "#f59e0b",
     icon: "🍽️",
     isDefault: true,
     ownerId: 1,
-    createdAt: "2024-01-01T00:00:00Z"
+    createdAt: "2024-01-01T00:00:00Z",
   },
   {
     id: 3,
     name: "Transporte",
     type: "expense",
-    color: "#3b82f6", 
+    color: "#3b82f6",
     icon: "🚗",
     isDefault: true,
     ownerId: 1,
-    createdAt: "2024-01-01T00:00:00Z"
+    createdAt: "2024-01-01T00:00:00Z",
   },
   {
     id: 4,
@@ -45,7 +44,7 @@ const mockCategories = [
     icon: "🎮",
     isDefault: true,
     ownerId: 1,
-    createdAt: "2024-01-01T00:00:00Z"
+    createdAt: "2024-01-01T00:00:00Z",
   },
   {
     id: 5,
@@ -55,8 +54,8 @@ const mockCategories = [
     icon: "🏥",
     isDefault: true,
     ownerId: 1,
-    createdAt: "2024-01-01T00:00:00Z"
-  }
+    createdAt: "2024-01-01T00:00:00Z",
+  },
 ];
 
 export const categoryHandlers = [
@@ -68,13 +67,13 @@ export const categoryHandlers = [
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return HttpResponse.json(
-        { detail: "Authorization header required" }, 
-        { status: 401 }
+        { detail: "Authorization header required" },
+        { status: 401 },
       );
     }
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     return HttpResponse.json(mockCategories, { status: 200 });
   }),
@@ -88,30 +87,61 @@ export const categoryHandlers = [
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return HttpResponse.json(
         { detail: "Authorization header required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const requestBody = await request.json();
 
     // Ensure requestBody is an object before spreading
-    const safeRequestBody = (requestBody && typeof requestBody === 'object') ? (requestBody as Record<string, unknown>) : {};
-    
+    const safeRequestBody =
+      requestBody && typeof requestBody === "object"
+        ? (requestBody as Record<string, unknown>)
+        : {};
+
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Create new category
-    const newCategory = {
-      id: mockCategories.length + 1,
-      ...safeRequestBody,
-      isDefault: false,
-      ownerId: 1,
-      createdAt: new Date().toISOString()
-    };
+    const newCategory = Object.assign(
+      {
+        id: mockCategories.length + 1,
+        name: "",
+        type: "expense",
+        color: "#cccccc",
+        icon: "",
+        isDefault: false,
+        ownerId: 1,
+        createdAt: new Date().toISOString(),
+      },
+      // only copy known fields from safeRequestBody
+      {
+        name:
+          typeof safeRequestBody.name === "string"
+            ? String(safeRequestBody.name)
+            : undefined,
+        type:
+          typeof safeRequestBody.type === "string" &&
+          (safeRequestBody.type === "income" ||
+            safeRequestBody.type === "expense")
+            ? (safeRequestBody.type as "income" | "expense")
+            : undefined,
+        color:
+          typeof safeRequestBody.color === "string"
+            ? String(safeRequestBody.color)
+            : undefined,
+        icon:
+          typeof safeRequestBody.icon === "string"
+            ? String(safeRequestBody.icon)
+            : undefined,
+      },
+    );
 
-    mockCategories.push(newCategory as any);
+    mockCategories.push(newCategory);
 
-    return HttpResponse.json(newCategory as any, { status: 201 });
+    return HttpResponse.json(newCategory as (typeof mockCategories)[number], {
+      status: 201,
+    });
   }),
 
   /**
@@ -123,20 +153,20 @@ export const categoryHandlers = [
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return HttpResponse.json(
         { detail: "Authorization header required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     // Return default categories
-    const defaultCategories = mockCategories.filter(cat => cat.isDefault);
-    
-    await new Promise(resolve => setTimeout(resolve, 100));
+    const defaultCategories = mockCategories.filter((cat) => cat.isDefault);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     return HttpResponse.json(defaultCategories, { status: 200 });
   }),
 
   /**
-   * PUT /api/categories/[id] - Update Category  
+   * PUT /api/categories/[id] - Update Category
    */
   http.put("/api/categories/:id", async ({ params, request }) => {
     // Check authorization
@@ -144,28 +174,33 @@ export const categoryHandlers = [
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return HttpResponse.json(
         { detail: "Authorization header required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const categoryId = parseInt(params.id as string);
     const requestBody = await request.json();
-    
-    await new Promise(resolve => setTimeout(resolve, 150));
+
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Find and update category
-    const categoryIndex = mockCategories.findIndex(cat => cat.id === categoryId);
+    const categoryIndex = mockCategories.findIndex(
+      (cat) => cat.id === categoryId,
+    );
     if (categoryIndex === -1) {
       return HttpResponse.json(
         { detail: "Categoria não encontrada" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const safeUpdate = (requestBody && typeof requestBody === 'object') ? (requestBody as Partial<typeof mockCategories[number]>) : {};
+    const safeUpdate =
+      requestBody && typeof requestBody === "object"
+        ? (requestBody as Partial<(typeof mockCategories)[number]>)
+        : {};
     mockCategories[categoryIndex] = {
       ...mockCategories[categoryIndex],
-      ...safeUpdate
+      ...safeUpdate,
     };
 
     return HttpResponse.json(mockCategories[categoryIndex], { status: 200 });
@@ -175,25 +210,27 @@ export const categoryHandlers = [
    * DELETE /api/categories/[id] - Delete Category
    */
   http.delete("/api/categories/:id", async ({ params, request }) => {
-    // Check authorization  
+    // Check authorization
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return HttpResponse.json(
         { detail: "Authorization header required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const categoryId = parseInt(params.id as string);
-    
-    await new Promise(resolve => setTimeout(resolve, 150));
+
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Find category
-    const categoryIndex = mockCategories.findIndex(cat => cat.id === categoryId);
+    const categoryIndex = mockCategories.findIndex(
+      (cat) => cat.id === categoryId,
+    );
     if (categoryIndex === -1) {
       return HttpResponse.json(
         { detail: "Categoria não encontrada" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -202,7 +239,8 @@ export const categoryHandlers = [
 
     return HttpResponse.json(
       { message: "Categoria excluída com sucesso" },
-      { status: 200 }
+      { status: 200 },
     );
-  })
+  }),
 ];
+

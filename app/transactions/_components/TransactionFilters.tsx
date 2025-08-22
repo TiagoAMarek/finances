@@ -23,7 +23,6 @@ import {
   TrendingUpIcon,
   TrendingDownIcon,
   ChevronDownIcon,
-  ChevronUpIcon,
 } from "lucide-react";
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";

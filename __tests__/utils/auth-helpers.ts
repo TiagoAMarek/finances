@@ -23,6 +23,12 @@ import { localStorageMock } from "./test-utils";
  * managing auth state, and simulating various auth scenarios.
  */
 
+type FetchResult<T> = {
+  response: Response;
+  data: T | Record<string, unknown>;
+  status: number;
+};
+
 export const authTestHelpers = {
   // ===================
   // Auth State Management
@@ -194,7 +200,13 @@ export const authTestHelpers = {
   /**
    * Fill login form with valid credentials
    */
-  fillLoginForm: (getByLabelText: any, getByRole?: any) => {
+  fillLoginForm: (
+    getByLabelText: (text: RegExp) => HTMLInputElement,
+    getByRole?: (
+      role: string,
+      options?: Record<string, any>,
+    ) => HTMLElement | null,
+  ) => {
     const credentials = authTestHelpers.getValidCredentials();
 
     const emailInput = getByLabelText(/email/i);
@@ -224,7 +236,13 @@ export const authTestHelpers = {
   /**
    * Fill registration form with valid data
    */
-  fillRegistrationForm: (getByLabelText: any, getByRole?: any) => {
+  fillRegistrationForm: (
+    getByLabelText: (text: RegExp) => HTMLInputElement,
+    getByRole?: (
+      role: string,
+      options?: Record<string, any>,
+    ) => HTMLElement | null,
+  ) => {
     const registrationData = authTestHelpers.getValidRegistrationData();
 
     const emailInput = getByLabelText(/email/i);
@@ -285,7 +303,11 @@ export const authTestHelpers = {
       init?: RequestInit,
     ) => Promise<Response>,
     credentials?: LoginInput,
-  ) => {
+  ): Promise<{
+    response: Response;
+    data: LoginResponse | Record<string, unknown>;
+    status: number;
+  }> => {
     const creds = credentials || authTestHelpers.getValidCredentials();
 
     const response = await fetchFunction("/api/auth/login", {
