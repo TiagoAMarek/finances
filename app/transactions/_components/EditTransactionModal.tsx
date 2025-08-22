@@ -31,6 +31,7 @@ import {
 import { Transaction } from "@/lib/schemas";
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
+import { useGetCategories } from "@/features/categories";
 
 interface EditTransactionModalProps {
   transaction: Transaction | null;
@@ -51,7 +52,7 @@ export function EditTransactionModal({
   const [amount, setAmount] = useState<number>(0);
   const [type, setType] = useState<"income" | "expense">("expense");
   const [date, setDate] = useState("");
-  const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [sourceType, setSourceType] = useState<"account" | "creditCard">(
     "account",
   );
@@ -62,6 +63,7 @@ export function EditTransactionModal({
 
   const { data: accounts = [] } = useGetAccounts();
   const { data: creditCards = [] } = useGetCreditCards();
+  const { data: categories = [] } = useGetCategories();
 
   useEffect(() => {
     if (transaction) {
@@ -69,7 +71,7 @@ export function EditTransactionModal({
       setAmount(parseFloat(transaction.amount));
       setType(transaction.type as "income" | "expense");
       setDate(transaction.date);
-      setCategory(transaction.category);
+      setCategoryId(transaction.categoryId || undefined);
       setSelectedAccount(transaction.accountId);
       setSelectedCreditCard(transaction.creditCardId);
 
@@ -99,13 +101,18 @@ export function EditTransactionModal({
       return;
     }
 
+    if (!categoryId) {
+      alert("Selecione uma categoria");
+      return;
+    }
+
     onSave({
       ...transaction,
       description,
       amount: amount.toString(),
       type: type as "income" | "expense" | "transfer",
       date,
-      category,
+      categoryId,
       accountId: sourceType === "account" ? selectedAccount : null,
       creditCardId: sourceType === "creditCard" ? selectedCreditCard : null,
     });
@@ -117,7 +124,7 @@ export function EditTransactionModal({
       setAmount(parseFloat(transaction.amount));
       setType(transaction.type as "income" | "expense");
       setDate(transaction.date);
-      setCategory(transaction.category);
+      setCategoryId(transaction.categoryId || undefined);
       setSelectedAccount(transaction.accountId);
       setSelectedCreditCard(transaction.creditCardId);
 
@@ -145,6 +152,12 @@ export function EditTransactionModal({
   };
 
   if (!transaction) return null;
+
+  // Filter categories based on transaction type
+  const filteredCategories = categories.filter((category) => {
+    if (category.type === "both") return true;
+    return category.type === type;
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -312,15 +325,41 @@ export function EditTransactionModal({
                   <TagIcon className="h-4 w-4" />
                   Categoria
                 </Label>
-                <Input
-                  type="text"
-                  id="editCategory"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  placeholder="Ex: Alimentação, Salário, Transporte"
-                  className="h-11"
+                <Select
+                  value={categoryId?.toString() || ""}
+                  onValueChange={(value) =>
+                    setCategoryId(value ? parseInt(value) : undefined)
+                  }
                   required
-                />
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredCategories.map((category) => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                              backgroundColor: category.color || "#64748b",
+                            }}
+                          />
+                          <span>{category.icon}</span>
+                          <span>{category.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {filteredCategories.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Nenhuma categoria disponível para este tipo de transação.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -436,9 +475,7 @@ export function EditTransactionModal({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={
-                    isLoading || !description.trim() || !category.trim()
-                  }
+                  disabled={isLoading || !description.trim() || !categoryId}
                   className="flex-1"
                 >
                   {isLoading ? (

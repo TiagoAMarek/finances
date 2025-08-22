@@ -172,7 +172,7 @@ describe("Schemas Zod", () => {
         amount: "150.00",
         type: "expense" as const,
         date: "2024-01-15",
-        category: "Alimentação",
+        categoryId: 1,
         accountId: 1,
       };
 
@@ -186,7 +186,7 @@ describe("Schemas Zod", () => {
         amount: "5000.00",
         type: "income" as const,
         date: "2024-01-01",
-        category: "Salário",
+        categoryId: 1,
         accountId: 1,
       };
 
@@ -200,7 +200,7 @@ describe("Schemas Zod", () => {
         amount: "150.00",
         type: "expense",
         date: "2024-01-15",
-        category: "Alimentação",
+        categoryId: 1,
         accountId: 1,
       };
 
@@ -218,7 +218,7 @@ describe("Schemas Zod", () => {
         amount: "",
         type: "expense",
         date: "2024-01-15",
-        category: "Alimentação",
+        categoryId: 1,
         accountId: 1,
       };
 
@@ -236,7 +236,6 @@ describe("Schemas Zod", () => {
         amount: "100.00",
         type: "expense",
         date: "2024-01-15",
-        category: "",
         accountId: 1,
       };
 
@@ -254,7 +253,7 @@ describe("Schemas Zod", () => {
         amount: "100.00",
         type: "expense",
         date: "2024-01-15",
-        category: "Teste",
+        categoryId: 1,
         accountId: 1,
         creditCardId: 1,
       };

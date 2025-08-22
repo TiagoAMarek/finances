@@ -5,6 +5,8 @@ import {
   bankAccounts,
   creditCards,
   transactions,
+  categories,
+  defaultCategories,
 } from "@/app/api/lib/schema";
 import { hashPassword } from "@/app/api/lib/auth";
 
@@ -16,7 +18,7 @@ export function createIntegrationTestDb() {
   sqlite.exec("PRAGMA foreign_keys = ON;");
 
   const db = drizzle(sqlite, {
-    schema: { users, bankAccounts, creditCards, transactions },
+    schema: { users, bankAccounts, creditCards, transactions, categories, defaultCategories },
   });
 
   // Create tables manually since we're using in-memory
@@ -52,6 +54,31 @@ export function createIntegrationTestDb() {
   `);
 
   sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL CHECK (type IN ('income', 'expense', 'both')),
+      color TEXT,
+      icon TEXT,
+      is_default BOOLEAN NOT NULL DEFAULT false,
+      owner_id INTEGER NOT NULL,
+      created_at DATETIME NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS default_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL CHECK (type IN ('income', 'expense', 'both')),
+      color TEXT,
+      icon TEXT,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS transactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       owner_id INTEGER NOT NULL,
@@ -59,11 +86,13 @@ export function createIntegrationTestDb() {
       amount TEXT NOT NULL,
       description TEXT NOT NULL,
       date TEXT NOT NULL,
-      category TEXT NOT NULL,
+      category TEXT,
+      category_id INTEGER,
       account_id INTEGER,
       credit_card_id INTEGER,
       to_account_id INTEGER,
       FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
       FOREIGN KEY (account_id) REFERENCES bank_accounts(id) ON DELETE SET NULL,
       FOREIGN KEY (credit_card_id) REFERENCES credit_cards(id) ON DELETE SET NULL,
       FOREIGN KEY (to_account_id) REFERENCES bank_accounts(id) ON DELETE SET NULL
@@ -136,6 +165,32 @@ export async function createTestCreditCard(
   return card;
 }
 
+// Helper to create test category
+export async function createTestCategory(
+  db: any,
+  userId: number,
+  categoryData: {
+    name?: string;
+    type?: "income" | "expense" | "both";
+    color?: string;
+    icon?: string;
+  } = {},
+) {
+  const [category] = await db
+    .insert(categories)
+    .values({
+      ownerId: userId,
+      name: categoryData.name || "Test Category",
+      type: categoryData.type || "expense",
+      color: categoryData.color || "#64748b",
+      icon: categoryData.icon || "📁",
+      isDefault: false,
+    })
+    .returning();
+
+  return category;
+}
+
 // Helper to create test transaction
 export async function createTestTransaction(
   db: any,
@@ -146,6 +201,7 @@ export async function createTestTransaction(
     description?: string;
     date?: string;
     category?: string;
+    categoryId?: number;
     accountId?: number;
     creditCardId?: number;
   } = {},
@@ -159,6 +215,7 @@ export async function createTestTransaction(
       description: transactionData.description || "Test Transaction",
       date: transactionData.date || new Date().toISOString().split("T")[0],
       category: transactionData.category || "General",
+      categoryId: transactionData.categoryId || null,
       accountId: transactionData.accountId || null,
       creditCardId: transactionData.creditCardId || null,
     })
@@ -170,6 +227,8 @@ export async function createTestTransaction(
 // Helper to clean up database between tests
 export function cleanupTestDb(sqlite: Database.Database) {
   sqlite.exec("DELETE FROM transactions;");
+  sqlite.exec("DELETE FROM categories;");
+  sqlite.exec("DELETE FROM default_categories;");
   sqlite.exec("DELETE FROM credit_cards;");
   sqlite.exec("DELETE FROM bank_accounts;");
   sqlite.exec("DELETE FROM users;");

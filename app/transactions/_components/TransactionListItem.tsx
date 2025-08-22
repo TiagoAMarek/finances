@@ -184,7 +184,7 @@ export function TransactionListItem({
 
   const handleCopyDetails = async () => {
     try {
-      const details = `${transaction.description}: ${formatCurrency(transaction.amount)} - ${transaction.category}`;
+      const details = `${transaction.description}: ${formatCurrency(transaction.amount)} - ${transaction.categoryData?.name || transaction.category || "Sem categoria"}`;
       await navigator.clipboard.writeText(details);
     } catch (error) {
       console.error("Failed to copy:", error);
@@ -200,7 +200,7 @@ export function TransactionListItem({
   const accountName = getAccountName(transaction.accountId);
   const creditCardName = getCreditCardName(transaction.creditCardId);
   const categoryIcon = getCategoryIcon(
-    transaction.category,
+    transaction.categoryData?.name || transaction.category || "Sem categoria",
     transaction.type,
     transaction,
   );
@@ -237,7 +237,9 @@ export function TransactionListItem({
             </h3>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-sm text-muted-foreground">
-                {transaction.category}
+                {transaction.categoryData?.name ||
+                  transaction.category ||
+                  "Sem categoria"}
               </span>
               {(accountName || creditCardName) && (
                 <>

@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import { eq, and, sql } from "drizzle-orm";
 import { db } from "../lib/db";
-import { transactions, bankAccounts, creditCards } from "../lib/schema";
+import {
+  transactions,
+  bankAccounts,
+  creditCards,
+  categories,
+} from "../lib/schema";
 import { TransactionCreateSchema } from "../lib/validation";
 import {
   getUserFromRequest,
@@ -20,9 +25,33 @@ export async function GET(request: NextRequest) {
 
   try {
     const userTransactions = await db
-      .select()
+      .select({
+        id: transactions.id,
+        description: transactions.description,
+        amount: transactions.amount,
+        type: transactions.type,
+        date: transactions.date,
+        category: transactions.category, // Legacy field
+        categoryId: transactions.categoryId,
+        ownerId: transactions.ownerId,
+        accountId: transactions.accountId,
+        creditCardId: transactions.creditCardId,
+        toAccountId: transactions.toAccountId,
+        categoryData: {
+          id: categories.id,
+          name: categories.name,
+          type: categories.type,
+          color: categories.color,
+          icon: categories.icon,
+          isDefault: categories.isDefault,
+          ownerId: categories.ownerId,
+          createdAt: categories.createdAt,
+        },
+      })
       .from(transactions)
-      .where(eq(transactions.ownerId, user.userId));
+      .leftJoin(categories, eq(transactions.categoryId, categories.id))
+      .where(eq(transactions.ownerId, user.userId))
+      .orderBy(sql`${transactions.date} DESC`);
 
     return createSuccessResponse(userTransactions);
   } catch (error) {
@@ -42,6 +71,32 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const validatedData = TransactionCreateSchema.parse(body);
+
+    // Validate category ownership and type compatibility
+    const [category] = await db
+      .select()
+      .from(categories)
+      .where(
+        and(
+          eq(categories.id, validatedData.categoryId),
+          eq(categories.ownerId, user.userId),
+        ),
+      )
+      .limit(1);
+
+    if (!category) {
+      return createErrorResponse("Categoria não encontrada", 404);
+    }
+
+    // Validate category type compatibility with transaction type
+    if (validatedData.type !== "transfer") {
+      if (category.type !== "both" && category.type !== validatedData.type) {
+        return createErrorResponse(
+          "Tipo de categoria incompatível com o tipo de transação",
+          400,
+        );
+      }
+    }
 
     // Validate account/credit card ownership
     if (validatedData.accountId) {
@@ -104,7 +159,7 @@ export async function POST(request: NextRequest) {
         amount: validatedData.amount.toString(),
         type: validatedData.type,
         date: validatedData.date, // Already a string in ISO format
-        category: validatedData.category,
+        categoryId: validatedData.categoryId,
         ownerId: user.userId,
         accountId: validatedData.accountId || null,
         creditCardId: validatedData.creditCardId || null,
@@ -157,7 +212,7 @@ export async function POST(request: NextRequest) {
 
     return createSuccessResponse(
       {
-        message: "Transaction created successfully",
+        message: "Transação criada com sucesso",
         transaction: newTransaction,
       },
       201,

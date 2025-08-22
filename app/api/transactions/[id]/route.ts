@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { eq, and } from "drizzle-orm";
 import { db } from "../../lib/db";
-import { transactions } from "../../lib/schema";
+import { transactions, categories } from "../../lib/schema";
 import { TransactionUpdateSchema } from "../../lib/validation";
 import {
   getUserFromRequest,
@@ -31,6 +31,24 @@ export async function PUT(
     const body = await request.json();
     const validatedData = TransactionUpdateSchema.parse(body);
 
+    // Validate category if provided
+    if (validatedData.categoryId !== undefined) {
+      const [category] = await db
+        .select()
+        .from(categories)
+        .where(
+          and(
+            eq(categories.id, validatedData.categoryId),
+            eq(categories.ownerId, user.userId),
+          ),
+        )
+        .limit(1);
+
+      if (!category) {
+        return createErrorResponse("Categoria não encontrada", 404);
+      }
+    }
+
     // Check if transaction exists and belongs to user
     const [existingTransaction] = await db
       .select()
@@ -48,15 +66,15 @@ export async function PUT(
     }
 
     // Build update data
-    const updateData: Record<string, string | number | Date> = {};
+    const updateData: Record<string, string | number | Date | null> = {};
     if (validatedData.description !== undefined)
       updateData.description = validatedData.description;
     if (validatedData.amount !== undefined)
       updateData.amount = validatedData.amount.toString();
     if (validatedData.type !== undefined) updateData.type = validatedData.type;
     if (validatedData.date !== undefined) updateData.date = validatedData.date;
-    if (validatedData.category !== undefined)
-      updateData.category = validatedData.category;
+    if (validatedData.categoryId !== undefined)
+      updateData.categoryId = validatedData.categoryId;
     if (validatedData.accountId !== undefined)
       updateData.accountId = validatedData.accountId;
     if (validatedData.creditCardId !== undefined)
@@ -72,7 +90,7 @@ export async function PUT(
       .returning();
 
     return createSuccessResponse({
-      message: "Transaction updated successfully",
+      message: "Transação atualizada com sucesso",
       transaction: updatedTransaction,
     });
   } catch (error) {
@@ -123,7 +141,7 @@ export async function DELETE(
 
     return createSuccessResponse(
       {
-        message: "Transaction deleted successfully",
+        message: "Transação excluída com sucesso",
       },
       204,
     );

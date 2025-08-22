@@ -28,6 +28,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
+import { useGetCategories } from "@/features/categories";
 
 interface CreateTransactionModalProps {
   open: boolean;
@@ -37,7 +38,7 @@ interface CreateTransactionModalProps {
     amount: string;
     type: "income" | "expense" | "transfer";
     date: string;
-    category: string;
+    categoryId: number;
     accountId?: number;
     creditCardId?: number;
   }) => void;
@@ -54,7 +55,7 @@ export function CreateTransactionModal({
   const [amount, setAmount] = useState<number>(0);
   const [type, setType] = useState<"income" | "expense">("expense");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [sourceType, setSourceType] = useState<"account" | "creditCard">(
     "account",
   );
@@ -67,6 +68,7 @@ export function CreateTransactionModal({
 
   const { data: accounts = [] } = useGetAccounts();
   const { data: creditCards = [] } = useGetCreditCards();
+  const { data: categories = [] } = useGetCategories();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,12 +84,17 @@ export function CreateTransactionModal({
       return;
     }
 
+    if (!categoryId) {
+      alert("Selecione uma categoria");
+      return;
+    }
+
     onSubmit({
       description,
       amount: amount.toString(),
       type,
       date,
-      category,
+      categoryId,
       accountId: sourceType === "account" ? selectedAccount : undefined,
       creditCardId:
         sourceType === "creditCard" ? selectedCreditCard : undefined,
@@ -100,7 +107,7 @@ export function CreateTransactionModal({
     setAmount(0);
     setType("expense");
     setDate(new Date().toISOString().split("T")[0]);
-    setCategory("");
+    setCategoryId(undefined);
     setSourceType("account");
     setSelectedAccount(undefined);
     setSelectedCreditCard(undefined);
@@ -110,6 +117,12 @@ export function CreateTransactionModal({
     resetForm();
     onOpenChange(false);
   };
+
+  // Filter categories based on transaction type
+  const filteredCategories = categories.filter((category) => {
+    if (category.type === "both") return true;
+    return category.type === type;
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -237,15 +250,41 @@ export function CreateTransactionModal({
                   <TagIcon className="h-4 w-4" />
                   Categoria
                 </Label>
-                <Input
-                  type="text"
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  placeholder="Ex: Alimentação, Salário, Transporte"
-                  className="h-11"
+                <Select
+                  value={categoryId?.toString() || ""}
+                  onValueChange={(value) =>
+                    setCategoryId(value ? parseInt(value) : undefined)
+                  }
                   required
-                />
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredCategories.map((category) => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                              backgroundColor: category.color || "#64748b",
+                            }}
+                          />
+                          <span>{category.icon}</span>
+                          <span>{category.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {filteredCategories.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Nenhuma categoria disponível para este tipo de transação.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -354,9 +393,7 @@ export function CreateTransactionModal({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={
-                    isLoading || !description.trim() || !category.trim()
-                  }
+                  disabled={isLoading || !description.trim() || !categoryId}
                   className="flex-1"
                 >
                   {isLoading ? (

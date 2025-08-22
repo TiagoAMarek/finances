@@ -52,7 +52,7 @@ describe("POST /api/auth/register", () => {
     // Assert
     expect(response.status).toBe(201);
     expect(data).toHaveProperty("message");
-    expect(data.message).toBe("User registered successfully");
+    expect(data.message).toBe("Usuário registrado com sucesso");
     expect(data).toHaveProperty("user");
     expect(data.user).toHaveProperty("id");
     expect(data.user).toHaveProperty("email");

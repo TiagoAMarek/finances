@@ -29,7 +29,7 @@ const DashboardPage: NextPage = () => {
       amount: string;
       type: "income" | "expense" | "transfer";
       date: string;
-      category: string;
+      categoryId: number;
       accountId?: number;
       creditCardId?: number;
     }) => {

@@ -11,6 +11,7 @@ import {
   User,
   PieChart,
   Activity,
+  Tag,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -41,6 +42,11 @@ const navLinks = [
     name: "Cartões de Crédito",
     href: "/credit_cards",
     icon: CreditCard,
+  },
+  {
+    name: "Categorias",
+    href: "/categories",
+    icon: Tag,
   },
   {
     name: "Lançamentos",

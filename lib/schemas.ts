@@ -53,6 +53,57 @@ export const CreditCardUpdateSchema = z.object({
   currentBill: z.string().optional(),
 });
 
+// Category schemas
+export const CategorySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  type: z.enum(["income", "expense", "both"]),
+  color: z.string().nullable(),
+  icon: z.string().nullable(),
+  isDefault: z.boolean(),
+  ownerId: z.number(),
+  createdAt: z.string(), // ISO format string
+});
+
+export const CategoryCreateSchema = z.object({
+  name: z.string().min(1, "Nome da categoria é obrigatório"),
+  type: z.enum(["income", "expense", "both"], {
+    errorMap: () => ({
+      message: "Tipo deve ser 'income', 'expense' ou 'both'",
+    }),
+  }),
+  color: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato hexadecimal")
+    .optional(),
+  icon: z.string().min(1, "Ícone é obrigatório").optional(),
+});
+
+export const CategoryUpdateSchema = z.object({
+  name: z.string().min(1, "Nome da categoria é obrigatório").optional(),
+  type: z
+    .enum(["income", "expense", "both"], {
+      errorMap: () => ({
+        message: "Tipo deve ser 'income', 'expense' ou 'both'",
+      }),
+    })
+    .optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato hexadecimal")
+    .optional(),
+  icon: z.string().min(1, "Ícone é obrigatório").optional(),
+});
+
+// Default category schema (for seeding)
+export const DefaultCategorySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  type: z.enum(["income", "expense", "both"]),
+  color: z.string().nullable(),
+  icon: z.string().nullable(),
+});
+
 // Transaction schemas - reflecting API structure
 export const TransactionSchema = z.object({
   id: z.number(),
@@ -60,7 +111,9 @@ export const TransactionSchema = z.object({
   amount: z.string(), // Decimal fields come as strings from API
   type: z.enum(["income", "expense", "transfer"]),
   date: z.string(), // ISO format string
-  category: z.string(),
+  category: z.string().optional(), // Legacy field for migration compatibility
+  categoryId: z.number().nullable(),
+  categoryData: CategorySchema.optional(), // Category object when included in joins
   ownerId: z.number(),
   accountId: z.number().nullable(),
   creditCardId: z.number().nullable(),
@@ -73,7 +126,7 @@ export const TransactionCreateSchema = z
     amount: z.string().min(1, "Valor é obrigatório"),
     type: z.enum(["income", "expense", "transfer"]),
     date: z.string().min(1, "Data é obrigatória"),
-    category: z.string().min(1, "Categoria é obrigatória"),
+    categoryId: z.number({ required_error: "Categoria é obrigatória" }),
     accountId: z.number().optional(),
     creditCardId: z.number().optional(),
     toAccountId: z.number().optional(), // For transfers
@@ -103,7 +156,7 @@ export const TransactionUpdateSchema = z.object({
   amount: z.string().optional(),
   type: z.enum(["income", "expense", "transfer"]).optional(),
   date: z.string().optional(),
-  category: z.string().min(1, "Categoria é obrigatória").optional(),
+  categoryId: z.number().optional(),
   accountId: z.number().optional(),
   creditCardId: z.number().optional(),
   toAccountId: z.number().optional(),
@@ -165,6 +218,8 @@ export const ApiErrorResponseSchema = z.object({
 export type User = z.infer<typeof UserSchema>;
 export type BankAccount = z.infer<typeof BankAccountSchema>;
 export type CreditCard = z.infer<typeof CreditCardSchema>;
+export type Category = z.infer<typeof CategorySchema>;
+export type DefaultCategory = z.infer<typeof DefaultCategorySchema>;
 export type Transaction = z.infer<typeof TransactionSchema>;
 export type MonthlySummary = z.infer<typeof MonthlySummarySchema>;
 
@@ -175,6 +230,8 @@ export type BankAccountCreateInput = z.infer<typeof BankAccountCreateSchema>;
 export type BankAccountUpdateInput = z.infer<typeof BankAccountUpdateSchema>;
 export type CreditCardCreateInput = z.infer<typeof CreditCardCreateSchema>;
 export type CreditCardUpdateInput = z.infer<typeof CreditCardUpdateSchema>;
+export type CategoryCreateInput = z.infer<typeof CategoryCreateSchema>;
+export type CategoryUpdateInput = z.infer<typeof CategoryUpdateSchema>;
 export type TransactionCreateInput = z.infer<typeof TransactionCreateSchema>;
 export type TransactionUpdateInput = z.infer<typeof TransactionUpdateSchema>;
 export type TransferCreateInput = z.infer<typeof TransferCreateSchema>;

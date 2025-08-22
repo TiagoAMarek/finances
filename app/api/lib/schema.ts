@@ -5,6 +5,8 @@ import {
   decimal,
   date,
   serial,
+  boolean,
+  timestamp,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -13,6 +15,29 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   hashedPassword: varchar("hashed_password", { length: 255 }).notNull(),
+});
+
+// Categories table
+export const categories = pgTable("categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  type: varchar("type", { length: 20 }).notNull(), // 'income', 'expense', 'both'
+  color: varchar("color", { length: 7 }), // hex color code
+  icon: varchar("icon", { length: 50 }), // icon identifier
+  isDefault: boolean("is_default").default(false).notNull(),
+  ownerId: integer("owner_id")
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Default categories table (for seeding new users)
+export const defaultCategories = pgTable("default_categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  type: varchar("type", { length: 20 }).notNull(), // 'income', 'expense', 'both'
+  color: varchar("color", { length: 7 }), // hex color code
+  icon: varchar("icon", { length: 50 }), // icon identifier
 });
 
 // Bank accounts table
@@ -50,7 +75,8 @@ export const transactions = pgTable("transactions", {
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   type: varchar("type", { length: 20 }).notNull(), // 'income', 'expense', 'transfer'
   date: date("date").notNull(),
-  category: varchar("category", { length: 100 }).notNull(),
+  category: varchar("category", { length: 100 }), // Keep for migration compatibility
+  categoryId: integer("category_id").references(() => categories.id),
   ownerId: integer("owner_id")
     .notNull()
     .references(() => users.id),
@@ -63,6 +89,15 @@ export const transactions = pgTable("transactions", {
 export const usersRelations = relations(users, ({ many }) => ({
   bankAccounts: many(bankAccounts),
   creditCards: many(creditCards),
+  transactions: many(transactions),
+  categories: many(categories),
+}));
+
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [categories.ownerId],
+    references: [users.id],
+  }),
   transactions: many(transactions),
 }));
 
@@ -89,6 +124,10 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
   owner: one(users, {
     fields: [transactions.ownerId],
     references: [users.id],
+  }),
+  category: one(categories, {
+    fields: [transactions.categoryId],
+    references: [categories.id],
   }),
   bankAccount: one(bankAccounts, {
     fields: [transactions.accountId],

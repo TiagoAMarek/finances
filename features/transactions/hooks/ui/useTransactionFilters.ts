@@ -30,9 +30,10 @@ export function useTransactionFilters(transactions: Transaction[]) {
 
   // Extract unique categories from transactions
   const categories = useMemo(() => {
-    const uniqueCategories = new Set(
-      transactions.map((t) => t.category).filter(Boolean),
-    );
+    const categoryNames = transactions
+      .map((t) => t.categoryData?.name || t.category)
+      .filter((cat): cat is string => Boolean(cat));
+    const uniqueCategories = new Set(categoryNames);
     return Array.from(uniqueCategories).sort();
   }, [transactions]);
 
@@ -55,7 +56,7 @@ export function useTransactionFilters(transactions: Transaction[]) {
       }
 
       // Category filter
-      if (filters.category && transaction.category !== filters.category) {
+      if (filters.category && (transaction.categoryData?.name || transaction.category) !== filters.category) {
         return false;
       }
 

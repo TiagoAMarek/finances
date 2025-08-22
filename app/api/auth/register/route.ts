@@ -9,6 +9,7 @@ import {
   createSuccessResponse,
   handleZodError,
 } from "../../lib/auth";
+import { seedDefaultCategoriesForUser } from "../../lib/seedCategories";
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,9 +41,12 @@ export async function POST(request: NextRequest) {
         email: users.email,
       });
 
+    // Create default categories for the new user
+    await seedDefaultCategoriesForUser(newUser.id);
+
     return createSuccessResponse(
       {
-        message: "User registered successfully",
+        message: "Usuário registrado com sucesso",
         user: newUser,
       },
       201,
