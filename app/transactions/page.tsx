@@ -108,7 +108,10 @@ const TransactionsPage: NextPage = () => {
         title="Lançamentos"
         description="Gerencie suas receitas, despesas e transferências"
         action={
-          <QuickCreateButton onClick={() => setCreateModalOpen(true)}>
+          <QuickCreateButton
+            data-testid="open-create-transaction"
+            onClick={() => setCreateModalOpen(true)}
+          >
             Novo Lançamento
           </QuickCreateButton>
         }

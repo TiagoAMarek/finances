@@ -144,7 +144,7 @@ export function TransactionsList({
       <TransactionsMetricsGrid transactions={transactions} />
 
       {/* Transactions List */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="transactions-list">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Receipt className="h-5 w-5 text-foreground" />

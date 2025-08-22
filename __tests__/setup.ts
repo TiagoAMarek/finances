@@ -42,6 +42,15 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }));
 
+// Needed by Radix UI in jsdom
+global.HTMLElement.prototype.hasPointerCapture = function () {
+  return false as any;
+};
+// scrollIntoView is not implemented in jsdom
+if (!global.HTMLElement.prototype.scrollIntoView) {
+  global.HTMLElement.prototype.scrollIntoView = vi.fn();
+}
+
 // Mock chart.js canvas context
 global.HTMLCanvasElement.prototype.getContext = vi.fn();
 

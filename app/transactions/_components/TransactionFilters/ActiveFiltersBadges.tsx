@@ -16,6 +16,7 @@ export function ActiveFiltersBadges({
     <div
       className="flex flex-wrap gap-2 p-3 bg-muted/30 rounded-lg"
       data-testid="active-filters"
+      aria-label="Filtros Ativos"
     >
       <span className="text-xs font-medium text-muted-foreground">
         Filtros ativos:

@@ -12,6 +12,19 @@ export const transactionHandlers = [
   }),
 
   // POST /api/transactions - Create new transaction
+  http.post("http://localhost:3000/api/transactions", async ({ request }) => {
+    const newTransaction = (await request.json()) as any;
+    const transaction = {
+      id: Math.max(...mockTransactions.map((t) => t.id)) + 1,
+      ...newTransaction,
+      userId: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockTransactions.push(transaction);
+    return HttpResponse.json({ transaction });
+  }),
   http.post("/api/transactions", async ({ request }) => {
     const newTransaction = (await request.json()) as any;
     const transaction = {
@@ -53,6 +66,22 @@ export const transactionHandlers = [
   }),
 
   // DELETE /api/transactions/:id - Delete transaction
+  http.delete("http://localhost:3000/api/transactions/:id", ({ params }) => {
+    const transactionId = parseInt(params.id as string);
+    const transactionIndex = mockTransactions.findIndex(
+      (t) => t.id === transactionId,
+    );
+
+    if (transactionIndex === -1) {
+      return HttpResponse.json(
+        { detail: "Transação não encontrada." },
+        { status: 404 },
+      );
+    }
+
+    mockTransactions.splice(transactionIndex, 1);
+    return HttpResponse.json({ message: "Transação excluída com sucesso." });
+  }),
   http.delete("/api/transactions/:id", ({ params }) => {
     const transactionId = parseInt(params.id as string);
     const transactionIndex = mockTransactions.findIndex(

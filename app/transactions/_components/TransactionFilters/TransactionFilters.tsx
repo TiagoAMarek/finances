@@ -186,7 +186,7 @@ export function TransactionFiltersComponent({
   );
 
   return (
-    <Card className="group transition-shadow hover:shadow-md">
+    <Card className="group transition-shadow hover:shadow-md" data-testid="transaction-filters">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -244,20 +244,25 @@ export function TransactionFiltersComponent({
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por descrição..."
-                value={filters.search}
-                onChange={(e) => updateFilter("search", e.target.value)}
-                className="pl-10 transition-all focus:ring-2 focus:ring-primary/20"
-              />
+               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+               <Input
+                 aria-label="Buscar"
+                 placeholder="Buscar por descrição..."
+                 value={filters.search}
+                 onChange={(e) => updateFilter("search", e.target.value)}
+                 className="pl-10 transition-all focus:ring-2 focus:ring-primary/20"
+               />
             </div>
 
             <Select
               value={filters.type}
               onValueChange={(value) => updateFilter("type", value)}
             >
-              <SelectTrigger className="w-full sm:w-48 transition-all hover:border-primary/50">
+              <SelectTrigger
+                className="w-full sm:w-48 transition-all hover:border-primary/50"
+                aria-label="Tipo"
+                data-testid="type-filter"
+              >
                 <SelectValue placeholder="Todos os tipos" />
               </SelectTrigger>
               <SelectContent>
