@@ -13,7 +13,7 @@ import {
 // GET /api/categories/[id] - Get specific category
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const user = await getUserFromRequest(request);
 
@@ -22,7 +22,8 @@ export async function GET(
   }
 
   try {
-    const categoryId = parseInt(params.id);
+    const { id } = await params;
+    const categoryId = parseInt(id);
     if (isNaN(categoryId)) {
       return createErrorResponse("ID de categoria inválido", 400);
     }
@@ -48,7 +49,7 @@ export async function GET(
 // PUT /api/categories/[id] - Update category
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const user = await getUserFromRequest(request);
 
@@ -57,7 +58,8 @@ export async function PUT(
   }
 
   try {
-    const categoryId = parseInt(params.id);
+    const { id } = await params;
+    const categoryId = parseInt(id);
     if (isNaN(categoryId)) {
       return createErrorResponse("ID de categoria inválido", 400);
     }
@@ -112,7 +114,7 @@ export async function PUT(
 // DELETE /api/categories/[id] - Delete category
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const user = await getUserFromRequest(request);
 
@@ -121,7 +123,8 @@ export async function DELETE(
   }
 
   try {
-    const categoryId = parseInt(params.id);
+    const { id } = await params;
+    const categoryId = parseInt(id);
     if (isNaN(categoryId)) {
       return createErrorResponse("ID de categoria inválido", 400);
     }

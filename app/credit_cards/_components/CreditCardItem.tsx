@@ -1,28 +1,36 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
-  EditIcon,
-  TrashIcon,
-  CreditCardIcon,
-  AlertTriangleIcon,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { RowListItem } from "@/components/ui/row-list";
+import {
+  Edit2,
+  Trash2,
+  CreditCard,
+  AlertTriangle,
+  MoreHorizontal,
 } from "lucide-react";
-import { CreditCard } from "@/lib/schemas";
+import { CreditCard as CreditCardType } from "@/lib/schemas";
 
 interface CreditCardItemProps {
-  card: CreditCard;
-  onEdit: (card: CreditCard) => void;
+  card: CreditCardType;
+  onEdit: (card: CreditCardType) => void;
   onDelete: (cardId: number) => void;
   isDeleting: boolean;
 }
@@ -33,7 +41,7 @@ export function CreditCardItem({
   onDelete,
   isDeleting,
 }: CreditCardItemProps) {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const limit = parseFloat(card.limit);
   const currentBill = parseFloat(card.currentBill);
@@ -50,155 +58,127 @@ export function CreditCardItem({
 
   const handleDelete = () => {
     onDelete(card.id);
-    setDeleteDialogOpen(false);
+    setShowDeleteDialog(false);
   };
 
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10">
-                <CreditCardIcon className="h-6 w-6 text-blue-500" />
-              </div>
+  const getUsageColor = () => {
+    if (isHighUsage)
+      return "text-amber-600 bg-amber-100 dark:bg-amber-900 dark:text-amber-300";
+    if (usagePercentage > 50)
+      return "text-orange-600 bg-orange-100 dark:bg-orange-900 dark:text-orange-300";
+    return "text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-300";
+  };
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="text-lg font-semibold text-foreground truncate">
-                    {card.name}
-                  </h3>
-                  {isHighUsage && (
-                    <div className="flex items-center gap-1">
-                      <AlertTriangleIcon className="h-4 w-4 text-amber-500" />
-                      <Badge
-                        variant="secondary"
-                        className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10"
-                      >
-                        Alto uso
-                      </Badge>
-                    </div>
-                  )}
-                </div>
+  const icon = (
+    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500 flex-shrink-0">
+      <CreditCard className="h-5 w-5 text-white" />
+    </div>
+  );
 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>Limite: {formatCurrency(limit)}</span>
-                  <span>•</span>
-                  <span>Disponível: {formatCurrency(availableCredit)}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 ml-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onEdit(card)}
-                className="h-9 px-3 hover:bg-primary/10"
-              >
-                <EditIcon className="h-4 w-4 mr-1" />
-                Editar
-              </Button>
-
-              <Dialog
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <TrashIcon className="h-4 w-4 mr-1" />
-                    Excluir
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader className="text-center space-y-3">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-                      <TrashIcon className="h-6 w-6 text-destructive" />
-                    </div>
-                    <div className="space-y-1">
-                      <DialogTitle className="text-xl">
-                        Confirmar Exclusão
-                      </DialogTitle>
-                      <DialogDescription className="text-sm">
-                        Esta ação não pode ser desfeita e removerá
-                        permanentemente o cartão.
-                      </DialogDescription>
-                    </div>
-                  </DialogHeader>
-
-                  <div className="bg-muted/50 rounded-lg p-4 border border-dashed">
-                    <div className="text-center">
-                      <p className="font-medium text-foreground">{card.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Fatura: {formatCurrency(currentBill)} • Limite:{" "}
-                        {formatCurrency(limit)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <DialogFooter className="flex gap-3 sm:gap-3">
-                    <Button
-                      variant="outline"
-                      onClick={() => setDeleteDialogOpen(false)}
-                      className="flex-1"
-                      disabled={isDeleting}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                      className="flex-1"
-                    >
-                      {isDeleting ? (
-                        "Excluindo..."
-                      ) : (
-                        <>
-                          <TrashIcon className="h-4 w-4 mr-1" />
-                          Excluir Cartão
-                        </>
-                      )}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+  const subtitle = (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="text-xs font-medium">
+          Fatura: {formatCurrency(currentBill)}
+        </Badge>
+        <Badge
+          variant="secondary"
+          className={`text-xs font-medium ${getUsageColor()}`}
+        >
+          {usagePercentage.toFixed(1)}% usado
+        </Badge>
+        {isHighUsage && (
+          <div className="flex items-center gap-1">
+            <AlertTriangle className="h-3 w-3 text-amber-500" />
+            <Badge
+              variant="secondary"
+              className="text-xs text-amber-600 bg-amber-100 dark:bg-amber-900 dark:text-amber-300"
+            >
+              Alto uso
+            </Badge>
           </div>
-
-          {/* Fatura e Progress Bar */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">
-                Fatura Atual
-              </span>
-              <div className="text-right">
-                <span className="text-lg font-bold text-red-600 dark:text-red-400">
-                  {formatCurrency(currentBill)}
-                </span>
-                <p className="text-xs text-muted-foreground">
-                  {usagePercentage.toFixed(1)}% do limite
-                </p>
-              </div>
-            </div>
-
-            <Progress
-              value={usagePercentage}
-              className={`h-2 ${
-                isHighUsage
-                  ? "[&>div]:bg-amber-500"
-                  : usagePercentage > 50
-                    ? "[&>div]:bg-orange-500"
-                    : "[&>div]:bg-green-500"
-              }`}
-            />
-          </div>
+        )}
+      </div>
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>Limite: {formatCurrency(limit)}</span>
+          <span>Disponível: {formatCurrency(availableCredit)}</span>
         </div>
-      </CardContent>
-    </Card>
+        <Progress
+          value={usagePercentage}
+          className={`h-1.5 ${
+            isHighUsage
+              ? "[&>div]:bg-amber-500"
+              : usagePercentage > 50
+                ? "[&>div]:bg-orange-500"
+                : "[&>div]:bg-green-500"
+          }`}
+        />
+      </div>
+    </div>
+  );
+
+  const actions = (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label={`Ações do cartão ${card.name}`}
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onEdit(card)}>
+          <Edit2 className="h-4 w-4 mr-2" />
+          Editar
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => setShowDeleteDialog(true)}
+          disabled={isDeleting}
+          className="text-destructive"
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Excluir
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  return (
+    <>
+      <RowListItem
+        icon={icon}
+        title={card.name}
+        subtitle={subtitle}
+        actions={actions}
+        isLoading={isDeleting}
+        loadingText="Processando..."
+      />
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir cartão de crédito</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o cartão &quot;{card.name}&quot;?
+              Esta ação não pode ser desfeita e removerá permanentemente o
+              cartão e todas as suas transações.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

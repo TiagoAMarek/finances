@@ -2,6 +2,7 @@ import { Category } from "@/lib/schemas";
 import { CategoryWithStats } from "@/features/categories/hooks/data/useGetCategoriesWithStats";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { RowListItem } from "@/components/ui/row-list";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -107,96 +108,82 @@ export function CategoryItem({
     setShowDeleteDialog(false);
   };
 
+  const icon = (
+    <div
+      className="flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0"
+      style={{ backgroundColor: category.color || "#64748b" }}
+    >
+      {renderIcon()}
+    </div>
+  );
+
+  const subtitle = (
+    <div className="flex items-center gap-2">
+      <Badge
+        variant="secondary"
+        className={`text-xs font-medium ${getTypeColor(category.type)}`}
+      >
+        {getTypeLabel(category.type)}
+      </Badge>
+      {"transactionCount" in category && (
+        <Badge variant="outline" className="text-xs font-medium">
+          {category.transactionCount}{" "}
+          {category.transactionCount === 1 ? "transação" : "transações"}
+        </Badge>
+      )}
+      {category.isDefault && (
+        <div className="flex items-center gap-1">
+          <Shield className="h-3 w-3 text-muted-foreground" />
+          <Badge variant="outline" className="text-xs text-muted-foreground">
+            Padrão
+          </Badge>
+        </div>
+      )}
+    </div>
+  );
+
+  const actions = (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label={`Ações da categoria ${category.name}`}
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onClick={() => onEdit(category.id)}
+          disabled={category.isDefault}
+        >
+          <Edit2 className="h-4 w-4 mr-2" />
+          Editar
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => setShowDeleteDialog(true)}
+          disabled={category.isDefault || isDeleting}
+          className="text-destructive"
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Excluir
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <>
-      <div
-        className={`group relative flex items-center gap-4 p-4 transition-all duration-200 hover:bg-muted/30 border-b border-border/50 last:border-b-0 ${isDeleting ? "opacity-50 pointer-events-none" : ""}`}
-      >
-        {isDeleting && (
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-              <span className="text-sm text-muted-foreground">
-                Processando...
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Category Icon */}
-        <div
-          className="flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0"
-          style={{ backgroundColor: category.color || "#64748b" }}
-        >
-          {renderIcon()}
-        </div>
-
-        {/* Category Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-foreground truncate">
-                  {category.name}
-                </h3>
-                {category.isDefault && (
-                  <Shield className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge
-                  variant="secondary"
-                  className={`text-xs font-medium ${getTypeColor(category.type)}`}
-                >
-                  {getTypeLabel(category.type)}
-                </Badge>
-                {"transactionCount" in category && (
-                  <Badge variant="outline" className="text-xs font-medium">
-                    {category.transactionCount}{" "}
-                    {category.transactionCount === 1
-                      ? "transação"
-                      : "transações"}
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-1 flex-shrink-0">
-              {/* Single dropdown menu - appears on hover, consistent across all devices */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label={`Ações da categoria ${category.name}`}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => onEdit(category.id)}
-                    disabled={category.isDefault}
-                  >
-                    <Edit2 className="h-4 w-4 mr-2" />
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setShowDeleteDialog(true)}
-                    disabled={category.isDefault || isDeleting}
-                    className="text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RowListItem
+        icon={icon}
+        title={category.name}
+        subtitle={subtitle}
+        actions={actions}
+        isLoading={isDeleting}
+        loadingText="Processando..."
+      />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>

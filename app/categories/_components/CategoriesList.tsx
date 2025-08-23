@@ -1,6 +1,7 @@
 import { Category } from "@/lib/schemas";
 import { CategoryWithStats } from "@/features/categories/hooks/data/useGetCategoriesWithStats";
 import { CategoryItem } from "./CategoryItem";
+import { RowList } from "@/components/ui/row-list";
 import { TagIcon } from "lucide-react";
 
 interface CategoriesListProps {
@@ -44,7 +45,7 @@ export function CategoriesList({
           <h3 className="text-sm font-medium mb-2 text-muted-foreground">
             Categorias de Despesa ({expenseCategories.length})
           </h3>
-          <div className="border border-border rounded-lg overflow-hidden">
+          <RowList>
             {expenseCategories.map((category) => (
               <CategoryItem
                 key={category.id}
@@ -54,7 +55,7 @@ export function CategoriesList({
                 isDeleting={isDeleting}
               />
             ))}
-          </div>
+          </RowList>
         </div>
       )}
 
@@ -63,7 +64,7 @@ export function CategoriesList({
           <h3 className="text-sm font-medium mb-2 text-muted-foreground">
             Categorias de Receita ({incomeCategories.length})
           </h3>
-          <div className="border border-border rounded-lg overflow-hidden">
+          <RowList>
             {incomeCategories.map((category) => (
               <CategoryItem
                 key={category.id}
@@ -73,7 +74,7 @@ export function CategoriesList({
                 isDeleting={isDeleting}
               />
             ))}
-          </div>
+          </RowList>
         </div>
       )}
 
@@ -82,7 +83,7 @@ export function CategoriesList({
           <h3 className="text-sm font-medium mb-2 text-muted-foreground">
             Categorias Gerais ({bothCategories.length})
           </h3>
-          <div className="border border-border rounded-lg overflow-hidden">
+          <RowList>
             {bothCategories.map((category) => (
               <CategoryItem
                 key={category.id}
@@ -92,7 +93,7 @@ export function CategoriesList({
                 isDeleting={isDeleting}
               />
             ))}
-          </div>
+          </RowList>
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { RowList, RowListSkeleton } from "@/components/ui/row-list";
 import {
   CreditCardIcon,
   TrendingDownIcon,
@@ -61,36 +61,7 @@ function CreditCardsListSkeleton() {
           <Skeleton className="h-5 w-16 rounded-full" />
         </div>
 
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      <Skeleton className="h-12 w-12 rounded-xl" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-5 w-32" />
-                        <Skeleton className="h-4 w-48" />
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Skeleton className="h-9 w-16" />
-                      <Skeleton className="h-9 w-16" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <Skeleton className="h-4 w-20" />
-                      <Skeleton className="h-6 w-24" />
-                    </div>
-                    <Skeleton className="h-2 w-full" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <RowListSkeleton rows={3} showSubtitle={true} />
       </div>
     </div>
   );
@@ -98,22 +69,16 @@ function CreditCardsListSkeleton() {
 
 function EmptyState() {
   return (
-    <Card className="border-dashed">
-      <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted/50 mb-6">
-          <Wallet className="h-10 w-10 text-muted-foreground" />
-        </div>
-        <h3 className="text-xl font-semibold mb-2">Nenhum cartão cadastrado</h3>
-        <p className="text-muted-foreground mb-6 max-w-md">
-          Comece adicionando seus cartões de crédito para ter controle total das
-          suas despesas. Use o botão &quot;Novo Cartão&quot; no topo da página.
-        </p>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CreditCardIcon className="h-4 w-4" />
-          <span>Gerencie todos os seus cartões em um só lugar</span>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="py-12 text-center border border-dashed rounded-lg">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+        <Wallet className="h-6 w-6 text-muted-foreground" />
+      </div>
+      <h3 className="mt-4 text-lg font-medium">Nenhum cartão encontrado</h3>
+      <p className="mt-2 text-muted-foreground">
+        Comece criando seu primeiro cartão de crédito para organizar suas
+        finanças.
+      </p>
+    </div>
   );
 }
 
@@ -219,7 +184,7 @@ export function CreditCardsList({
           </Badge>
         </div>
 
-        <div className="space-y-3">
+        <RowList>
           {cards.map((card) => (
             <CreditCardItem
               key={card.id}
@@ -229,7 +194,7 @@ export function CreditCardsList({
               isDeleting={isDeleting}
             />
           ))}
-        </div>
+        </RowList>
       </div>
     </div>
   );
