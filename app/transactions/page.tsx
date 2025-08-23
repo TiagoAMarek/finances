@@ -14,6 +14,7 @@ import { TransactionsList } from "./_components/TransactionsList";
 import { TransactionFiltersComponent } from "./_components/TransactionFilters";
 import { useTransactionActions } from "@/features/transactions/hooks/ui/useTransactionActions";
 import { useTransactionFilters } from "@/features/transactions/hooks/ui/useTransactionFilters";
+import { ArrowLeftRight } from "lucide-react";
 
 const TransactionsPage: NextPage = () => {
   const {
@@ -107,6 +108,8 @@ const TransactionsPage: NextPage = () => {
       <PageHeader
         title="Lançamentos"
         description="Gerencie suas receitas, despesas e transferências"
+        icon={ArrowLeftRight}
+        iconColor="text-purple-500"
         action={
           <QuickCreateButton
             data-testid="open-create-transaction"

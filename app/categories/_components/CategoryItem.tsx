@@ -1,5 +1,5 @@
 import { Category } from "@/lib/schemas";
-import { Card, CardContent } from "@/components/ui/card";
+import { CategoryWithStats } from "@/features/categories/hooks/data/useGetCategoriesWithStats";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,11 +18,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Edit2, Trash2, Shield } from "lucide-react";
+import {
+  MoreHorizontal,
+  Edit2,
+  Trash2,
+  Shield,
+  Wallet,
+  ShoppingCart,
+  TrendingUp,
+  Folder,
+} from "lucide-react";
 import { useState } from "react";
 
 interface CategoryItemProps {
-  category: Category;
+  category: Category | CategoryWithStats;
   onEdit: (categoryId: number) => void;
   onDelete: (categoryId: number) => void;
   isDeleting: boolean;
@@ -35,6 +44,37 @@ export function CategoryItem({
   isDeleting,
 }: CategoryItemProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const getDefaultIcon = (type: string) => {
+    switch (type) {
+      case "income":
+        return <TrendingUp className="h-5 w-5 text-white" />;
+      case "expense":
+        return <ShoppingCart className="h-5 w-5 text-white" />;
+      case "both":
+        return <Wallet className="h-5 w-5 text-white" />;
+      default:
+        return <Folder className="h-5 w-5 text-white" />;
+    }
+  };
+
+  const renderIcon = () => {
+    if (category.icon) {
+      // Check if it's an emoji or text
+      const isEmoji = /\p{Emoji}/u.test(category.icon);
+      if (isEmoji) {
+        return (
+          <span className="drop-shadow-sm text-xl leading-none">
+            {category.icon}
+          </span>
+        );
+      } else {
+        // Fallback to default icon for non-emoji strings
+        return getDefaultIcon(category.type);
+      }
+    }
+    return getDefaultIcon(category.type);
+  };
 
   const getTypeLabel = (type: string) => {
     switch (type) {
@@ -69,63 +109,94 @@ export function CategoryItem({
 
   return (
     <>
-      <Card className="hover:shadow-md transition-shadow">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                style={{ backgroundColor: category.color || "#64748b" }}
-              >
-                {category.icon || "📁"}
-              </div>
+      <div
+        className={`group relative flex items-center gap-4 p-4 transition-all duration-200 hover:bg-muted/30 border-b border-border/50 last:border-b-0 ${isDeleting ? "opacity-50 pointer-events-none" : ""}`}
+      >
+        {isDeleting && (
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+              <span className="text-sm text-muted-foreground">
+                Processando...
+              </span>
+            </div>
+          </div>
+        )}
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-sm truncate">
-                    {category.name}
-                  </h3>
-                  {category.isDefault && (
-                    <Shield className="h-3 w-3 text-muted-foreground" />
-                  )}
-                </div>
+        {/* Category Icon */}
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0"
+          style={{ backgroundColor: category.color || "#64748b" }}
+        >
+          {renderIcon()}
+        </div>
+
+        {/* Category Details */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-foreground truncate">
+                  {category.name}
+                </h3>
+                {category.isDefault && (
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-1">
                 <Badge
                   variant="secondary"
-                  className={`text-xs ${getTypeColor(category.type)}`}
+                  className={`text-xs font-medium ${getTypeColor(category.type)}`}
                 >
                   {getTypeLabel(category.type)}
                 </Badge>
+                {"transactionCount" in category && (
+                  <Badge variant="outline" className="text-xs font-medium">
+                    {category.transactionCount}{" "}
+                    {category.transactionCount === 1
+                      ? "transação"
+                      : "transações"}
+                  </Badge>
+                )}
               </div>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                  <span className="sr-only">Abrir menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => onEdit(category.id)}
-                  disabled={category.isDefault}
-                >
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setShowDeleteDialog(true)}
-                  disabled={category.isDefault || isDeleting}
-                  className="text-destructive"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Excluir
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Actions */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {/* Single dropdown menu - appears on hover, consistent across all devices */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label={`Ações da categoria ${category.name}`}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => onEdit(category.id)}
+                    disabled={category.isDefault}
+                  >
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setShowDeleteDialog(true)}
+                    disabled={category.isDefault || isDeleting}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>

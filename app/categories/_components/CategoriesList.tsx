@@ -1,10 +1,10 @@
 import { Category } from "@/lib/schemas";
+import { CategoryWithStats } from "@/features/categories/hooks/data/useGetCategoriesWithStats";
 import { CategoryItem } from "./CategoryItem";
-import { Card, CardContent } from "@/components/ui/card";
 import { TagIcon } from "lucide-react";
 
 interface CategoriesListProps {
-  categories: Category[];
+  categories: (Category | CategoryWithStats)[];
   onEdit: (categoryId: number) => void;
   onDelete: (categoryId: number) => void;
   isDeleting: boolean;
@@ -18,20 +18,17 @@ export function CategoriesList({
 }: CategoriesListProps) {
   if (categories.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-            <TagIcon className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <h3 className="mt-4 text-lg font-medium">
-            Nenhuma categoria encontrada
-          </h3>
-          <p className="mt-2 text-muted-foreground">
-            Comece criando sua primeira categoria para organizar suas
-            transações.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="py-12 text-center border border-dashed rounded-lg">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <TagIcon className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <h3 className="mt-4 text-lg font-medium">
+          Nenhuma categoria encontrada
+        </h3>
+        <p className="mt-2 text-muted-foreground">
+          Comece criando sua primeira categoria para organizar suas transações.
+        </p>
+      </div>
     );
   }
 
@@ -44,10 +41,10 @@ export function CategoriesList({
     <div className="space-y-6">
       {expenseCategories.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-red-700 dark:text-red-300">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">
             Categorias de Despesa ({expenseCategories.length})
           </h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="border border-border rounded-lg overflow-hidden">
             {expenseCategories.map((category) => (
               <CategoryItem
                 key={category.id}
@@ -63,10 +60,10 @@ export function CategoriesList({
 
       {incomeCategories.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-green-700 dark:text-green-300">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">
             Categorias de Receita ({incomeCategories.length})
           </h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="border border-border rounded-lg overflow-hidden">
             {incomeCategories.map((category) => (
               <CategoryItem
                 key={category.id}
@@ -82,10 +79,10 @@ export function CategoriesList({
 
       {bothCategories.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-blue-700 dark:text-blue-300">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">
             Categorias Gerais ({bothCategories.length})
           </h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="border border-border rounded-lg overflow-hidden">
             {bothCategories.map((category) => (
               <CategoryItem
                 key={category.id}

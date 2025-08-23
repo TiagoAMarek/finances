@@ -11,6 +11,7 @@ import { DashboardSkeletonLoader } from "./_components/DashboardSkeletonLoader";
 import { DashboardMetricsGrid } from "./_components/DashboardMetricsGrid";
 import { ResourcesAccordion } from "./_components/ResourcesAccordion";
 import { ReportsAccordion } from "./_components/ReportsAccordion";
+import { BarChart3 } from "lucide-react";
 
 const DashboardPage: NextPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -48,6 +49,8 @@ const DashboardPage: NextPage = () => {
       <PageHeader
         title="Dashboard"
         description="Visão geral das suas finanças e transações recentes"
+        icon={BarChart3}
+        iconColor="text-orange-500"
         action={
           <QuickCreateButton onClick={handleCreateTransaction}>
             Novo Lançamento

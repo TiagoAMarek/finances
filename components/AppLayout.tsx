@@ -25,6 +25,7 @@ const routeMapping: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/accounts": "Contas Bancárias",
   "/credit_cards": "Cartões de Crédito",
+  "/categories": "Categorias",
   "/transactions": "Lançamentos",
   "/reports": "Relatórios",
   "/reports/performance": "Performance Mensal",

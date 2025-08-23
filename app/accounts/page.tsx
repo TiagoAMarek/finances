@@ -10,6 +10,7 @@ import { AccountsList } from "./_components/AccountsList";
 import { AccountsMetricsGrid } from "./_components/AccountsMetricsGrid";
 import { ErrorAlerts } from "./_components/ErrorAlerts";
 import { useAccountActions } from "@/features/accounts/hooks/ui";
+import { Banknote } from "lucide-react";
 
 const AccountsPage: NextPage = () => {
   const { data: accounts = [], isLoading, error } = useGetAccounts();
@@ -62,6 +63,8 @@ const AccountsPage: NextPage = () => {
       <PageHeader
         title="Minhas Contas Bancárias"
         description="Gerencie suas contas bancárias e saldos"
+        icon={Banknote}
+        iconColor="text-green-500"
         action={
           <CreateAccountModal
             open={createModalOpen}

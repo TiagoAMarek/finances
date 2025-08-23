@@ -9,6 +9,7 @@ import { useCreditCardActions } from "@/features/credit-cards/hooks/ui";
 import { CreateCardModal } from "./_components/CreateCardModal";
 import { EditCardModal } from "./_components/EditCardModal";
 import { CreditCardsList } from "./_components/CreditCardsList";
+import { CreditCard } from "lucide-react";
 
 const CreditCardsPage: NextPage = () => {
   const { data: creditCards = [], isLoading, error } = useGetCreditCards();
@@ -52,6 +53,8 @@ const CreditCardsPage: NextPage = () => {
       <PageHeader
         title="Meus Cartões de Crédito"
         description="Gerencie seus cartões de crédito e limites"
+        icon={CreditCard}
+        iconColor="text-indigo-500"
         action={
           <CreateCardModal
             open={createModalOpen}
