@@ -1,15 +1,10 @@
 import { formatDashboardCurrency } from "@/features/dashboard/utils/dashboard-calculations";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-} from "@/features/shared/components/ui";
 import { BankAccount, CreditCard } from "@/lib/schemas";
 import { Wallet } from "lucide-react";
 import { memo } from "react";
 import { AccountsOverview } from "./AccountsOverview";
 import { CreditCardsOverview } from "./CreditCardsOverview";
-import { DashboardAccordionTrigger } from "./DashboardAccordionTrigger";
+import { DashboardAccordion } from "./DashboardAccordion";
 
 /**
  * Props for ResourcesAccordion component
@@ -55,30 +50,18 @@ export const ResourcesAccordion = memo<ResourcesAccordionProps>(
     ];
 
     return (
-      <Accordion
-        type="single"
-        collapsible
-        className="w-full"
+      <DashboardAccordion
+        title="Recursos"
+        icon={Wallet}
+        iconColor="text-blue-500"
+        badges={badges}
         defaultValue="resources"
       >
-        <AccordionItem value="resources">
-          <DashboardAccordionTrigger
-            title="Recursos"
-            icon={Wallet}
-            iconColor="text-blue-500"
-            badges={badges}
-          />
-          <AccordionContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-              <AccountsOverview
-                accounts={accounts}
-                totalBalance={totalBalance}
-              />
-              <CreditCardsOverview creditCards={creditCards} />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+          <AccountsOverview accounts={accounts} totalBalance={totalBalance} />
+          <CreditCardsOverview creditCards={creditCards} />
+        </div>
+      </DashboardAccordion>
     );
   },
 );

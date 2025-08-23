@@ -3,6 +3,7 @@ export * from "./IncomeVsExpenseChart";
 export * from "./AccountCardFilter";
 export * from "./AppLayout";
 export * from "./AppSidebar";
+export * from "./FormModal";
 export * from "./IncomeVsExpenseChart";
 export * from "./MonthlyPerformanceCards";
 export * from "./Navbar";
