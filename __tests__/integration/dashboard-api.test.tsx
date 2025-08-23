@@ -160,6 +160,54 @@ describe("Dashboard API Integration Tests", () => {
       // Given: Mock APIs return empty data
       setupEmptyDataHandlers();
 
+      // Re-apply categories GET handlers for both absolute and relative URLs to avoid unhandled requests
+      server.use(
+        http.get(/\/api\/categories(?:\/.*)?$/, ({ request }) => {
+          // Optionally honor auth header as in shared handler
+          const authHeader = request.headers.get("Authorization");
+          if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return HttpResponse.json(
+              { detail: "Authorization header required" },
+              { status: 401 },
+            );
+          }
+          // Minimal but consistent response shape
+          return HttpResponse.json([
+            {
+              id: 2,
+              name: "Alimentação",
+              type: "expense",
+              color: "#f59e0b",
+              icon: "🍽️",
+              isDefault: true,
+              ownerId: 1,
+              createdAt: "2024-01-01T00:00:00Z",
+            },
+          ]);
+        }),
+        http.get("http://localhost:3000/api/categories", ({ request }) => {
+          const authHeader = request.headers.get("Authorization");
+          if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return HttpResponse.json(
+              { detail: "Authorization header required" },
+              { status: 401 },
+            );
+          }
+          return HttpResponse.json([
+            {
+              id: 2,
+              name: "Alimentação",
+              type: "expense",
+              color: "#f59e0b",
+              icon: "🍽️",
+              isDefault: true,
+              ownerId: 1,
+              createdAt: "2024-01-01T00:00:00Z",
+            },
+          ]);
+        }),
+      );
+
       // When: Dashboard is rendered
       renderWithProviders(<DashboardPage />);
       await waitForDashboardLoad();
@@ -172,6 +220,19 @@ describe("Dashboard API Integration Tests", () => {
     });
 
     describe("Performance and Caching", () => {
+      // Ensure categories handlers are present to avoid unhandled requests in this block
+      beforeEach(() => {
+        // import helper lazily to avoid hoist issues in Vitest
+        // Inline minimal re-apply to avoid CJS/TSX import issues in Vitest
+        server.use(
+          http.get(/\/api\/categories(?:\/.*)?$/, () =>
+            HttpResponse.json(TEST_DATA.CATEGORIES.DEFAULT),
+          ),
+          http.get("http://localhost:3000/api/categories", () =>
+            HttpResponse.json(TEST_DATA.CATEGORIES.DEFAULT),
+          ),
+        );
+      });
       it("should cache API responses and avoid redundant calls", async () => {
         // Given: Mock API that tracks call count
         let apiCallCount = 0;

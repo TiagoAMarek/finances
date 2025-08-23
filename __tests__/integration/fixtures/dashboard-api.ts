@@ -46,4 +46,12 @@ export const TEST_DATA = {
     TEMPORARY_ERROR: "Erro temporário",
     TOKEN_EXPIRED: "Token expirado",
   },
+
+  CATEGORIES: {
+    DEFAULT: [
+      { id: 1, name: "Alimentação", type: "expense", ownerId: 1 },
+      { id: 2, name: "Transporte", type: "expense", ownerId: 1 },
+      { id: 3, name: "Salário", type: "income", ownerId: 1 },
+    ],
+  },
 } as const;

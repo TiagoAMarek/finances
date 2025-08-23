@@ -75,3 +75,22 @@ export const createLargeTransactionSet = (size = 1000) => {
     creditCardId: null,
   }));
 };
+
+/**
+ * Re-applies categories GET handlers (relative and absolute) to avoid MSW unhandled warnings
+ */
+export const applyCategoriesHandlers = () => {
+  // Relative (regex to match nested paths too)
+  const relative = /\/api\/categories(?:\/.*)?$/;
+  // Absolute root fetch used by some code paths
+  const absolute = "http://localhost:3000/api/categories";
+
+  server.use(
+    http.get(relative, () =>
+      HttpResponse.json(TEST_DATA.CATEGORIES.DEFAULT),
+    ),
+    http.get(absolute, () =>
+      HttpResponse.json(TEST_DATA.CATEGORIES.DEFAULT),
+    ),
+  );
+};

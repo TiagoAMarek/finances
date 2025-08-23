@@ -43,16 +43,16 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Needed by Radix UI in jsdom
-global.HTMLElement.prototype.hasPointerCapture = function () {
+(global.HTMLElement.prototype as any).hasPointerCapture = function () {
   return false as any;
 };
 // scrollIntoView is not implemented in jsdom
-if (!global.HTMLElement.prototype.scrollIntoView) {
-  global.HTMLElement.prototype.scrollIntoView = vi.fn();
+if (!(global.HTMLElement.prototype as any).scrollIntoView) {
+  (global.HTMLElement.prototype as any).scrollIntoView = vi.fn();
 }
 
 // Mock chart.js canvas context
-global.HTMLCanvasElement.prototype.getContext = vi.fn();
+(global.HTMLCanvasElement.prototype as any).getContext = vi.fn();
 
 // Mock sonner toast
 vi.mock("sonner", () => ({
@@ -63,3 +63,31 @@ vi.mock("sonner", () => ({
     warning: vi.fn(),
   },
 }));
+
+// Recharts/jsdom: ensure non-zero layout sizes to avoid 0x0 warnings
+(() => {
+  const original = global.HTMLElement.prototype.getBoundingClientRect;
+  const fakeRect: DOMRect = {
+    x: 0,
+    y: 0,
+    top: 0,
+    left: 0,
+    right: 800,
+    bottom: 400,
+    width: 800,
+    height: 400,
+    toJSON: () => ({}),
+  } as unknown as DOMRect;
+
+  // Patch immediately for test runtime
+  (global.HTMLElement.prototype as any).getBoundingClientRect = function () {
+    const el = this as HTMLElement;
+    const className = (el.className || "").toString();
+    const isRechartsContainer = className.includes("recharts-responsive-container");
+    const isChartTestId = (el.getAttribute && el.getAttribute("data-testid")) === "chart-container";
+    if (isRechartsContainer || isChartTestId) {
+      return fakeRect;
+    }
+    return original.call(this);
+  };
+})();
