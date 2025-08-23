@@ -1,18 +1,25 @@
 "use client";
 
+import { useRegister } from "@/features/auth/hooks/data";
+import {
+  Button,
+  FormField,
+  Input,
+  PasswordInput,
+  PasswordStrengthIndicator,
+} from "@/features/shared/components/ui";
+import { Alert, AlertDescription } from "@/features/shared/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/features/shared/components/ui/card";
+import { RegisterSchema, type RegisterInput } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { FormField } from "@/components/ui/form-field";
-import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { RegisterSchema, type RegisterInput } from "@/lib/schemas";
-import { useRegister } from "@/features/auth/hooks/data";
 
 const RegisterPage: NextPage = () => {
   const router = useRouter();

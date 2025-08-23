@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
-import { TransactionFiltersComponent, TransactionFilters } from "@/app/transactions/_components/TransactionFilters";
+import { TransactionFiltersComponent, TransactionFilters } from "@/features/transactions/components/TransactionFilters";
 
 vi.mock("@/features/accounts/hooks/data", () => ({
   useGetAccounts: () => ({ data: [{ id: 1, name: "Conta Corrente" }] }),

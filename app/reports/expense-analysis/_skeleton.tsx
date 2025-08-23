@@ -1,5 +1,5 @@
-import { PageHeader } from "@/components/PageHeader";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeader } from "@/features/shared/components";
+import { Skeleton } from "@/features/shared/components/ui";
 import { PieChart } from "lucide-react";
 
 export function ExpenseAnalysisPageSkeleton() {

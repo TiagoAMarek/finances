@@ -1,21 +1,30 @@
 "use client";
 
-import { PageHeader } from "@/components/PageHeader";
-import { CreateCategoryModal } from "./_components/CreateCategoryModal";
-import { EditCategoryModal } from "./_components/EditCategoryModal";
-import { CategoriesList } from "./_components/CategoriesList";
 import {
-  useGetCategoriesWithStats,
   useCategoryActions,
+  useGetCategoriesWithStats,
 } from "@/features/categories";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { EmptyState } from "./_components/EmptyState";
-import { ListHeader } from "./_components/ListHeader";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  CategoriesList,
+  CreateCategoryModal,
+  EditCategoryModal,
+  EmptyState,
+  ListHeader,
+} from "@/features/categories/components";
+import { PageHeader } from "@/features/shared/components";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/features/shared/components/ui";
 import { AlertCircle, Filter, Tag } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMemo, useState } from "react";
 
 export default function CategoriesPage() {

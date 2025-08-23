@@ -34,14 +34,15 @@ describe("POST /api/auth/register", () => {
   it("registra usuário com dados válidos", async () => {
     // Arrange: Empty database (no existing user)
     mockDbSelect = vi.fn(() => []);
-    insertReturnValue = [{ id: 1, email: "newuser@example.com" }];
+    insertReturnValue = [{ id: 1, name: "New User", email: "newuser@example.com" }];
 
     // Act: Make registration request
     const request = createMockRequest("http://localhost/api/auth/register", {
       method: "POST",
       body: {
+        name: "New User",
         email: "newuser@example.com",
-        password: "123456",
+        password: "Abcdef1!",
       },
     });
 
@@ -63,6 +64,7 @@ describe("POST /api/auth/register", () => {
     // Arrange: Mock existing user
     const existingUser = {
       id: 1,
+      name: "Existing",
       email: "existing@example.com",
       hashedPassword: "hash",
     };
@@ -72,8 +74,9 @@ describe("POST /api/auth/register", () => {
     const request = createMockRequest("http://localhost/api/auth/register", {
       method: "POST",
       body: {
+        name: "Existing",
         email: "existing@example.com",
-        password: "123456",
+        password: "Abcdef1!",
       },
     });
 
@@ -91,8 +94,9 @@ describe("POST /api/auth/register", () => {
     const request = createMockRequest("http://localhost/api/auth/register", {
       method: "POST",
       body: {
+        name: "User",
         email: "email-inválido",
-        password: "123456",
+        password: "Abcdef1!",
       },
     });
 
@@ -110,8 +114,9 @@ describe("POST /api/auth/register", () => {
     const request = createMockRequest("http://localhost/api/auth/register", {
       method: "POST",
       body: {
+        name: "User",
         email: "user@example.com",
-        password: "123",
+        password: "abc",
       },
     });
 
@@ -121,7 +126,7 @@ describe("POST /api/auth/register", () => {
     // Assert
     expect(response.status).toBe(400);
     expect(data).toHaveProperty("detail");
-    expect(data.detail).toContain("Senha deve ter pelo menos 6 caracteres");
+    expect(data.detail).toContain("Senha deve ter pelo menos 8 caracteres");
   });
 
   it("rejeita registro com dados ausentes", async () => {
@@ -149,7 +154,7 @@ describe("POST /api/auth/register", () => {
       method: "POST",
       body: {
         email: "",
-        password: "123456",
+        password: "Abcdef1!",
       },
     });
 
@@ -183,12 +188,13 @@ describe("POST /api/auth/register", () => {
     // Arrange: Empty database (no existing user)
     mockDbSelect = vi.fn(() => []);
 
-    const plainPassword = "123456";
+    const plainPassword = "Abcdef1!";
 
     // Act: Make registration request
     const request = createMockRequest("http://localhost/api/auth/register", {
       method: "POST",
       body: {
+        name: "New User",
         email: "newuser@example.com",
         password: plainPassword,
       },
@@ -211,6 +217,7 @@ describe("POST /api/auth/register", () => {
     insertReturnValue = [
       {
         id: 1,
+        name: "Test User",
         email: "test@example.com",
         // hashedPassword is not included in returning() clause
       },
@@ -220,8 +227,9 @@ describe("POST /api/auth/register", () => {
     const request = createMockRequest("http://localhost/api/auth/register", {
       method: "POST",
       body: {
+        name: "Test User",
         email: "test@example.com",
-        password: "123456",
+        password: "Abcdef1!",
       },
     });
 

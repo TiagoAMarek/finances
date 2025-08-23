@@ -1,16 +1,18 @@
 "use client";
 
-import type { NextPage } from "next";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AccountsList,
+  AccountsMetricsGrid,
+  CreateAccountModal,
+  EditAccountModal,
+  ErrorAlerts,
+} from "@/features/accounts/components";
 import { useGetAccounts } from "@/features/accounts/hooks/data";
-import { PageHeader } from "@/components/PageHeader";
-import { CreateAccountModal } from "./_components/CreateAccountModal";
-import { EditAccountModal } from "./_components/EditAccountModal";
-import { AccountsList } from "./_components/AccountsList";
-import { AccountsMetricsGrid } from "./_components/AccountsMetricsGrid";
-import { ErrorAlerts } from "./_components/ErrorAlerts";
 import { useAccountActions } from "@/features/accounts/hooks/ui";
+import { PageHeader } from "@/features/shared/components";
+import { Skeleton } from "@/features/shared/components/ui";
 import { Banknote } from "lucide-react";
+import type { NextPage } from "next";
 
 const AccountsPage: NextPage = () => {
   const { data: accounts = [], isLoading, error } = useGetAccounts();

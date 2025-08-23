@@ -14,7 +14,7 @@ describe("Schemas Zod", () => {
     it("valida dados corretos de login", () => {
       const validData = {
         email: "user@example.com",
-        password: "123456",
+         password: "Abcdef1!",
       };
 
       const result = LoginSchema.safeParse(validData);
@@ -28,7 +28,7 @@ describe("Schemas Zod", () => {
     it("rejeita email em formato inválido", () => {
       const invalidData = {
         email: "email-inválido",
-        password: "123456",
+         password: "Abcdef1!",
       };
 
       const result = LoginSchema.safeParse(invalidData);
@@ -66,28 +66,26 @@ describe("Schemas Zod", () => {
   describe("RegisterSchema", () => {
     it("valida dados corretos de registro", () => {
       const validData = {
+        name: "Usuário Teste",
         email: "user@example.com",
-        password: "123456",
+        password: "Abcdef1!",
+        confirmPassword: "Abcdef1!",
       };
 
       const result = RegisterSchema.safeParse(validData);
       expect(result.success).toBe(true);
     });
 
-    it("rejeita senha com menos de 6 caracteres", () => {
+    it("rejeita senha fraca (menos de 8 e sem complexidade)", () => {
       const invalidData = {
+        name: "Usuário Teste",
         email: "user@example.com",
-        password: "123",
+        password: "1234567",
+        confirmPassword: "1234567",
       };
 
       const result = RegisterSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Senha deve ter pelo menos 6 caracteres",
-        );
-      }
     });
   });
 

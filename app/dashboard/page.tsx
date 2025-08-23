@@ -1,17 +1,18 @@
 "use client";
 
-import { PageHeader } from "@/components/PageHeader";
-import { QuickCreateButton } from "@/components/QuickCreateButton";
-import type { NextPage } from "next";
-import { useState, useCallback } from "react";
-import { CreateTransactionModal } from "../transactions/_components/CreateTransactionModal";
-import { useTransactionActions } from "@/features/transactions/hooks/ui/useTransactionActions";
+import {
+  DashboardMetricsGrid,
+  DashboardSkeletonLoader,
+  ReportsAccordion,
+  ResourcesAccordion,
+} from "@/features/dashboard/components";
 import { useDashboardData } from "@/features/dashboard/hooks/ui/useDashboardData";
-import { DashboardSkeletonLoader } from "./_components/DashboardSkeletonLoader";
-import { DashboardMetricsGrid } from "./_components/DashboardMetricsGrid";
-import { ResourcesAccordion } from "./_components/ResourcesAccordion";
-import { ReportsAccordion } from "./_components/ReportsAccordion";
+import { PageHeader, QuickCreateButton } from "@/features/shared/components";
+import { CreateTransactionModal } from "@/features/transactions/components";
+import { useTransactionActions } from "@/features/transactions/hooks/ui/useTransactionActions";
 import { BarChart3 } from "lucide-react";
+import type { NextPage } from "next";
+import { useCallback, useState } from "react";
 
 const DashboardPage: NextPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

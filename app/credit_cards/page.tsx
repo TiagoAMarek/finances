@@ -1,15 +1,17 @@
 "use client";
 
-import { PageHeader } from "@/components/PageHeader";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  CreateCardModal,
+  CreditCardsList,
+  EditCardModal,
+  ErrorAlerts,
+} from "@/features/credit-cards/components";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 import { useCreditCardActions } from "@/features/credit-cards/hooks/ui";
+import { PageHeader } from "@/features/shared/components";
+import { Skeleton } from "@/features/shared/components/ui";
 import { CreditCard } from "lucide-react";
 import type { NextPage } from "next";
-import { CreateCardModal } from "./_components/CreateCardModal";
-import { CreditCardsList } from "./_components/CreditCardsList";
-import { EditCardModal } from "./_components/EditCardModal";
-import { ErrorAlerts } from "./_components/ErrorAlerts";
 
 const CreditCardsPage: NextPage = () => {
   const { data: creditCards = [], isLoading, error } = useGetCreditCards();

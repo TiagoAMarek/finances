@@ -1,20 +1,26 @@
 "use client";
 
-import type { NextPage } from "next";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useGetTransactions } from "@/features/transactions/hooks/data/useGetTransactions";
 import { useGetAccounts } from "@/features/accounts/hooks/data/useGetAccounts";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data/useGetCreditCards";
-import { PageHeader } from "@/components/PageHeader";
-import { QuickCreateButton } from "@/components/QuickCreateButton";
-import { CreateTransactionModal } from "./_components/CreateTransactionModal";
-import { EditTransactionModal } from "./_components/EditTransactionModal";
-import { TransactionsList } from "./_components/TransactionsList";
-import { TransactionFiltersComponent } from "./_components/TransactionFilters";
-import { useTransactionActions } from "@/features/transactions/hooks/ui/useTransactionActions";
-import { useTransactionFilters } from "@/features/transactions/hooks/ui/useTransactionFilters";
+import { PageHeader, QuickCreateButton } from "@/features/shared/components";
+import {
+  Alert,
+  AlertDescription,
+  Skeleton,
+} from "@/features/shared/components/ui";
+import {
+  CreateTransactionModal,
+  EditTransactionModal,
+  TransactionFiltersComponent,
+  TransactionsList,
+} from "@/features/transactions/components";
+import { useGetTransactions } from "@/features/transactions/hooks/data/useGetTransactions";
+import {
+  useTransactionActions,
+  useTransactionFilters,
+} from "@/features/transactions/hooks/ui";
 import { ArrowLeftRight } from "lucide-react";
+import type { NextPage } from "next";
 
 const TransactionsPage: NextPage = () => {
   const {

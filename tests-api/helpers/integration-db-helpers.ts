@@ -26,6 +26,7 @@ export function createIntegrationTestDb() {
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       hashed_password TEXT NOT NULL
     );
@@ -105,20 +106,23 @@ export function createIntegrationTestDb() {
 // Helper to create a test user with hashed password
 export async function createTestUser(
   db: any,
-  userData: { email?: string; password?: string } = {},
+  userData: { name?: string; email?: string; password?: string } = {},
 ) {
+  const name = userData.name || "Test User";
   const email = userData.email || "test@example.com";
-  const plainPassword = userData.password || "123456";
+  const plainPassword = userData.password || "Abcdef1!";
   const hashedPassword = await hashPassword(plainPassword);
 
   const [user] = await db
     .insert(users)
     .values({
+      name,
       email,
       hashedPassword,
     })
     .returning({
       id: users.id,
+      name: users.name,
       email: users.email,
     });
 

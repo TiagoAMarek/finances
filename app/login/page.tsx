@@ -1,18 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useLogin } from "@/features/auth/hooks/data";
+import { Button, Input, Label } from "@/features/shared/components/ui";
+import { Alert, AlertDescription } from "@/features/shared/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/features/shared/components/ui/card";
+import { LoginSchema, type LoginInput } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Check, Loader2 } from "lucide-react";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Check } from "lucide-react";
-import { LoginSchema, type LoginInput } from "@/lib/schemas";
-import { useLogin } from "@/features/auth/hooks/data";
 
 const LoginPage: NextPage = () => {
   const router = useRouter();

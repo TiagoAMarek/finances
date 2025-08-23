@@ -37,8 +37,9 @@ describe("POST /api/auth/login - Integration Tests", () => {
   it("autentica usuário existente com credenciais corretas", async () => {
     // Arrange: Create user in database
     const { user } = await createTestUser(testDb, {
+      name: "User",
       email: "user@example.com",
-      password: "senha123",
+      password: "Abcdef1!",
     });
 
     // Act: Make login request
@@ -46,7 +47,7 @@ describe("POST /api/auth/login - Integration Tests", () => {
       method: "POST",
       body: {
         email: "user@example.com",
-        password: "senha123",
+        password: "Abcdef1!",
       },
     });
 
@@ -90,8 +91,9 @@ describe("POST /api/auth/login - Integration Tests", () => {
   it("rejeita login com senha incorreta", async () => {
     // Arrange: Create user in database
     await createTestUser(testDb, {
+      name: "User",
       email: "user@example.com",
-      password: "senha-correta",
+      password: "Abcdef1!",
     });
 
     // Act: Try to login with wrong password
@@ -131,8 +133,9 @@ describe("POST /api/auth/login - Integration Tests", () => {
 
   it("verifica comparação de senha com hash real do banco", async () => {
     // Arrange: Create user with specific password
-    const plainPassword = "minha-senha-complexa-123!@#";
+    const plainPassword = "MinhaSenha123!";
     const { user } = await createTestUser(testDb, {
+      name: "User",
       email: "user@example.com",
       password: plainPassword,
     });
@@ -164,8 +167,9 @@ describe("POST /api/auth/login - Integration Tests", () => {
   it("gera token JWT válido com expiração correta", async () => {
     // Arrange: Create user
     await createTestUser(testDb, {
+      name: "User",
       email: "user@example.com",
-      password: "123456",
+      password: "Abcdef1!",
     });
 
     // Act: Login
@@ -175,7 +179,7 @@ describe("POST /api/auth/login - Integration Tests", () => {
       method: "POST",
       body: {
         email: "user@example.com",
-        password: "123456",
+        password: "Abcdef1!",
       },
     });
 
@@ -206,8 +210,9 @@ describe("POST /api/auth/login - Integration Tests", () => {
 
     // Arrange: Create one real user
     await createTestUser(testDb, {
+      name: "Real",
       email: "real@example.com",
-      password: "123456",
+      password: "Abcdef1!",
     });
 
     // Test non-existent user
@@ -246,25 +251,28 @@ describe("POST /api/auth/login - Integration Tests", () => {
   it("testa comportamento com múltiplos usuários no banco", async () => {
     // Arrange: Create multiple users
     await createTestUser(testDb, {
+      name: "User1",
       email: "user1@example.com",
-      password: "password1",
+      password: "Password1!",
     });
 
     await createTestUser(testDb, {
+      name: "User2",
       email: "user2@example.com",
-      password: "password2",
+      password: "Password2!",
     });
 
     await createTestUser(testDb, {
+      name: "User3",
       email: "user3@example.com",
-      password: "password3",
+      password: "Password3!",
     });
 
     // Act & Assert: Each user can login independently
     const testCases = [
-      { email: "user1@example.com", password: "password1" },
-      { email: "user2@example.com", password: "password2" },
-      { email: "user3@example.com", password: "password3" },
+      { email: "user1@example.com", password: "Password1!" },
+      { email: "user2@example.com", password: "Password2!" },
+      { email: "user3@example.com", password: "Password3!" },
     ];
 
     for (const testCase of testCases) {
