@@ -1,8 +1,7 @@
 import { memo } from "react";
 import { Transaction } from "@/lib/schemas";
-import { TotalIncomesMetricCard } from "./TotalIncomesMetricCard";
-import { TotalExpensesMetricCard } from "./TotalExpensesMetricCard";
-import { PeriodBalanceMetricCard } from "./PeriodBalanceMetricCard";
+import { MetricCard } from "@/components/ui/metric-card";
+import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
 
 interface TransactionsMetricsGridProps {
   transactions: Transaction[];
@@ -28,20 +27,40 @@ export const TransactionsMetricsGrid = memo<TransactionsMetricsGridProps>(
 
     const balance = totalIncomes - totalExpenses;
 
+    const expenseRatio =
+      totalIncomes > 0 ? (totalExpenses / totalIncomes) * 100 : 0;
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <TotalIncomesMetricCard
-          totalIncomes={totalIncomes}
-          transactionCount={incomeTransactions.length}
+        <MetricCard
+          title="Total Receitas"
+          value={totalIncomes}
+          description={`${incomeTransactions.length} ${incomeTransactions.length === 1 ? "transação" : "transações"}`}
+          icon={TrendingUp}
+          iconTheme="success"
+          valueTheme="success"
+          formatValue="currency"
+          hoverEffect
         />
-        <TotalExpensesMetricCard
-          totalExpenses={totalExpenses}
-          transactionCount={expenseTransactions.length}
+        <MetricCard
+          title="Total Despesas"
+          value={totalExpenses}
+          description={`${expenseTransactions.length} ${expenseTransactions.length === 1 ? "transação" : "transações"}`}
+          icon={TrendingDown}
+          iconTheme="danger"
+          valueTheme="danger"
+          formatValue="currency"
+          hoverEffect
         />
-        <PeriodBalanceMetricCard
-          balance={balance}
-          totalIncomes={totalIncomes}
-          totalExpenses={totalExpenses}
+        <MetricCard
+          title="Saldo do Período"
+          value={balance}
+          description={`${expenseRatio.toFixed(1)}% de gastos sobre receitas`}
+          icon={BarChart3}
+          iconTheme={(value) => (Number(value) >= 0 ? "primary" : "orange")}
+          valueTheme={(value) => (Number(value) >= 0 ? "primary" : "orange")}
+          formatValue="currency"
+          hoverEffect
         />
       </div>
     );
