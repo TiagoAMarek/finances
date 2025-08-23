@@ -1,36 +1,49 @@
 "use client";
 
-import { useState } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
+import { FormField } from "@/components/ui/form-field";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RegisterSchema, type RegisterInput } from "@/lib/schemas";
 import { useRegister } from "@/features/auth/hooks/data";
 
 const RegisterPage: NextPage = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
   const registerMutation = useRegister();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, touchedFields },
+    watch,
+  } = useForm<RegisterInput>({
+    resolver: zodResolver(RegisterSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    if (password !== confirmPassword) {
-      setError("As senhas não coincidem.");
-      return;
-    }
+  const watchedName = watch("name");
+  const watchedEmail = watch("email");
+  const watchedPassword = watch("password");
+  const watchedConfirmPassword = watch("confirmPassword");
 
+  const onSubmit = (data: RegisterInput) => {
+    // Extract only the fields needed by the API
+    const { name, email, password } = data;
     registerMutation.mutate(
-      { email, password },
+      { name, email, password },
       {
         onSuccess: () => {
           router.push("/login");
@@ -48,62 +61,84 @@ const RegisterPage: NextPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {(error || registerMutation.error) && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {registerMutation.error && (
               <Alert variant="destructive">
                 <AlertDescription>
-                  {error || registerMutation.error?.message}
+                  {registerMutation.error.message}
                 </AlertDescription>
               </Alert>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
+
+            <FormField
+              label="Nome completo"
+              error={errors.name?.message}
+              isValid={touchedFields.name && !errors.name && !!watchedName}
+              required
+            >
               <Input
                 type="text"
-                id="name"
-                placeholder="Seu nome completo"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                placeholder="Digite seu nome completo"
+                autoComplete="name"
+                {...register("name")}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+            </FormField>
+
+            <FormField
+              label="E-mail"
+              error={errors.email?.message}
+              isValid={touchedFields.email && !errors.email && !!watchedEmail}
+              required
+            >
               <Input
                 type="email"
-                id="email"
                 placeholder="seuemail@exemplo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                autoComplete="email"
+                {...register("email")}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                type="password"
-                id="password"
-                placeholder="********"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+            </FormField>
+
+            <FormField
+              label="Senha"
+              error={errors.password?.message}
+              isValid={
+                touchedFields.password && !errors.password && !!watchedPassword
+              }
+              required
+            >
+              <PasswordInput
+                placeholder="Crie uma senha forte"
+                autoComplete="new-password"
+                {...register("password")}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-              <Input
-                type="password"
-                id="confirmPassword"
-                placeholder="********"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
+            </FormField>
+
+            {watchedPassword && (
+              <PasswordStrengthIndicator password={watchedPassword} />
+            )}
+
+            <FormField
+              label="Confirmar senha"
+              error={errors.confirmPassword?.message}
+              isValid={
+                touchedFields.confirmPassword &&
+                !errors.confirmPassword &&
+                !!watchedConfirmPassword
+              }
+              required
+            >
+              <PasswordInput
+                placeholder="Digite a senha novamente"
+                autoComplete="new-password"
+                showVisibilityToggle={false}
+                {...register("confirmPassword")}
               />
-            </div>
+            </FormField>
+
             <Button
               type="submit"
               className="w-full"
-              disabled={registerMutation.isPending}
+              disabled={registerMutation.isPending || !isValid}
             >
               {registerMutation.isPending ? "Criando conta..." : "Criar conta"}
             </Button>

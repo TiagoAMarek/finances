@@ -22,7 +22,9 @@ export function ActiveFiltersBadges({
         Filtros ativos:
       </span>
       {badges.map((badge) => {
-        const IconComponent = badge.icon as any;
+        const IconComponent = badge.icon as React.ComponentType<{
+          className?: string;
+        }>;
         return (
           <Badge
             key={badge.key}

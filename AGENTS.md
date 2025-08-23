@@ -10,7 +10,7 @@
 - pnpm test:watch — run tests in watch mode
 - pnpm test:server — run server-side tests only
 - pnpm test:client — run client-side (jsdom) tests only
-- pnpm test:single <file> — run a single test file (example: pnpm test -- tests/unit/schemas.test.ts)
+- pnpm test:single <file> — run a single test file (example: pnpm test tests/unit/schemas.test.ts)
 - pnpm test:coverage — run tests with coverage report
 - pnpm drizzle-kit generate / push — manage DB migrations
 

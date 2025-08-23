@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "../../lib/db";
 import { users } from "../../lib/schema";
-import { RegisterSchema } from "../../lib/validation";
+import { RegisterApiSchema } from "../../lib/validation";
 import {
   hashPassword,
   createErrorResponse,
@@ -14,7 +14,7 @@ import { seedDefaultCategoriesForUser } from "../../lib/seedCategories";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validatedData = RegisterSchema.parse(body);
+    const validatedData = RegisterApiSchema.parse(body);
 
     // Check if user already exists
     const existingUser = await db
@@ -33,11 +33,13 @@ export async function POST(request: NextRequest) {
     const [newUser] = await db
       .insert(users)
       .values({
+        name: validatedData.name,
         email: validatedData.email,
         hashedPassword,
       })
       .returning({
         id: users.id,
+        name: users.name,
         email: users.email,
       });
 

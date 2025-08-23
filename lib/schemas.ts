@@ -6,9 +6,28 @@ export const LoginSchema = z.object({
   password: z.string().min(1, "Senha é obrigatória"),
 });
 
-export const RegisterSchema = z.object({
+// API register schema (what gets sent to the API)
+export const RegisterApiSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Formato de email inválido"),
-  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  password: z
+    .string()
+    .min(8, "Senha deve ter pelo menos 8 caracteres")
+    .regex(/[A-Z]/, "Senha deve conter pelo menos uma letra maiúscula")
+    .regex(/[a-z]/, "Senha deve conter pelo menos uma letra minúscula")
+    .regex(/[0-9]/, "Senha deve conter pelo menos um número")
+    .regex(
+      /[^A-Za-z0-9]/,
+      "Senha deve conter pelo menos um caractere especial",
+    ),
+});
+
+// Form register schema (includes confirm password for UI validation)
+export const RegisterSchema = RegisterApiSchema.extend({
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
 });
 
 // Bank account schemas - reflecting API structure
@@ -192,6 +211,7 @@ export const MonthlySummaryRequestSchema = z.object({
 // User schema - reflecting API structure
 export const UserSchema = z.object({
   id: z.number(),
+  name: z.string(),
   email: z.string().email(),
   hashedPassword: z.string(),
 });
@@ -226,6 +246,7 @@ export type MonthlySummary = z.infer<typeof MonthlySummarySchema>;
 // Input types (for forms and API requests)
 export type LoginInput = z.infer<typeof LoginSchema>;
 export type RegisterInput = z.infer<typeof RegisterSchema>;
+export type RegisterApiInput = z.infer<typeof RegisterApiSchema>;
 export type BankAccountCreateInput = z.infer<typeof BankAccountCreateSchema>;
 export type BankAccountUpdateInput = z.infer<typeof BankAccountUpdateSchema>;
 export type CreditCardCreateInput = z.infer<typeof CreditCardCreateSchema>;

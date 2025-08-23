@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/utils/api";
-import { RegisterResponse, RegisterInput } from "@/lib/schemas";
+import { RegisterResponse, RegisterApiInput } from "@/lib/schemas";
 
 /**
  * Hook for user registration
  */
 export const useRegister = () => {
-  return useMutation<RegisterResponse, Error, RegisterInput>({
+  return useMutation<RegisterResponse, Error, RegisterApiInput>({
     mutationFn: async (userData) => {
       const response = await fetchWithAuth("/api/auth/register", {
         method: "POST",
