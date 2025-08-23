@@ -1,7 +1,7 @@
-import { memo } from "react";
-import { MonthlyMetrics } from "../_utils/dashboard-calculations";
 import { MetricCard } from "@/components/ui/metric-card";
-import { TrendingUp, TrendingDown, BarChart3, Wallet } from "lucide-react";
+import { MonthlyMetrics } from "@/features/dashboard/utils/dashboard-calculations";
+import { BarChart3, TrendingDown, TrendingUp, Wallet } from "lucide-react";
+import { memo } from "react";
 
 /**
  * Props for DashboardMetricsGrid component

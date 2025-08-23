@@ -1,22 +1,22 @@
-import { memo } from "react";
+import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { BarChart3, TrendingUp, AlertCircle } from "lucide-react";
-import Link from "next/link";
-import { Transaction } from "@/lib/schemas";
+import { useCurrentMonth } from "@/features/dashboard/hooks/ui";
 import {
   MonthlyMetrics,
   formatDashboardCurrency,
   getBalanceBadgeVariant,
-} from "../_utils/dashboard-calculations";
+} from "@/features/dashboard/utils/dashboard-calculations";
+import { Transaction } from "@/lib/schemas";
+import { AlertCircle, BarChart3, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { memo } from "react";
 import { DashboardAccordionTrigger } from "./DashboardAccordionTrigger";
 import { FinancialInsights } from "./FinancialInsights";
-import { IncomeVsExpenseChart } from "@/components/IncomeVsExpenseChart";
-import { useCurrentMonth } from "@/features/dashboard/hooks/ui";
 
 /**
  * Props for ReportsAccordion component

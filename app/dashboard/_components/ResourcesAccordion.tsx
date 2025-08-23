@@ -1,15 +1,15 @@
-import { memo } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
 } from "@/components/ui/accordion";
-import { Wallet } from "lucide-react";
+import { formatDashboardCurrency } from "@/features/dashboard/utils/dashboard-calculations";
 import { BankAccount, CreditCard } from "@/lib/schemas";
-import { formatDashboardCurrency } from "../_utils/dashboard-calculations";
-import { DashboardAccordionTrigger } from "./DashboardAccordionTrigger";
+import { Wallet } from "lucide-react";
+import { memo } from "react";
 import { AccountsOverview } from "./AccountsOverview";
 import { CreditCardsOverview } from "./CreditCardsOverview";
+import { DashboardAccordionTrigger } from "./DashboardAccordionTrigger";
 
 /**
  * Props for ResourcesAccordion component

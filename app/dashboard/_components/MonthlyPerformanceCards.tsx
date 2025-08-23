@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  TrendingDown,
-  Target,
-  PiggyBank,
-  Award,
-  TrendingUp,
-  AlertCircle,
-  Calendar,
-} from "lucide-react";
 import { Transaction } from "@/lib/schemas";
+import {
+  AlertCircle,
+  Award,
+  Calendar,
+  PiggyBank,
+  Target,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
 interface MonthlyPerformanceCardsProps {
   transactions: Transaction[];

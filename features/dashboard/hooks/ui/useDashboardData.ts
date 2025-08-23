@@ -1,13 +1,13 @@
-import { useMemo } from "react";
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
-import { useGetTransactions } from "@/features/transactions/hooks/data";
 import {
   calculateMonthlyMetrics,
   calculateTotalBalance,
   MonthlyMetrics,
-} from "@/app/dashboard/_utils/dashboard-calculations";
-import { Transaction, BankAccount, CreditCard } from "@/lib/schemas";
+} from "@/features/dashboard/utils/dashboard-calculations";
+import { useGetTransactions } from "@/features/transactions/hooks/data";
+import { BankAccount, CreditCard, Transaction } from "@/lib/schemas";
+import { useMemo } from "react";
 
 /**
  * Interface for dashboard data
