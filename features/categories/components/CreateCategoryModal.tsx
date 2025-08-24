@@ -1,25 +1,28 @@
-import { FormModal, QuickCreateButton } from "@/features/shared/components";
+import { 
+  FormModal,
+  FormModalHeader,
+  FormModalField,
+  FormModalActions,
+  FormModalFormWithHook,
+  QuickCreateButton
+} from "@/features/shared/components";
 import {
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/features/shared/components/ui";
+import { CategoryCreateInput, CategoryCreateSchema } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon, TagIcon } from "lucide-react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 interface CreateCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: {
-    name: string;
-    type: "income" | "expense" | "both";
-    color?: string;
-    icon?: string;
-  }) => void;
+  onSubmit: (data: CategoryCreateInput) => void;
   isLoading: boolean;
 }
 
@@ -65,31 +68,24 @@ export function CreateCategoryModal({
   onSubmit,
   isLoading,
 }: CreateCategoryModalProps) {
-  const [name, setName] = useState("");
-  const [type, setType] = useState<"income" | "expense" | "both">("expense");
-  const [color, setColor] = useState(CATEGORY_COLORS[0]);
-  const [icon, setIcon] = useState(CATEGORY_ICONS[0]);
+  const form = useForm<CategoryCreateInput>({
+    resolver: zodResolver(CategoryCreateSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      type: "expense",
+      color: CATEGORY_COLORS[0],
+      icon: CATEGORY_ICONS[0],
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      name,
-      type,
-      color,
-      icon,
-    });
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setName("");
-    setType("expense");
-    setColor(CATEGORY_COLORS[0]);
-    setIcon(CATEGORY_ICONS[0]);
+  const handleSubmit = (data: CategoryCreateInput) => {
+    onSubmit(data);
+    handleClose();
   };
 
   const handleClose = () => {
-    resetForm();
+    form.reset();
     onOpenChange(false);
   };
 
@@ -105,7 +101,7 @@ export function CreateCategoryModal({
         </QuickCreateButton>
       }
     >
-      <FormModal.Header
+      <FormModalHeader
         icon={TagIcon}
         iconColor="text-primary"
         iconBgColor="bg-primary/10"
@@ -113,33 +109,27 @@ export function CreateCategoryModal({
         description="Crie uma nova categoria para organizar suas transações"
       />
 
-      <FormModal.Form onSubmit={handleSubmit}>
-        <div className="space-y-2">
-          <Label
-            htmlFor="categoryName"
-            className="text-sm font-medium flex items-center gap-2"
-          >
-            <TagIcon className="h-4 w-4" />
-            Nome da Categoria
-          </Label>
+      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+        <FormModalField
+          form={form}
+          name="name"
+          label="Nome da Categoria"
+          required
+        >
           <Input
             type="text"
-            id="categoryName"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Alimentação"
             className="h-11"
             autoFocus
-            required
+            {...form.register("name")}
           />
-        </div>
+        </FormModalField>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Tipo</Label>
+        <FormModalField form={form} name="type" label="Tipo" required>
           <Select
-            value={type}
-            onValueChange={(value: "income" | "expense" | "both") =>
-              setType(value)
+            value={form.watch("type")}
+            onValueChange={(value) =>
+              form.setValue("type", value as "income" | "expense" | "both")
             }
           >
             <SelectTrigger>
@@ -151,53 +141,53 @@ export function CreateCategoryModal({
               <SelectItem value="both">Ambos</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </FormModalField>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Cor</Label>
+        <FormModalField form={form} name="color" label="Cor">
           <div className="flex flex-wrap gap-2">
             {CATEGORY_COLORS.map((colorOption) => (
               <button
                 key={colorOption}
                 type="button"
-                className={`w-8 h-8 rounded-full border-2 ${color === colorOption
+                className={`w-8 h-8 rounded-full border-2 ${
+                  form.watch("color") === colorOption
                     ? "border-primary"
                     : "border-transparent"
-                  }`}
+                }`}
                 style={{ backgroundColor: colorOption }}
-                onClick={() => setColor(colorOption)}
+                onClick={() => form.setValue("color", colorOption)}
               />
             ))}
           </div>
-        </div>
+        </FormModalField>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Ícone</Label>
+        <FormModalField form={form} name="icon" label="Ícone">
           <div className="flex flex-wrap gap-2">
             {CATEGORY_ICONS.map((iconOption) => (
               <button
                 key={iconOption}
                 type="button"
-                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${icon === iconOption
+                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${
+                  form.watch("icon") === iconOption
                     ? "border-primary bg-primary/10"
                     : "border-border hover:border-primary/50"
-                  }`}
-                onClick={() => setIcon(iconOption)}
+                }`}
+                onClick={() => form.setValue("icon", iconOption)}
               >
                 {iconOption}
               </button>
             ))}
           </div>
-        </div>
+        </FormModalField>
 
-        <FormModal.Actions
+        <FormModalActions
+          form={form}
           onCancel={handleClose}
           submitText="Criar Categoria"
           submitIcon={PlusIcon}
           isLoading={isLoading}
-          isDisabled={!name.trim()}
         />
-      </FormModal.Form>
+      </FormModalFormWithHook>
     </FormModal>
   );
 }

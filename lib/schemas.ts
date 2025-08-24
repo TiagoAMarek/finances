@@ -39,10 +39,18 @@ export const BankAccountSchema = z.object({
   ownerId: z.number(),
 });
 
+// API schema with defaults for server processing
 export const BankAccountCreateSchema = z.object({
   name: z.string().min(1, "Nome da conta é obrigatório"),
-  balance: z.string().default("0"),
-  currency: z.string().default("BRL"),
+  balance: z.string().min(1, "Saldo é obrigatório").default("0"),
+  currency: z.string().min(1, "Moeda é obrigatória").default("BRL"),
+});
+
+// Form schema for react-hook-form (without defaults to keep types clean)
+export const BankAccountFormSchema = z.object({
+  name: z.string().min(1, "Nome da conta é obrigatório"),
+  balance: z.string().min(1, "Saldo é obrigatório"),
+  currency: z.string().min(1, "Moeda é obrigatória"),
 });
 
 export const BankAccountUpdateSchema = z.object({
@@ -62,8 +70,8 @@ export const CreditCardSchema = z.object({
 
 export const CreditCardCreateSchema = z.object({
   name: z.string().min(1, "Nome do cartão é obrigatório"),
-  limit: z.string().default("0"),
-  currentBill: z.string().default("0"),
+  limit: z.string().min(1, "Limite é obrigatório"),
+  currentBill: z.string().min(1, "Fatura atual é obrigatória"),
 });
 
 export const CreditCardUpdateSchema = z.object({
@@ -139,17 +147,31 @@ export const TransactionSchema = z.object({
   toAccountId: z.number().nullable().optional(), // For transfers
 });
 
+// Base schema for API - categoryId is required for income/expense
 export const TransactionCreateSchema = z
   .object({
     description: z.string().min(1, "Descrição é obrigatória"),
     amount: z.string().min(1, "Valor é obrigatório"),
     type: z.enum(["income", "expense", "transfer"]),
     date: z.string().min(1, "Data é obrigatória"),
-    categoryId: z.number({ required_error: "Categoria é obrigatória" }),
+    categoryId: z.number().optional(),
     accountId: z.number().optional(),
     creditCardId: z.number().optional(),
     toAccountId: z.number().optional(), // For transfers
   })
+  .refine(
+    (data) => {
+      // Category is required for income and expense
+      if (data.type !== "transfer" && !data.categoryId) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Categoria é obrigatória",
+      path: ["categoryId"],
+    },
+  )
   .refine(
     (data) => {
       if (data.type === "transfer") {
@@ -159,15 +181,43 @@ export const TransactionCreateSchema = z
           data.accountId !== data.toAccountId
         );
       }
-      return (
-        !!(data.accountId || data.creditCardId) &&
-        !(data.accountId && data.creditCardId)
-      );
+      return true;
     },
     {
-      message: "Configuração de transação inválida",
+      message:
+        "Para transferências, conta de origem e destino são obrigatórias e devem ser diferentes",
+      path: ["toAccountId"],
+    },
+  )
+  .refine(
+    (data) => {
+      // For income/expense, either accountId or creditCardId is required but not both
+      if (data.type !== "transfer") {
+        return (
+          !!(data.accountId || data.creditCardId) &&
+          !(data.accountId && data.creditCardId)
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "Para receitas e despesas, selecione apenas uma conta ou cartão de crédito",
+      path: ["accountId"],
     },
   );
+
+// Form schema for React Hook Form - allows optional fields for better UX
+export const TransactionFormSchema = z.object({
+  description: z.string().min(1, "Descrição é obrigatória"),
+  amount: z.string().min(1, "Valor é obrigatório"),
+  type: z.enum(["income", "expense", "transfer"]),
+  date: z.string().min(1, "Data é obrigatória"),
+  categoryId: z.number().optional(),
+  accountId: z.number().optional(),
+  creditCardId: z.number().optional(),
+  toAccountId: z.number().optional(),
+});
 
 export const TransactionUpdateSchema = z.object({
   id: z.number(),
@@ -248,12 +298,14 @@ export type LoginInput = z.infer<typeof LoginSchema>;
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type RegisterApiInput = z.infer<typeof RegisterApiSchema>;
 export type BankAccountCreateInput = z.infer<typeof BankAccountCreateSchema>;
+export type BankAccountFormInput = z.infer<typeof BankAccountFormSchema>;
 export type BankAccountUpdateInput = z.infer<typeof BankAccountUpdateSchema>;
 export type CreditCardCreateInput = z.infer<typeof CreditCardCreateSchema>;
 export type CreditCardUpdateInput = z.infer<typeof CreditCardUpdateSchema>;
 export type CategoryCreateInput = z.infer<typeof CategoryCreateSchema>;
 export type CategoryUpdateInput = z.infer<typeof CategoryUpdateSchema>;
 export type TransactionCreateInput = z.infer<typeof TransactionCreateSchema>;
+export type TransactionFormInput = z.infer<typeof TransactionFormSchema>;
 export type TransactionUpdateInput = z.infer<typeof TransactionUpdateSchema>;
 export type TransferCreateInput = z.infer<typeof TransferCreateSchema>;
 export type MonthlySummaryRequestInput = z.infer<

@@ -1,12 +1,25 @@
-import { FormModal, QuickCreateButton } from "@/features/shared/components";
-import { Input, Label } from "@/features/shared/components/ui";
-import { CreditCardIcon, DollarSignIcon, PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { 
+  FormModal,
+  FormModalHeader,
+  FormModalField,
+  FormModalActions,
+  FormModalFormWithHook
+} from "@/features/shared/components/FormModal";
+import { QuickCreateButton } from "@/features/shared/components";
+import { Input } from "@/features/shared/components/ui";
+import {
+  BankAccountCreateInput,
+  BankAccountFormInput,
+  BankAccountFormSchema,
+} from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreditCardIcon, PlusIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 interface CreateAccountModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { name: string; balance: string }) => void;
+  onSubmit: (data: BankAccountCreateInput) => void;
   isLoading: boolean;
 }
 
@@ -16,26 +29,29 @@ export function CreateAccountModal({
   onSubmit,
   isLoading,
 }: CreateAccountModalProps) {
-  const [name, setName] = useState("");
-  const [balance, setBalance] = useState<number>(0);
+  const form = useForm<BankAccountFormInput>({
+    resolver: zodResolver(BankAccountFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      balance: "0",
+      currency: "BRL",
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      name,
-      balance: balance.toString(),
-    });
-    setName("");
-    setBalance(0);
-  };
-
-  const resetForm = () => {
-    setName("");
-    setBalance(0);
+  const handleSubmit = (data: BankAccountFormInput) => {
+    // Convert form data to API data with defaults
+    const createData: BankAccountCreateInput = {
+      ...data,
+      balance: data.balance || "0",
+      currency: data.currency || "BRL",
+    };
+    onSubmit(createData);
+    handleClose();
   };
 
   const handleClose = () => {
-    resetForm();
+    form.reset();
     onOpenChange(false);
   };
 
@@ -51,7 +67,7 @@ export function CreateAccountModal({
         </QuickCreateButton>
       }
     >
-      <FormModal.Header
+      <FormModalHeader
         icon={CreditCardIcon}
         iconColor="text-primary"
         iconBgColor="bg-primary/10"
@@ -59,67 +75,53 @@ export function CreateAccountModal({
         description="Cadastre uma nova conta para controlar suas finanças pessoais"
       />
 
-      <FormModal.Form onSubmit={handleSubmit}>
-        <div className="space-y-2">
-          <Label
-            htmlFor="accountName"
-            className="text-sm font-medium flex items-center gap-2"
-          >
-            <CreditCardIcon className="h-4 w-4" />
-            Nome da Conta
-          </Label>
+      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+        <FormModalField
+          form={form}
+          name="name"
+          label="Nome da Conta"
+          description="Escolha um nome que facilite a identificação da conta"
+          required
+        >
           <Input
             type="text"
-            id="accountName"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Conta Corrente Santander"
             className="h-11"
             autoFocus
-            required
+            {...form.register("name")}
           />
-          <p className="text-xs text-muted-foreground">
-            Escolha um nome que facilite a identificação da conta
-          </p>
-        </div>
+        </FormModalField>
 
-        <div className="space-y-2">
-          <Label
-            htmlFor="accountBalance"
-            className="text-sm font-medium flex items-center gap-2"
-          >
-            <DollarSignIcon className="h-4 w-4" />
-            Saldo Inicial
-          </Label>
+        <FormModalField
+          form={form}
+          name="balance"
+          label="Saldo Inicial"
+          description="Informe o saldo atual da sua conta bancária"
+          required
+        >
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
               R$
             </span>
             <Input
               type="number"
-              id="accountBalance"
-              value={balance || ""}
-              onChange={(e) => setBalance(parseFloat(e.target.value) || 0)}
               placeholder="0,00"
               className="h-11 pl-10"
               step="0.01"
               min="0"
-              required
+              {...form.register("balance")}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            Informe o saldo atual da sua conta bancária
-          </p>
-        </div>
+        </FormModalField>
 
-        <FormModal.Actions
+        <FormModalActions
+          form={form}
           onCancel={handleClose}
           submitText="Criar Conta"
           submitIcon={PlusIcon}
           isLoading={isLoading}
-          isDisabled={!name.trim()}
         />
-      </FormModal.Form>
+      </FormModalFormWithHook>
     </FormModal>
   );
 }

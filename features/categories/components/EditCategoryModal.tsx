@@ -1,23 +1,24 @@
+import { 
+  FormModal,
+  FormModalHeader,
+  FormModalField,
+  FormModalActions,
+  FormModalFormWithHook,
+  FormModalPreview
+} from "@/features/shared/components";
 import {
-  Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/features/shared/components/ui";
-import { Category } from "@/lib/schemas";
-import { Loader2Icon, SaveIcon, TagIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Category, CategoryCreateInput, CategoryCreateSchema } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SaveIcon, TagIcon } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 interface EditCategoryModalProps {
   open: boolean;
@@ -75,173 +76,174 @@ export function EditCategoryModal({
   onSubmit,
   isLoading,
 }: EditCategoryModalProps) {
-  const [name, setName] = useState("");
-  const [type, setType] = useState<"income" | "expense" | "both">("expense");
-  const [color, setColor] = useState(CATEGORY_COLORS[0]);
-  const [icon, setIcon] = useState(CATEGORY_ICONS[0]);
+  const form = useForm<CategoryCreateInput>({
+    resolver: zodResolver(CategoryCreateSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      type: "expense" as const,
+      color: CATEGORY_COLORS[0],
+      icon: CATEGORY_ICONS[0],
+    },
+  });
 
+  // Update form values when category changes
   useEffect(() => {
     if (category) {
-      setName(category.name);
-      setType(category.type);
-      setColor(category.color || CATEGORY_COLORS[0]);
-      setIcon(category.icon || CATEGORY_ICONS[0]);
+      form.reset({
+        name: category.name,
+        type: category.type,
+        color: category.color || CATEGORY_COLORS[0],
+        icon: category.icon || CATEGORY_ICONS[0],
+      });
     }
-  }, [category]);
+  }, [category, form]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (data: CategoryCreateInput) => {
     onSubmit({
-      name,
-      type,
-      color,
-      icon,
+      name: data.name,
+      type: data.type,
+      color: data.color,
+      icon: data.icon,
     });
+    handleClose();
   };
 
   const handleClose = () => {
+    form.reset();
     onOpenChange(false);
   };
 
   if (!category) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="text-center space-y-3 pb-4">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <TagIcon className="h-6 w-6 text-primary" />
+    <FormModal
+      open={open}
+      onOpenChange={onOpenChange}
+      variant="edit"
+      size="md"
+    >
+      <FormModalHeader
+        icon={TagIcon}
+        iconColor="text-primary"
+        iconBgColor="bg-primary/10"
+        title="Editar Categoria"
+        description="Atualize as informações da categoria"
+      />
+
+      <FormModalPreview>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: category.color || CATEGORY_COLORS[0] }}>
+            <span className="text-lg">{category.icon || CATEGORY_ICONS[0]}</span>
           </div>
-          <div className="space-y-1">
-            <DialogTitle className="text-xl">Editar Categoria</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Atualize as informações da categoria
-            </DialogDescription>
+          <div>
+            <p className="font-medium text-foreground">{category.name}</p>
+            <p className="text-sm text-muted-foreground">
+              Tipo: {category.type === "income" ? "Receita" : category.type === "expense" ? "Despesa" : "Ambos"}
+              {category.isDefault && " • Categoria padrão"}
+            </p>
           </div>
-        </DialogHeader>
+        </div>
+      </FormModalPreview>
 
-        <Card className="border-dashed">
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="categoryName"
-                  className="text-sm font-medium flex items-center gap-2"
-                >
-                  <TagIcon className="h-4 w-4" />
-                  Nome da Categoria
-                </Label>
-                <Input
-                  type="text"
-                  id="categoryName"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex: Alimentação"
-                  className="h-11"
-                  autoFocus
-                  required
-                  disabled={category.isDefault}
-                />
-                {category.isDefault && (
-                  <p className="text-xs text-muted-foreground">
-                    Categorias padrão não podem ser editadas
-                  </p>
-                )}
-              </div>
+      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+        <FormModalField
+          form={form}
+          name="name"
+          label="Nome da Categoria"
+          description={category.isDefault ? "Categorias padrão não podem ser editadas" : "Escolha um nome descritivo para a categoria"}
+          required
+        >
+          <Input
+            type="text"
+            placeholder="Ex: Alimentação"
+            className="h-11"
+            autoFocus
+            disabled={category.isDefault}
+            {...form.register("name")}
+          />
+        </FormModalField>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Tipo</Label>
-                <Select
-                  value={type}
-                  onValueChange={(value: "income" | "expense" | "both") =>
-                    setType(value)
-                  }
-                  disabled={category.isDefault}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="income">Receita</SelectItem>
-                    <SelectItem value="expense">Despesa</SelectItem>
-                    <SelectItem value="both">Ambos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        <FormModalField
+          form={form}
+          name="type"
+          label="Tipo"
+          description="Defina se a categoria é para receitas, despesas ou ambos"
+          required
+        >
+          <Select
+            value={form.watch("type")}
+            onValueChange={(value: "income" | "expense" | "both") =>
+              form.setValue("type", value)
+            }
+            disabled={category.isDefault}
+          >
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="Selecione o tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="income">Receita</SelectItem>
+              <SelectItem value="expense">Despesa</SelectItem>
+              <SelectItem value="both">Ambos</SelectItem>
+            </SelectContent>
+          </Select>
+        </FormModalField>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Cor</Label>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORY_COLORS.map((colorOption) => (
-                    <button
-                      key={colorOption}
-                      type="button"
-                      className={`w-8 h-8 rounded-full border-2 ${
-                        color === colorOption
-                          ? "border-primary"
-                          : "border-transparent"
-                      }`}
-                      style={{ backgroundColor: colorOption }}
-                      onClick={() => setColor(colorOption)}
-                      disabled={category.isDefault}
-                    />
-                  ))}
-                </div>
-              </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Cor</label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORY_COLORS.map((colorOption) => (
+              <button
+                key={colorOption}
+                type="button"
+                className={`w-8 h-8 rounded-full border-2 ${
+                  form.watch("color") === colorOption
+                    ? "border-primary"
+                    : "border-transparent"
+                }`}
+                style={{ backgroundColor: colorOption }}
+                onClick={() => form.setValue("color", colorOption)}
+                disabled={category.isDefault}
+              />
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Selecione uma cor para identificar visualmente a categoria
+          </p>
+        </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Ícone</Label>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORY_ICONS.map((iconOption) => (
-                    <button
-                      key={iconOption}
-                      type="button"
-                      className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${
-                        icon === iconOption
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                      onClick={() => setIcon(iconOption)}
-                      disabled={category.isDefault}
-                    >
-                      {iconOption}
-                    </button>
-                  ))}
-                </div>
-              </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Ícone</label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORY_ICONS.map((iconOption) => (
+              <button
+                key={iconOption}
+                type="button"
+                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${
+                  form.watch("icon") === iconOption
+                    ? "border-primary bg-primary/10"
+                    : "border-border hover:border-primary/50"
+                }`}
+                onClick={() => form.setValue("icon", iconOption)}
+                disabled={category.isDefault}
+              >
+                {iconOption}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Escolha um ícone para representar a categoria
+          </p>
+        </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  className="flex-1"
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading || !name.trim() || category.isDefault}
-                  className="flex-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2Icon className="h-4 w-4 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    <>
-                      <SaveIcon className="h-4 w-4" />
-                      Salvar Alterações
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </DialogContent>
-    </Dialog>
+        <FormModalActions
+          onCancel={handleClose}
+          submitText="Salvar Alterações"
+          submitIcon={SaveIcon}
+          isLoading={isLoading}
+          isDisabled={!form.watch("name")?.trim() || category.isDefault}
+        />
+      </FormModalFormWithHook>
+    </FormModal>
   );
 }

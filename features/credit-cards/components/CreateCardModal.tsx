@@ -1,20 +1,21 @@
-import { FormModal, QuickCreateButton } from "@/features/shared/components";
-import { Input, Label } from "@/features/shared/components/ui";
-import {
-  CreditCardIcon,
-  DollarSignIcon,
-  PlusIcon,
-} from "lucide-react";
-import { useState } from "react";
+import { 
+  FormModal,
+  FormModalHeader,
+  FormModalField,
+  FormModalActions,
+  FormModalFormWithHook,
+  QuickCreateButton
+} from "@/features/shared/components";
+import { Input } from "@/features/shared/components/ui";
+import { CreditCardCreateInput, CreditCardCreateSchema } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreditCardIcon, PlusIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 interface CreateCardModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: {
-    name: string;
-    limit: string;
-    currentBill: string;
-  }) => void;
+  onSubmit: (data: CreditCardCreateInput) => void;
   isLoading: boolean;
 }
 
@@ -24,29 +25,23 @@ export function CreateCardModal({
   onSubmit,
   isLoading,
 }: CreateCardModalProps) {
-  const [name, setName] = useState("");
-  const [limit, setLimit] = useState<number>(0);
-  const [currentBill, setCurrentBill] = useState<number>(0);
+  const form = useForm<CreditCardCreateInput>({
+    resolver: zodResolver(CreditCardCreateSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      limit: "0",
+      currentBill: "0",
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      name,
-      limit: limit.toString(),
-      currentBill: currentBill.toString(),
-    });
-    setName("");
-    setLimit(0);
-  };
-
-  const resetForm = () => {
-    setName("");
-    setLimit(0);
-    setCurrentBill(0);
+  const handleSubmit = (data: CreditCardCreateInput) => {
+    onSubmit(data);
+    handleClose();
   };
 
   const handleClose = () => {
-    resetForm();
+    form.reset();
     onOpenChange(false);
   };
 
@@ -62,7 +57,7 @@ export function CreateCardModal({
         </QuickCreateButton>
       }
     >
-      <FormModal.Header
+      <FormModalHeader
         icon={CreditCardIcon}
         iconColor="text-blue-500"
         iconBgColor="bg-blue-500/10"
@@ -70,97 +65,74 @@ export function CreateCardModal({
         description="Cadastre um novo cartão para controlar suas despesas"
       />
 
-      <FormModal.Form onSubmit={handleSubmit}>
-        <div className="space-y-2">
-          <Label
-            htmlFor="cardName"
-            className="text-sm font-medium flex items-center gap-2"
-          >
-            <CreditCardIcon className="h-4 w-4" />
-            Nome do Cartão
-          </Label>
+      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+        <FormModalField
+          form={form}
+          name="name"
+          label="Nome do Cartão"
+          description="Escolha um nome que facilite a identificação do cartão"
+          required
+        >
           <Input
             type="text"
-            id="cardName"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Cartão Principal"
             className="h-11"
             autoFocus
-            required
+            {...form.register("name")}
           />
-          <p className="text-xs text-muted-foreground">
-            Escolha um nome que facilite a identificação do cartão
-          </p>
-        </div>
+        </FormModalField>
 
-        <div className="space-y-2">
-          <Label
-            htmlFor="cardLimit"
-            className="text-sm font-medium flex items-center gap-2"
-          >
-            <DollarSignIcon className="h-4 w-4" />
-            Limite do Cartão
-          </Label>
+        <FormModalField
+          form={form}
+          name="limit"
+          label="Limite do Cartão"
+          description="Informe o limite disponível do seu cartão de crédito"
+          required
+        >
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
               R$
             </span>
             <Input
               type="number"
-              id="cardLimit"
-              value={limit || ""}
-              onChange={(e) => setLimit(parseFloat(e.target.value) || 0)}
               placeholder="0,00"
               className="h-11 pl-10"
               step="0.01"
               min="0"
-              required
+              {...form.register("limit")}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            Informe o limite disponível do seu cartão de crédito
-          </p>
-        </div>
+        </FormModalField>
 
-        <div className="space-y-2">
-          <Label
-            htmlFor="currentBill"
-            className="text-sm font-medium flex items-center gap-2"
-          >
-            <DollarSignIcon className="h-4 w-4" />
-            Fatura Atual
-          </Label>
+        <FormModalField
+          form={form}
+          name="currentBill"
+          label="Fatura Atual"
+          description="Valor da fatura atual do cartão (opcional)"
+        >
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
               R$
             </span>
             <Input
               type="number"
-              id="currentBill"
-              value={currentBill || ""}
-              onChange={(e) =>
-                setCurrentBill(parseFloat(e.target.value) || 0)
-              }
               placeholder="0,00"
               className="h-11 pl-10"
               step="0.01"
               min="0"
+              {...form.register("currentBill")}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            Valor da fatura atual do cartão (opcional)
-          </p>
-        </div>
+        </FormModalField>
 
-        <FormModal.Actions
+        <FormModalActions
+          form={form}
           onCancel={handleClose}
           submitText="Criar Cartão"
           submitIcon={PlusIcon}
           isLoading={isLoading}
-          isDisabled={!name.trim()}
         />
-      </FormModal.Form>
+      </FormModalFormWithHook>
     </FormModal>
   );
 }

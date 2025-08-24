@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { toast } from "sonner";
+import { TransactionCreateInput } from "@/lib/schemas";
 import {
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransaction,
 } from "../data";
 import { Transaction } from "@/lib/schemas";
+import { toast } from "sonner";
 
 /**
  * Hook for managing transaction actions and UI state
@@ -21,15 +22,7 @@ export function useTransactionActions() {
   const updateTransactionMutation = useUpdateTransaction();
   const deleteTransactionMutation = useDeleteTransaction();
 
-  const createTransaction = async (data: {
-    description: string;
-    amount: string;
-    type: "income" | "expense" | "transfer";
-    date: string;
-    categoryId: number;
-    accountId?: number;
-    creditCardId?: number;
-  }) => {
+  const createTransaction = async (data: TransactionCreateInput) => {
     return new Promise<void>((resolve, reject) => {
       createTransactionMutation.mutate(data, {
         onSuccess: () => {

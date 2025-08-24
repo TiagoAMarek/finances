@@ -72,24 +72,24 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = TransactionCreateSchema.parse(body);
 
-    // Validate category ownership and type compatibility
-    const [category] = await db
-      .select()
-      .from(categories)
-      .where(
-        and(
-          eq(categories.id, validatedData.categoryId),
-          eq(categories.ownerId, user.userId),
-        ),
-      )
-      .limit(1);
+    // Validate category ownership and type compatibility for non-transfer transactions
+    if (validatedData.type !== "transfer" && validatedData.categoryId) {
+      const [category] = await db
+        .select()
+        .from(categories)
+        .where(
+          and(
+            eq(categories.id, validatedData.categoryId),
+            eq(categories.ownerId, user.userId),
+          ),
+        )
+        .limit(1);
 
-    if (!category) {
-      return createErrorResponse("Categoria não encontrada", 404);
-    }
+      if (!category) {
+        return createErrorResponse("Categoria não encontrada", 404);
+      }
 
-    // Validate category type compatibility with transaction type
-    if (validatedData.type !== "transfer") {
+      // Validate category type compatibility with transaction type
       if (category.type !== "both" && category.type !== validatedData.type) {
         return createErrorResponse(
           "Tipo de categoria incompatível com o tipo de transação",

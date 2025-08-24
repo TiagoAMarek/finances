@@ -1,17 +1,17 @@
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCategories } from "@/features/categories/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
+import { 
+  FormModal,
+  FormModalHeader,
+  FormModalField,
+  FormModalActions,
+  FormModalFormWithHook 
+} from "@/features/shared/components/FormModal";
+
+
 import {
-  Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   Input,
-  Label,
   RadioGroup,
   RadioGroupItem,
   Select,
@@ -20,28 +20,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/features/shared/components/ui";
+
+
 import {
-  CalendarIcon,
-  DollarSignIcon,
-  Loader2Icon,
-  PlusIcon,
-  Receipt,
-  TagIcon,
-} from "lucide-react";
-import { useState } from "react";
+  TransactionCreateInput,
+  TransactionFormInput,
+  TransactionFormSchema,
+} from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PlusIcon, Receipt } from "lucide-react";
+import { useEffect, useMemo, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { FormModalBase } from "@/features/shared/components/FormModal/FormModalBase";
 
 interface CreateTransactionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: {
-    description: string;
-    amount: string;
-    type: "income" | "expense" | "transfer";
-    date: string;
-    categoryId: number;
-    accountId?: number;
-    creditCardId?: number;
-  }) => void;
+  onSubmit: (data: TransactionCreateInput) => void;
   isLoading: boolean;
 }
 
@@ -51,368 +46,314 @@ export function CreateTransactionModal({
   onSubmit,
   isLoading,
 }: CreateTransactionModalProps) {
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState<number>(0);
-  const [type, setType] = useState<"income" | "expense">("expense");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
-  const [sourceType, setSourceType] = useState<"account" | "creditCard">(
-    "account",
-  );
-  const [selectedAccount, setSelectedAccount] = useState<number | undefined>(
-    undefined,
-  );
-  const [selectedCreditCard, setSelectedCreditCard] = useState<
-    number | undefined
-  >(undefined);
-
   const { data: accounts = [] } = useGetAccounts();
   const { data: creditCards = [] } = useGetCreditCards();
   const { data: categories = [] } = useGetCategories();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validação: deve ter uma conta OU um cartão, nunca ambos ou nenhum
-    if (sourceType === "account" && !selectedAccount) {
-      alert("Selecione uma conta bancária");
-      return;
-    }
-
-    if (sourceType === "creditCard" && !selectedCreditCard) {
-      alert("Selecione um cartão de crédito");
-      return;
-    }
-
-    if (!categoryId) {
-      alert("Selecione uma categoria");
-      return;
-    }
-
-    onSubmit({
-      description,
-      amount: amount.toString(),
-      type,
-      date,
-      categoryId,
-      accountId: sourceType === "account" ? selectedAccount : undefined,
-      creditCardId:
-        sourceType === "creditCard" ? selectedCreditCard : undefined,
-    });
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setDescription("");
-    setAmount(0);
-    setType("expense");
-    setDate(new Date().toISOString().split("T")[0]);
-    setCategoryId(undefined);
-    setSourceType("account");
-    setSelectedAccount(undefined);
-    setSelectedCreditCard(undefined);
-  };
-
-  const handleClose = () => {
-    resetForm();
-    onOpenChange(false);
-  };
-
-  // Filter categories based on transaction type
-  const filteredCategories = categories.filter((category) => {
-    if (category.type === "both") return true;
-    return category.type === type;
+  const form = useForm<TransactionFormInput>({
+    resolver: zodResolver(TransactionFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      description: "",
+      amount: "",
+      type: "expense" as const,
+      date: new Date().toISOString().split("T")[0],
+      categoryId: undefined,
+      accountId: undefined,
+      creditCardId: undefined,
+    },
   });
 
+  const { watch, setValue, reset } = form;
+  const watchedType = watch("type");
+  const watchedAccountId = watch("accountId");
+  const watchedCreditCardId = watch("creditCardId");
+
+  // Memoized source type determination
+  const sourceType = useMemo(() => {
+    return watchedAccountId
+      ? "account"
+      : watchedCreditCardId
+        ? "creditCard"
+        : "account";
+  }, [watchedAccountId, watchedCreditCardId]);
+
+  const handleClose = useCallback(() => {
+    reset();
+    onOpenChange(false);
+  }, [reset, onOpenChange]);
+
+  const handleSubmit = useCallback(
+    (data: TransactionFormInput) => {
+      // Convert form data to API data by ensuring categoryId is present for non-transfers
+      const createData: TransactionCreateInput = {
+        ...data,
+        categoryId: data.categoryId,
+      };
+      onSubmit(createData);
+      handleClose();
+    },
+    [onSubmit, handleClose],
+  );
+
+  const handleSourceTypeChange = useCallback(
+    (_newSourceType: "account" | "creditCard") => {
+      // Clear both fields when switching source type to ensure clean state
+      setValue("accountId", undefined);
+      setValue("creditCardId", undefined);
+    },
+    [setValue],
+  );
+
+  // Memoized category filtering to prevent unnecessary recalculations
+  const filteredCategories = useMemo(() => {
+    return categories.filter((category) => {
+      if (category.type === "both") return true;
+      return category.type === watchedType;
+    });
+  }, [categories, watchedType]);
+
+  // Reset category when type changes and current category is not valid
+  useEffect(() => {
+    const currentCategoryId = watch("categoryId");
+    if (currentCategoryId) {
+      const currentCategory = categories.find(
+        (cat) => cat.id === currentCategoryId,
+      );
+      if (
+        currentCategory &&
+        currentCategory.type !== "both" &&
+        currentCategory.type !== watchedType
+      ) {
+        setValue("categoryId", undefined);
+      }
+    }
+  }, [watchedType, categories, watch, setValue]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="text-center space-y-3 pb-4">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Receipt className="h-6 w-6 text-primary" />
-          </div>
-          <div className="space-y-1">
-            <DialogTitle className="text-xl">Novo Lançamento</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Registre uma receita, despesa ou transferência
-            </DialogDescription>
-          </div>
-        </DialogHeader>
+    <FormModal open={open} onOpenChange={onOpenChange} size="lg">
+      <FormModalHeader
+        icon={Receipt}
+        title="Novo Lançamento"
+        description="Registre uma receita, despesa ou transferência"
+      />
 
-        <Card className="border-dashed">
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="description"
-                    className="text-sm font-medium flex items-center gap-2"
-                  >
-                    <Receipt className="h-4 w-4" />
-                    Descrição
-                  </Label>
-                  <Input
-                    type="text"
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Ex: Compra no supermercado"
-                    className="h-11"
-                    autoFocus
-                    required
-                  />
-                </div>
+      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormModalField
+            form={form}
+            name="description"
+            label="Descrição"
+            required
+          >
+            <Input
+              type="text"
+              placeholder="Ex: Compra no supermercado"
+              className="h-11"
+              autoFocus
+              {...form.register("description")}
+            />
+          </FormModalField>
 
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="amount"
-                    className="text-sm font-medium flex items-center gap-2"
-                  >
-                    <DollarSignIcon className="h-4 w-4" />
-                    Valor
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                      R$
-                    </span>
-                    <Input
-                      type="number"
-                      id="amount"
-                      value={amount || ""}
-                      onChange={(e) =>
-                        setAmount(parseFloat(e.target.value) || 0)
-                      }
-                      placeholder="0,00"
-                      className="h-11 pl-10"
-                      step="0.01"
-                      min="0"
-                      required
-                    />
+          <FormModalField form={form} name="amount" label="Valor" required>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                R$
+              </span>
+              <Input
+                type="number"
+                placeholder="0,00"
+                className="h-11 pl-10"
+                step="0.01"
+                min="0"
+                {...form.register("amount")}
+              />
+            </div>
+          </FormModalField>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormModalField form={form} name="type" label="Tipo" required>
+            <Select
+              value={form.watch("type")}
+              onValueChange={(value) =>
+                form.setValue("type", value as "income" | "expense")
+              }
+            >
+              <SelectTrigger className="h-11">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expense">
+                  <div className="flex items-center gap-2">
+                    <span className="text-red-500">📤</span>
+                    Despesa
                   </div>
-                </div>
+                </SelectItem>
+                <SelectItem value="income">
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">📥</span>
+                    Receita
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FormModalField>
+
+          <FormModalField form={form} name="date" label="Data" required>
+            <Input type="date" className="h-11" {...form.register("date")} />
+          </FormModalField>
+        </div>
+
+        <FormModalField
+          form={form}
+          name="categoryId"
+          label="Categoria"
+          required
+        >
+          <div>
+            <Select
+              value={form.watch("categoryId")?.toString() || ""}
+              onValueChange={(value) =>
+                form.setValue("categoryId", value ? parseInt(value) : undefined)
+              }
+            >
+              <SelectTrigger className="h-11">
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredCategories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: category.color || "#64748b",
+                        }}
+                      />
+                      <span>{category.icon}</span>
+                      <span>{category.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {filteredCategories.length === 0 && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Nenhuma categoria disponível para este tipo de transação.
+              </p>
+            )}
+          </div>
+        </FormModalField>
+
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <label className="text-sm font-medium">
+              Origem do Lançamento *
+            </label>
+            <RadioGroup
+              value={sourceType}
+              onValueChange={handleSourceTypeChange}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="account" id="account-radio" />
+                <label htmlFor="account-radio" className="cursor-pointer">
+                  🏦 Conta Bancária
+                </label>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="type" className="text-sm font-medium">
-                    Tipo
-                  </Label>
-                  <Select
-                    value={type}
-                    onValueChange={(value) =>
-                      setType(value as "income" | "expense")
-                    }
-                  >
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="expense">
-                        <div className="flex items-center gap-2">
-                          <span className="text-red-500">📤</span>
-                          Despesa
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="income">
-                        <div className="flex items-center gap-2">
-                          <span className="text-green-500">📥</span>
-                          Receita
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="date"
-                    className="text-sm font-medium flex items-center gap-2"
-                  >
-                    <CalendarIcon className="h-4 w-4" />
-                    Data
-                  </Label>
-                  <Input
-                    type="date"
-                    id="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="h-11"
-                    required
-                  />
-                </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="creditCard" id="creditCard-radio" />
+                <label htmlFor="creditCard-radio" className="cursor-pointer">
+                  💳 Cartão de Crédito
+                </label>
               </div>
+            </RadioGroup>
+          </div>
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="category"
-                  className="text-sm font-medium flex items-center gap-2"
-                >
-                  <TagIcon className="h-4 w-4" />
-                  Categoria
-                </Label>
+          {sourceType === "account" && (
+            <FormModalField
+              form={form}
+              name="accountId"
+              label="Selecione a Conta Bancária"
+              required
+            >
+              <div>
                 <Select
-                  value={categoryId?.toString() || ""}
+                  value={form.watch("accountId")?.toString() || ""}
                   onValueChange={(value) =>
-                    setCategoryId(value ? parseInt(value) : undefined)
+                    form.setValue(
+                      "accountId",
+                      value ? parseInt(value) : undefined,
+                    )
                   }
-                  required
                 >
                   <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Selecione uma categoria" />
+                    <SelectValue placeholder="Escolha uma conta bancária" />
                   </SelectTrigger>
                   <SelectContent>
-                    {filteredCategories.map((category) => (
-                      <SelectItem
-                        key={category.id}
-                        value={category.id.toString()}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-3 h-3 rounded-full"
-                            style={{
-                              backgroundColor: category.color || "#64748b",
-                            }}
-                          />
-                          <span>{category.icon}</span>
-                          <span>{category.name}</span>
-                        </div>
+                    {accounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id.toString()}>
+                        {account.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {filteredCategories.length === 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Nenhuma categoria disponível para este tipo de transação.
+                {accounts.length === 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Nenhuma conta bancária disponível.
                   </p>
                 )}
               </div>
+            </FormModalField>
+          )}
 
-              <div className="space-y-4">
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">
-                    Origem do Lançamento *
-                  </Label>
-                  <RadioGroup
-                    value={sourceType}
-                    onValueChange={(value: "account" | "creditCard") => {
-                      setSourceType(value);
-                      // Limpar seleções quando mudar o tipo
-                      setSelectedAccount(undefined);
-                      setSelectedCreditCard(undefined);
-                    }}
-                    className="flex flex-col space-y-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="account" id="account-radio" />
-                      <Label htmlFor="account-radio" className="cursor-pointer">
-                        🏦 Conta Bancária
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value="creditCard"
-                        id="creditCard-radio"
-                      />
-                      <Label
-                        htmlFor="creditCard-radio"
-                        className="cursor-pointer"
-                      >
-                        💳 Cartão de Crédito
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
-                {sourceType === "account" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="account" className="text-sm font-medium">
-                      Selecione a Conta Bancária *
-                    </Label>
-                    <Select
-                      value={selectedAccount?.toString() || ""}
-                      onValueChange={(value) =>
-                        setSelectedAccount(value ? parseInt(value) : undefined)
-                      }
-                      required
-                    >
-                      <SelectTrigger className="h-11">
-                        <SelectValue placeholder="Escolha uma conta bancária" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {accounts.map((account) => (
-                          <SelectItem
-                            key={account.id}
-                            value={account.id.toString()}
-                          >
-                            {account.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {sourceType === "creditCard" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="creditCard" className="text-sm font-medium">
-                      Selecione o Cartão de Crédito *
-                    </Label>
-                    <Select
-                      value={selectedCreditCard?.toString() || ""}
-                      onValueChange={(value) =>
-                        setSelectedCreditCard(
-                          value ? parseInt(value) : undefined,
-                        )
-                      }
-                      required
-                    >
-                      <SelectTrigger className="h-11">
-                        <SelectValue placeholder="Escolha um cartão de crédito" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {creditCards.map((card) => (
-                          <SelectItem key={card.id} value={card.id.toString()}>
-                            {card.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+          {sourceType === "creditCard" && (
+            <FormModalField
+              form={form}
+              name="creditCardId"
+              label="Selecione o Cartão de Crédito"
+              required
+            >
+              <div>
+                <Select
+                  value={form.watch("creditCardId")?.toString() || ""}
+                  onValueChange={(value) =>
+                    form.setValue(
+                      "creditCardId",
+                      value ? parseInt(value) : undefined,
+                    )
+                  }
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Escolha um cartão de crédito" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {creditCards.map((card) => (
+                      <SelectItem key={card.id} value={card.id.toString()}>
+                        {card.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {creditCards.length === 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Nenhum cartão de crédito disponível.
+                  </p>
                 )}
               </div>
+            </FormModalField>
+          )}
+        </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  className="flex-1"
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading || !description.trim() || !categoryId}
-                  className="flex-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2Icon className="h-4 w-4 animate-spin" />
-                      Criando...
-                    </>
-                  ) : (
-                    <>
-                      <PlusIcon className="h-4 w-4" />
-                      Criar Lançamento
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </DialogContent>
-    </Dialog>
+        <FormModalActions
+          form={form}
+          onCancel={handleClose}
+          submitText="Criar Lançamento"
+          submitIcon={PlusIcon}
+          isLoading={isLoading}
+        />
+      </FormModalFormWithHook>
+    </FormModal>
   );
 }
