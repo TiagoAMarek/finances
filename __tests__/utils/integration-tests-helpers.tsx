@@ -19,7 +19,7 @@ export const setupEmptyDataHandlers = () => {
 export const createDelayedHandler = (
   endpoint: string,
   delay: number,
-  responseData: any = [],
+  responseData: Record<string, unknown> | unknown[] = [],
 ) => {
   return http.get(endpoint, async () => {
     await new Promise((resolve) => setTimeout(resolve, delay));
@@ -33,7 +33,7 @@ export const createDelayedHandler = (
 export const createRetryHandler = (
   endpoint: string,
   failureCount: number,
-  successData: any,
+  successData: Record<string, unknown> | unknown[],
   errorMessage = "Erro temporário",
 ) => {
   let attemptCount = 0;

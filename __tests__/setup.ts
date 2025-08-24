@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
 
 // Mock next/image
 vi.mock("next/image", () => ({
-  default: (props: any) => {
+  default: (props: { src: string; alt: string; [key: string]: unknown }) => {
     const { src, alt, ...rest } = props;
     // Return a simple object representation for tests
     return {
@@ -43,16 +43,16 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Needed by Radix UI in jsdom
-(global.HTMLElement.prototype as any).hasPointerCapture = function () {
-  return false as any;
+(global.HTMLElement.prototype as unknown as { hasPointerCapture: () => boolean }).hasPointerCapture = function () {
+  return false;
 };
 // scrollIntoView is not implemented in jsdom
-if (!(global.HTMLElement.prototype as any).scrollIntoView) {
-  (global.HTMLElement.prototype as any).scrollIntoView = vi.fn();
+if (!(global.HTMLElement.prototype as unknown as { scrollIntoView?: () => void }).scrollIntoView) {
+  (global.HTMLElement.prototype as unknown as { scrollIntoView: () => void }).scrollIntoView = vi.fn();
 }
 
 // Mock chart.js canvas context
-(global.HTMLCanvasElement.prototype as any).getContext = vi.fn();
+(global.HTMLCanvasElement.prototype as unknown as { getContext: () => void }).getContext = vi.fn();
 
 // Mock sonner toast
 vi.mock("sonner", () => ({
@@ -80,7 +80,7 @@ vi.mock("sonner", () => ({
   } as unknown as DOMRect;
 
   // Patch immediately for test runtime
-  (global.HTMLElement.prototype as any).getBoundingClientRect = function () {
+  (global.HTMLElement.prototype as unknown as { getBoundingClientRect: () => DOMRect }).getBoundingClientRect = function () {
     const el = this as HTMLElement;
     const className = (el.className || "").toString();
     const isRechartsContainer = className.includes("recharts-responsive-container");

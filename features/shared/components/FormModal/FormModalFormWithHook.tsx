@@ -1,14 +1,15 @@
+import { FieldValues } from "react-hook-form";
 import { Card, CardContent } from "../ui/card";
 import type { FormModalFormWithHookProps } from "./types";
 
 /**
  * Enhanced FormModal Form with react-hook-form integration
  */
-export function FormModalFormWithHook({
+export function FormModalFormWithHook<T extends FieldValues = FieldValues>({
   form,
   onSubmit,
   children,
-}: FormModalFormWithHookProps) {
+}: FormModalFormWithHookProps<T>) {
   return (
     <Card className="border-dashed">
       <CardContent className="pt-6">
@@ -19,3 +20,4 @@ export function FormModalFormWithHook({
     </Card>
   );
 }
+

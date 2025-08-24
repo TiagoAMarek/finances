@@ -1,7 +1,3 @@
-// ============================================================================
-// CONFIGURATION AND CONSTANTS
-// ============================================================================
-
 /** Modal size configuration */
 export const MODAL_SIZE_CLASSES = {
   sm: "sm:max-w-sm",
@@ -11,8 +7,8 @@ export const MODAL_SIZE_CLASSES = {
 
 /** Loading text configuration */
 export const LOADING_TEXT_MAP = {
-  "Criando": "Criando...",
-  "Salvando": "Salvando...",
+  Criando: "Criando...",
+  Salvando: "Salvando...",
   default: "Processando...",
 } as const;
 
@@ -24,3 +20,4 @@ export const DEFAULT_MODAL_CONFIG = {
   iconColor: "text-primary",
   iconBgColor: "bg-primary/10",
 } as const;
+

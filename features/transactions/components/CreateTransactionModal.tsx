@@ -1,14 +1,13 @@
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCategories } from "@/features/categories/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
-import { 
+import {
   FormModal,
   FormModalHeader,
   FormModalField,
   FormModalActions,
-  FormModalFormWithHook 
+  FormModalFormWithHook,
 } from "@/features/shared/components/FormModal";
-
 
 import {
   Input,
@@ -21,7 +20,6 @@ import {
   SelectValue,
 } from "@/features/shared/components/ui";
 
-
 import {
   TransactionCreateInput,
   TransactionFormInput,
@@ -31,7 +29,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon, Receipt } from "lucide-react";
 import { useEffect, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { FormModalBase } from "@/features/shared/components/FormModal/FormModalBase";
 
 interface CreateTransactionModalProps {
   open: boolean;
@@ -85,25 +82,17 @@ export function CreateTransactionModal({
 
   const handleSubmit = useCallback(
     (data: TransactionFormInput) => {
-      // Convert form data to API data by ensuring categoryId is present for non-transfers
-      const createData: TransactionCreateInput = {
-        ...data,
-        categoryId: data.categoryId,
-      };
-      onSubmit(createData);
+      onSubmit(data);
       handleClose();
     },
     [onSubmit, handleClose],
   );
 
-  const handleSourceTypeChange = useCallback(
-    (_newSourceType: "account" | "creditCard") => {
-      // Clear both fields when switching source type to ensure clean state
-      setValue("accountId", undefined);
-      setValue("creditCardId", undefined);
-    },
-    [setValue],
-  );
+  const handleSourceTypeChange = useCallback(() => {
+    // Clear both fields when switching source type to ensure clean state
+    setValue("accountId", undefined);
+    setValue("creditCardId", undefined);
+  }, [setValue]);
 
   // Memoized category filtering to prevent unnecessary recalculations
   const filteredCategories = useMemo(() => {
@@ -293,7 +282,10 @@ export function CreateTransactionModal({
                   </SelectTrigger>
                   <SelectContent>
                     {accounts.map((account) => (
-                      <SelectItem key={account.id} value={account.id.toString()}>
+                      <SelectItem
+                        key={account.id}
+                        value={account.id.toString()}
+                      >
                         {account.name}
                       </SelectItem>
                     ))}

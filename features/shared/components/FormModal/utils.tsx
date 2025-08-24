@@ -2,20 +2,16 @@ import { UseFormReturn, FieldValues } from "react-hook-form";
 import { LucideIcon } from "lucide-react";
 import { LOADING_TEXT_MAP } from "./constants";
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
 /**
  * Determines loading text based on submit text content
  * @param submitText - The submit button text
  * @returns Appropriate loading text
  */
 export const getLoadingText = (submitText: string): string => {
-  const key = Object.keys(LOADING_TEXT_MAP).find(k => 
-    k !== "default" && submitText.includes(k)
+  const key = Object.keys(LOADING_TEXT_MAP).find(
+    (k) => k !== "default" && submitText.includes(k),
   ) as keyof typeof LOADING_TEXT_MAP;
-  
+
   return LOADING_TEXT_MAP[key] || LOADING_TEXT_MAP.default;
 };
 
@@ -33,6 +29,9 @@ export const renderIcon = (IconComponent: LucideIcon, className: string) => {
  * @param formState - React Hook Form's form state
  * @returns Whether the form is valid
  */
-export const isFormValid = <T extends FieldValues>(formState: UseFormReturn<T>['formState']): boolean => {
+export const isFormValid = <T extends FieldValues>(
+  formState: UseFormReturn<T>["formState"],
+): boolean => {
   return formState.isValid && !Object.keys(formState.errors).length;
 };
+

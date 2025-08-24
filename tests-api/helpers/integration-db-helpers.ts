@@ -105,6 +105,7 @@ export function createIntegrationTestDb() {
 
 // Helper to create a test user with hashed password
 export async function createTestUser(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: any,
   userData: { name?: string; email?: string; password?: string } = {},
 ) {
@@ -134,6 +135,7 @@ export async function createTestUser(
 
 // Helper to create test bank account
 export async function createTestBankAccount(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: any,
   userId: number,
   accountData: { name?: string; balance?: string } = {},
@@ -152,6 +154,7 @@ export async function createTestBankAccount(
 
 // Helper to create test credit card
 export async function createTestCreditCard(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: any,
   userId: number,
   cardData: { name?: string; limit?: string } = {},
@@ -171,6 +174,7 @@ export async function createTestCreditCard(
 
 // Helper to create test category
 export async function createTestCategory(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: any,
   userId: number,
   categoryData: {
@@ -197,6 +201,7 @@ export async function createTestCategory(
 
 // Helper to create test transaction
 export async function createTestTransaction(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: any,
   userId: number,
   transactionData: {

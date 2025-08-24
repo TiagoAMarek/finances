@@ -1,20 +1,20 @@
 import { useMemo } from "react";
+import { FieldValues } from "react-hook-form";
 import { FormField } from "../ui/form-field";
 import type { FieldValidationState, FormModalFieldProps } from "./types";
-
 
 /**
  * Enhanced FormModal Field with react-hook-form integration
  * Optimized with memoized validation state calculation
  */
-export function FormModalField({
+export function FormModalField<T extends FieldValues = FieldValues>({
   form,
   name,
   label,
   description,
   required = false,
   children,
-}: FormModalFieldProps) {
+}: FormModalFieldProps<T>) {
   const {
     formState: { errors, touchedFields },
     watch,
@@ -22,10 +22,9 @@ export function FormModalField({
 
   // Memoized field validation state to prevent unnecessary recalculations
   const fieldValidation = useMemo<FieldValidationState>(() => {
-    const fieldError = errors[name];
+    const fieldError = errors[name as keyof typeof errors];
     const isTouched = name in touchedFields;
-    const watchedValue = watch(name);
-    const isValid = isTouched && !fieldError && !!watchedValue;
+    const watchedValue = watch(name); const isValid = isTouched && !fieldError && !!watchedValue;
 
     return {
       error:

@@ -1,4 +1,5 @@
-import { memo, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
+import { FieldValues } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
 import { DEFAULT_MODAL_CONFIG } from "./constants";
@@ -9,7 +10,7 @@ import type { FormModalActionsProps } from "./types";
  * Unified FormModal Actions - handles both traditional and hook form approaches
  * Automatically detects form instance and applies appropriate validation logic
  */
-export const FormModalActions = memo(function FormModalActions({
+function FormModalActionsImpl<T extends FieldValues = FieldValues>({
   onCancel,
   cancelText = DEFAULT_MODAL_CONFIG.cancelText,
   submitText,
@@ -17,7 +18,7 @@ export const FormModalActions = memo(function FormModalActions({
   isLoading,
   isDisabled = false,
   form,
-}: FormModalActionsProps) {
+}: FormModalActionsProps<T>) {
   // Memoized loading text calculation
   const loadingText = useMemo(() => getLoadingText(submitText), [submitText]);
 
@@ -78,4 +79,7 @@ export const FormModalActions = memo(function FormModalActions({
       </Button>
     </div>
   );
-});
+}
+
+// Export as generic component
+export const FormModalActions = FormModalActionsImpl;

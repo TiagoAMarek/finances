@@ -23,12 +23,6 @@ import { localStorageMock } from "./test-utils";
  * managing auth state, and simulating various auth scenarios.
  */
 
-type FetchResult<T> = {
-  response: Response;
-  data: T | Record<string, unknown>;
-  status: number;
-};
-
 export const authTestHelpers = {
   // ===================
   // Auth State Management
@@ -200,11 +194,11 @@ export const authTestHelpers = {
   /**
    * Fill login form with valid credentials
    */
-  fillLoginForm: (
+   fillLoginForm: (
     getByLabelText: (text: RegExp) => HTMLInputElement,
     getByRole?: (
       role: string,
-      options?: Record<string, any>,
+      options?: Record<string, unknown>,
     ) => HTMLElement | null,
   ) => {
     const credentials = authTestHelpers.getValidCredentials();
@@ -236,11 +230,11 @@ export const authTestHelpers = {
   /**
    * Fill registration form with valid data
    */
-  fillRegistrationForm: (
+   fillRegistrationForm: (
     getByLabelText: (text: RegExp) => HTMLInputElement,
     getByRole?: (
       role: string,
-      options?: Record<string, any>,
+      options?: Record<string, unknown>,
     ) => HTMLElement | null,
   ) => {
     const registrationData = authTestHelpers.getValidRegistrationData();
@@ -368,7 +362,7 @@ export const authTestHelpers = {
       ...(options ?? {}),
       headers: {
         Authorization: `Bearer ${authUser.token}`,
-        ...((options as any)?.headers ?? {}),
+        ...((options as RequestInit)?.headers ?? {}),
       },
     });
 

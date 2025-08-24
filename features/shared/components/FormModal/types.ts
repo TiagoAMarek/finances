@@ -1,11 +1,7 @@
 import { ReactNode } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 import { LucideIcon } from "lucide-react";
 import { MODAL_SIZE_CLASSES } from "./constants";
-
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
 
 /** Modal size types */
 export type ModalSize = keyof typeof MODAL_SIZE_CLASSES;
@@ -75,11 +71,11 @@ export interface FormModalFormProps {
 /**
  * Enhanced FormModal form props with react-hook-form integration
  */
-export interface FormModalFormWithHookProps {
+export interface FormModalFormWithHookProps<T extends FieldValues = FieldValues> {
   /** React Hook Form instance */
-  form: UseFormReturn<any>;
+  form: UseFormReturn<T>;
   /** Form submission handler with typed data */
-  onSubmit: (data: any) => void;
+  onSubmit: (data: T) => void;
   /** Form content and fields */
   children: ReactNode;
 }
@@ -87,7 +83,7 @@ export interface FormModalFormWithHookProps {
 /**
  * Unified FormModal actions props supporting both traditional and hook form approaches
  */
-export interface FormModalActionsProps {
+export interface FormModalActionsProps<T extends FieldValues = FieldValues> {
   /** Cancel button handler */
   onCancel: () => void;
   /** Cancel button text (default: "Cancelar") */
@@ -101,17 +97,17 @@ export interface FormModalActionsProps {
   /** Manual disable override (for traditional forms) */
   isDisabled?: boolean;
   /** Optional form instance for automatic validation */
-  form?: UseFormReturn<any>;
+  form?: UseFormReturn<T>;
 }
 
 /**
  * FormModal field props for react-hook-form integration
  */
-export interface FormModalFieldProps {
+export interface FormModalFieldProps<T extends FieldValues = FieldValues> {
   /** React Hook Form instance */
-  form: UseFormReturn<any>;
+  form: UseFormReturn<T>;
   /** Field name with type safety */
-  name: string;
+  name: Path<T>;
   /** Field label text */
   label: string;
   /** Optional field description */
@@ -126,9 +122,9 @@ export interface FormModalFieldProps {
  * @deprecated Legacy FormModal actions props - kept for backward compatibility
  * Use FormModalActionsProps with form prop instead
  */
-export interface FormModalActionsWithFormProps {
+export interface FormModalActionsWithFormProps<T extends FieldValues = FieldValues> {
   /** React Hook Form instance */
-  form: UseFormReturn<any>;
+  form: UseFormReturn<T>;
   /** Cancel button handler */
   onCancel: () => void;
   /** Cancel button text (default: "Cancelar") */
@@ -140,3 +136,4 @@ export interface FormModalActionsWithFormProps {
   /** Loading state for async operations */
   isLoading: boolean;
 }
+
