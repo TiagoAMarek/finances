@@ -3,13 +3,15 @@
 ## Build / Lint / Test Commands
 
 - pnpm dev — start Next.js dev server
+- pnpm dev:mocked — start dev server with mocked APIs
 - pnpm build — production build
 - pnpm lint — run ESLint (Next.js + TypeScript + Prettier)
-- pnpm typecheck — ts compiler checks
+- pnpm typecheck — ts compiler checks (use npm run typecheck:all for both app + tests)
 - pnpm test — run full Vitest suite (server + client)
 - pnpm test:watch — run tests in watch mode
 - pnpm test:server — run server-side tests only
 - pnpm test:client — run client-side (jsdom) tests only
+- pnpm test:browser — run browser tests with Playwright
 - pnpm test <file> — run a single test file (example: pnpm test tests/unit/schemas.test.ts)
 - pnpm test:coverage — run tests with coverage report
 - pnpm drizzle-kit generate / push — manage DB migrations
@@ -26,7 +28,7 @@
 - Data: store decimals as strings and dates as ISO strings in DB and APIs.
 - Authentication: JWT tokens live in localStorage; use built-in automatic 401 handling in auth helpers.
 - File layout: Next app routes under `app/<route>/page.tsx`, api routes under `app/api/<resource>/route.ts`.
-- Testing: Vitest with separate environments (server/node and client/jsdom). Use mocks in `mocks/` and MSW setup in `src/mocks`.
+- Testing: Vitest with separate environments (server/node, client/jsdom, browser/playwright). Use mocks in `mocks/` and MSW setup in `src/mocks`.
 
 ## Repo Assistant Rules
 

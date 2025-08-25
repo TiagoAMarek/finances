@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TransactionCreateInput } from "@/lib/schemas";
+import { TransactionCreateInput, TransactionFormInput, TransactionCreateSchema } from "@/lib/schemas";
 import {
   useCreateTransaction,
   useUpdateTransaction,
@@ -22,9 +22,21 @@ export function useTransactionActions() {
   const updateTransactionMutation = useUpdateTransaction();
   const deleteTransactionMutation = useDeleteTransaction();
 
-  const createTransaction = async (data: TransactionCreateInput) => {
+  const createTransaction = async (data: TransactionFormInput) => {
+    // Validate against the create schema before submitting
+    const parseResult = TransactionCreateSchema.safeParse(data);
+    
+    if (!parseResult.success) {
+      // If validation fails, show the first error and reject
+      const firstError = parseResult.error.errors[0];
+      toast.error(firstError.message);
+      return Promise.reject(new Error(firstError.message));
+    }
+    
+    const createInput: TransactionCreateInput = parseResult.data;
+    
     return new Promise<void>((resolve, reject) => {
-      createTransactionMutation.mutate(data, {
+      createTransactionMutation.mutate(createInput, {
         onSuccess: () => {
           toast.success("Transação criada com sucesso!");
           setCreateModalOpen(false);

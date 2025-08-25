@@ -206,7 +206,7 @@ export const TransactionCreateSchema = z
     },
   );
 
-// Form schema for React Hook Form - allows optional fields for better UX
+// Form schema for React Hook Form - includes business validation rules
 export const TransactionFormSchema = z.object({
   description: z.string().min(1, requiredMessage("description")),
   amount: z.string().min(1, requiredMessage("amount")),
@@ -216,7 +216,52 @@ export const TransactionFormSchema = z.object({
   accountId: z.number().optional(),
   creditCardId: z.number().optional(),
   toAccountId: z.number().optional(),
-});
+})
+  .refine(
+    (data) => {
+      // Category is required for income and expense
+      if (data.type !== "transfer" && !data.categoryId) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.categoryRequired,
+      path: ["categoryId"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === "transfer") {
+        return (
+          data.accountId &&
+          data.toAccountId &&
+          data.accountId !== data.toAccountId
+        );
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.transferAccounts,
+      path: ["toAccountId"],
+    },
+  )
+  .refine(
+    (data) => {
+      // For income/expense, either accountId or creditCardId is required but not both
+      if (data.type !== "transfer") {
+        return (
+          !!(data.accountId || data.creditCardId) &&
+          !(data.accountId && data.creditCardId)
+        );
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.singleSource,
+      path: ["accountId"],
+    },
+  );
 
 export const TransactionUpdateSchema = z.object({
   id: z.number(),

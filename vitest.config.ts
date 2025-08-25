@@ -51,7 +51,54 @@ export default defineConfig({
           hookTimeout: 10000,
         },
         esbuild: {
-          jsxInject: `import React from 'react'`,
+          jsx: 'automatic',
+        },
+        resolve: {
+          alias: {
+            "@": path.resolve(__dirname, "./"),
+          },
+        },
+        define: {
+          "process.env": process.env,
+        },
+      },
+      // Projeto Browser (Playwright environment)
+      {
+        test: {
+          name: "browser",
+          browser: {
+            enabled: true,
+            provider: "playwright",
+            instances: [
+              { browser: "chromium" }  // Single browser for faster testing
+            ],
+            headless: true,
+            viewport: {
+              width: 1280,
+              height: 720
+            }
+          },
+          globals: true,
+          setupFiles: ["./__tests__/browser-setup.ts"],
+          include: [
+            "__tests__/browser/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+            "**/*.browser.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"
+          ],
+          exclude: [
+            "node_modules/**",
+            "dist/**",
+            ".next/**",
+            "coverage/**",
+            "**/examples/**",
+          ],
+          testTimeout: 10000,      // Reduced from 30000 for faster failure detection
+          hookTimeout: 5000,       // Reduced from 30000 for faster failure detection
+        },
+        esbuild: {
+          jsx: 'automatic',
+        },
+        optimizeDeps: {
+          include: ['react/jsx-dev-runtime', 'react', 'react-dom', 'next/navigation', 'next/image']
         },
         resolve: {
           alias: {
