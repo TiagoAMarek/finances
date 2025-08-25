@@ -28,7 +28,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon, Receipt } from "lucide-react";
 import { useEffect, useMemo, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 interface CreateTransactionModalProps {
   open: boolean;
@@ -47,24 +47,36 @@ export function CreateTransactionModal({
   const { data: creditCards = [] } = useGetCreditCards();
   const { data: categories = [] } = useGetCategories();
 
+  // Memoize resolver to prevent recreation on every render
+  const resolver = useMemo(() => zodResolver(TransactionFormSchema), []);
+  
+  // Memoize default values to prevent recreation on every render
+  const defaultValues = useMemo(() => ({
+    description: "",
+    amount: "",
+    type: "expense" as const,
+    date: new Date().toISOString().split("T")[0],
+    categoryId: undefined,
+    accountId: undefined,
+    creditCardId: undefined,
+  }), []);
+
   const form = useForm<TransactionFormInput>({
-    resolver: zodResolver(TransactionFormSchema),
-    mode: "onChange",
-    defaultValues: {
-      description: "",
-      amount: "",
-      type: "expense" as const,
-      date: new Date().toISOString().split("T")[0],
-      categoryId: undefined,
-      accountId: undefined,
-      creditCardId: undefined,
-    },
+    resolver,
+    mode: "onTouched", // Less aggressive validation for better performance
+    defaultValues,
   });
 
-  const { watch, setValue, reset } = form;
-  const watchedType = watch("type");
-  const watchedAccountId = watch("accountId");
-  const watchedCreditCardId = watch("creditCardId");
+  const { setValue, reset } = form;
+  
+  // Replace multiple watch() calls with a single useWatch subscription
+  // This reduces re-renders by subscribing to multiple fields at once
+  const watchedFields = useWatch({
+    control: form.control,
+    name: ["type", "accountId", "creditCardId"],
+  });
+  
+  const [watchedType, watchedAccountId, watchedCreditCardId] = watchedFields;
 
   // Memoized source type determination
   const sourceType = useMemo(() => {
@@ -102,12 +114,17 @@ export function CreateTransactionModal({
     });
   }, [categories, watchedType]);
 
+  // Get current categoryId to check if it needs to be reset
+  const watchedCategoryId = useWatch({
+    control: form.control,
+    name: "categoryId",
+  });
+
   // Reset category when type changes and current category is not valid
   useEffect(() => {
-    const currentCategoryId = watch("categoryId");
-    if (currentCategoryId) {
+    if (watchedCategoryId) {
       const currentCategory = categories.find(
-        (cat) => cat.id === currentCategoryId,
+        (cat) => cat.id === watchedCategoryId,
       );
       if (
         currentCategory &&
@@ -117,7 +134,7 @@ export function CreateTransactionModal({
         setValue("categoryId", undefined);
       }
     }
-  }, [watchedType, categories, watch, setValue]);
+  }, [watchedType, categories, watchedCategoryId, setValue]);
 
   return (
     <FormModal open={open} onOpenChange={onOpenChange} size="lg">
@@ -144,12 +161,19 @@ export function CreateTransactionModal({
             />
           </FormModalField>
 
-          <FormModalField form={form} name="amount" label="Valor" required>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                R$
+          <div className="space-y-2">
+            <label 
+              htmlFor="amount-field"
+              className="flex items-center gap-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Valor
+              <span className="text-destructive ml-1" aria-label="obrigatório">
+                *
               </span>
+            </label>
+            <div className="relative">
               <Input
+                id="amount-field"
                 type="number"
                 placeholder="0,00"
                 className="h-11 pl-10"
@@ -157,8 +181,16 @@ export function CreateTransactionModal({
                 min="0"
                 {...form.register("amount")}
               />
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">
+                R$
+              </span>
             </div>
-          </FormModalField>
+            {form.formState.errors.amount && (
+              <div className="flex items-center space-x-2 text-sm text-destructive" role="alert" aria-live="polite">
+                <span>{form.formState.errors.amount.message}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

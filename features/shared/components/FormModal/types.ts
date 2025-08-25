@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, ComponentProps } from "react";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 import { LucideIcon } from "lucide-react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MODAL_SIZE_CLASSES } from "./constants";
 
 /** Modal size types */
@@ -17,7 +18,7 @@ export type FieldValidationState = {
 };
 
 /**
- * FormModal base props with enhanced typing
+ * FormModal base props with enhanced typing and escape hatches
  */
 export interface FormModalProps {
   /** Controls whether the modal is open */
@@ -32,6 +33,16 @@ export interface FormModalProps {
   trigger?: ReactNode;
   /** Modal content */
   children: ReactNode;
+  /** 
+   * Escape hatch: Additional props to pass to the underlying Dialog component
+   * Allows customization of dialog behavior like onPointerDownOutside, onEscapeKeyDown, etc.
+   */
+  dialogProps?: Omit<ComponentProps<typeof DialogPrimitive.Root>, 'open' | 'onOpenChange' | 'children'>;
+  /** 
+   * Escape hatch: Additional props to pass to the DialogContent component
+   * Allows customization of content behavior and styling
+   */
+  dialogContentProps?: Omit<ComponentProps<typeof DialogPrimitive.Content>, 'children'>;
 }
 
 /**
@@ -136,4 +147,3 @@ export interface FormModalActionsWithFormProps<T extends FieldValues = FieldValu
   /** Loading state for async operations */
   isLoading: boolean;
 }
-

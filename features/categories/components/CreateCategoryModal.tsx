@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { 
   FormModal,
   FormModalHeader,
@@ -68,15 +69,21 @@ export function CreateCategoryModal({
   onSubmit,
   isLoading,
 }: CreateCategoryModalProps) {
+  // Memoize resolver to prevent recreation on every render
+  const resolver = useMemo(() => zodResolver(CategoryCreateSchema), []);
+  
+  // Memoize default values to prevent recreation on every render
+  const defaultValues = useMemo(() => ({
+    name: "",
+    type: "expense" as const,
+    color: CATEGORY_COLORS[0],
+    icon: CATEGORY_ICONS[0],
+  }), []);
+
   const form = useForm<CategoryCreateInput>({
-    resolver: zodResolver(CategoryCreateSchema),
-    mode: "onChange",
-    defaultValues: {
-      name: "",
-      type: "expense",
-      color: CATEGORY_COLORS[0],
-      icon: CATEGORY_ICONS[0],
-    },
+    resolver,
+    mode: "onTouched", // Less aggressive validation for better performance
+    defaultValues,
   });
 
   const handleSubmit = (data: CategoryCreateInput) => {

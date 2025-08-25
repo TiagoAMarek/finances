@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { 
   FormModal,
   FormModalHeader,
@@ -32,14 +33,20 @@ export function EditAccountModal({
   onSave,
   isLoading,
 }: EditAccountModalProps) {
+  // Memoize resolver to prevent recreation on every render
+  const resolver = useMemo(() => zodResolver(BankAccountFormSchema), []);
+  
+  // Memoize default values to prevent recreation on every render
+  const defaultValues = useMemo(() => ({
+    name: "",
+    balance: "0",
+    currency: "BRL" as const,
+  }), []);
+
   const form = useForm<BankAccountFormInput>({
-    resolver: zodResolver(BankAccountFormSchema),
-    mode: "onChange",
-    defaultValues: {
-      name: "",
-      balance: "0",
-      currency: "BRL",
-    },
+    resolver,
+    mode: "onTouched", // Less aggressive validation for better performance
+    defaultValues,
   });
 
   // Update form values when account changes
