@@ -1,74 +1,40 @@
-import * as React from "react";
-import { forwardRef, useEffect, useState } from "react";
+import { brazilianCurrencyFormatter } from "@/lib/formatters";
+import { FieldValues, Path, UseFormReturn } from "react-hook-form";
+import { FormattedInput } from "./formatted-input";
+import { ComponentProps } from "react";
 
-import { Input } from "./input";
-import { formatCurrencyInput, removeCurrencyMask } from "@/lib/utils";
-
-export interface BrazilianCurrencyInputProps
-  extends Omit<React.ComponentProps<typeof Input>, 'type'> {
-  currencySymbol?: string;
+export interface BrazilianCurrencyInputProps<TFieldValues extends FieldValues> 
+  extends Omit<ComponentProps<'input'>, 'form'> {
+  form: UseFormReturn<TFieldValues>;
 }
 
-const BrazilianCurrencyInput = forwardRef<
-  HTMLInputElement,
-  BrazilianCurrencyInputProps
->(({ onChange, value, currencySymbol = "R$", placeholder = "0,00", ...props }, ref) => {
-  const [displayValue, setDisplayValue] = useState("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    const formatted = formatCurrencyInput(inputValue);
-    setDisplayValue(formatted);
-
-    // Convert back to decimal format for form state
-    const decimalValue = removeCurrencyMask(formatted);
-
-    // Create a new event with the decimal value for react-hook-form
-    const syntheticEvent = {
-      ...e,
-      target: {
-        ...e.target,
-        value: decimalValue,
-      },
-    };
-
-    onChange?.(syntheticEvent);
-  };
-
-  // Initialize display value from form value
-  useEffect(() => {
-    if (value && typeof value === 'string') {
-      // If value is already formatted (contains comma), use it as is
-      if (value.includes(',')) {
-        setDisplayValue(value);
-      } else {
-        // Convert decimal value to formatted display
-        const numericValue = parseFloat(value) || 0;
-        setDisplayValue(formatCurrencyInput((numericValue * 100).toString()));
-      }
-    } else if (!value) {
-      setDisplayValue("");
-    }
-  }, [value]);
+/**
+ * Brazilian currency input component with formatter pattern
+ * Maintains the same API as before but uses the new formatter internally
+ * 
+ * For React Hook Form integration, prefer using FormattedInput with Controller pattern
+ * This component is kept for backward compatibility and direct usage scenarios
+ */
+export function BrazilianCurrencyInput<TFieldValues extends FieldValues>({ 
+  form, 
+  ...props 
+}: BrazilianCurrencyInputProps<TFieldValues>) {
+  const name = "amount" as Path<TFieldValues>;
 
   return (
     <div className="relative">
-      <Input
-        ref={ref}
-        type="text"
-        placeholder={placeholder}
+      <FormattedInput
+        control={form.control}
+        name={name}
+        formatter={brazilianCurrencyFormatter}
+        placeholder="0,00"
         className="h-11 pl-10"
-        value={displayValue}
-        onChange={handleChange}
         {...props}
       />
       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">
-        {currencySymbol}
+        R$
       </span>
     </div>
   );
-});
+};
 
-BrazilianCurrencyInput.displayName = "BrazilianCurrencyInput";
-
-export { BrazilianCurrencyInput };

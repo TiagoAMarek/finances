@@ -52,7 +52,7 @@ export function CreateTransactionModal({
   const resolver = useMemo(() => zodResolver(TransactionFormSchema), []);
 
   // Memoize default values to prevent recreation on every render
-  const defaultValues = useMemo(() => ({
+  const defaultValues: TransactionFormInput = useMemo(() => ({
     description: "",
     amount: "",
     type: "expense" as const,
@@ -60,6 +60,7 @@ export function CreateTransactionModal({
     categoryId: undefined,
     accountId: undefined,
     creditCardId: undefined,
+    sourceType: "account",
   }), []);
 
   const form = useForm<TransactionFormInput>({
@@ -74,19 +75,10 @@ export function CreateTransactionModal({
   // This reduces re-renders by subscribing to multiple fields at once
   const watchedFields = useWatch({
     control: form.control,
-    name: ["type", "accountId", "creditCardId"],
+    name: ["type", "accountId", "creditCardId", "sourceType"],
   });
 
-  const [watchedType, watchedAccountId, watchedCreditCardId] = watchedFields;
-
-  // Memoized source type determination
-  const sourceType = useMemo(() => {
-    return watchedAccountId
-      ? "account"
-      : watchedCreditCardId
-        ? "creditCard"
-        : "account";
-  }, [watchedAccountId, watchedCreditCardId]);
+  const [watchedType, watchedAccountId, watchedCreditCardId, sourceType] = watchedFields;
 
   const handleClose = useCallback(() => {
     reset();
@@ -100,11 +92,14 @@ export function CreateTransactionModal({
     [onSubmit],
   );
 
-  const handleSourceTypeChange = useCallback(() => {
-    // Clear both fields when switching source type to ensure clean state
-    setValue("accountId", undefined);
-    setValue("creditCardId", undefined);
-  }, [setValue]);
+  // Handle clearing opposite field when source type changes
+  useEffect(() => {
+    if (sourceType === "account") {
+      setValue("creditCardId", undefined);
+    } else if (sourceType === "creditCard") {
+      setValue("accountId", undefined);
+    }
+  }, [sourceType, setValue]);
 
   // Memoized category filtering to prevent unnecessary recalculations
   const filteredCategories = useMemo(() => {
@@ -157,6 +152,7 @@ export function CreateTransactionModal({
               placeholder="Ex: Compra no supermercado"
               className="h-11"
               autoFocus
+              data-testid="description-input"
               {...form.register("description")}
             />
           </FormModalField>
@@ -167,7 +163,7 @@ export function CreateTransactionModal({
             label="Valor"
             required
           >
-            <BrazilianCurrencyInput {...form.register("amount")} />
+            <BrazilianCurrencyInput form={form} data-testid="amount-input" />
           </FormModalField>
         </div>
 
@@ -178,7 +174,7 @@ export function CreateTransactionModal({
               name="type"
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="h-11">
+                  <SelectTrigger className="h-11" data-testid="type-select">
                     <SelectValue placeholder="Selecione o tipo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -201,7 +197,7 @@ export function CreateTransactionModal({
           </FormModalField>
 
           <FormModalField form={form} name="date" label="Data" required>
-            <Input type="date" className="h-11" {...form.register("date")} />
+            <Input type="date" className="h-11" data-testid="date-input" {...form.register("date")} />
           </FormModalField>
         </div>
 
@@ -257,24 +253,30 @@ export function CreateTransactionModal({
             <label className="text-sm font-medium">
               Origem do Lançamento *
             </label>
-            <RadioGroup
-              value={sourceType}
-              onValueChange={handleSourceTypeChange}
-              className="flex flex-col space-y-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="account" id="account-radio" />
-                <label htmlFor="account-radio" className="cursor-pointer">
-                  🏦 Conta Bancária
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="creditCard" id="creditCard-radio" />
-                <label htmlFor="creditCard-radio" className="cursor-pointer">
-                  💳 Cartão de Crédito
-                </label>
-              </div>
-            </RadioGroup>
+            <Controller
+              control={form.control}
+              name="sourceType"
+              render={({ field }) => (
+                <RadioGroup
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  className="flex flex-col space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="account" id="account-radio" data-testid="account-radio" />
+                    <label htmlFor="account-radio" className="cursor-pointer">
+                      🏦 Conta Bancária
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="creditCard" id="creditCard-radio" data-testid="credit-card-radio" />
+                    <label htmlFor="creditCard-radio" className="cursor-pointer">
+                      💳 Cartão de Crédito
+                    </label>
+                  </div>
+                </RadioGroup>
+              )}
+            />
           </div>
 
           {sourceType === "account" && (

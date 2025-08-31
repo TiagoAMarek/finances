@@ -76,6 +76,12 @@ export default defineConfig({
             viewport: {
               width: 1280,
               height: 720
+            },
+            // Enhanced browser configuration following latest Vitest docs
+            screenshotFailures: false,
+            ui: false, // Since we're running headless
+            api: {
+              port: 63315, // Default port, explicit is better
             }
           },
           globals: true,
@@ -90,15 +96,26 @@ export default defineConfig({
             ".next/**",
             "coverage/**",
             "**/examples/**",
+            "**/*.{node,server}.{test,spec}.*",  // Exclude server tests
+            "**/api/**"  // Exclude API tests
           ],
-          testTimeout: 10000,      // Reduced from 30000 for faster failure detection
-          hookTimeout: 5000,       // Reduced from 30000 for faster failure detection
+          testTimeout: 5000,      // Optimized for browser tests
+          hookTimeout: 3000,      // Optimized for browser tests
         },
         esbuild: {
           jsx: 'automatic',
         },
         optimizeDeps: {
-          include: ['react/jsx-dev-runtime', 'react', 'react-dom', 'next/navigation', 'next/image']
+          include: [
+            'react/jsx-dev-runtime', 
+            'react', 
+            'react-dom', 
+            'next/navigation', 
+            'next/image',
+            '@vitest/browser/context',
+            'vitest-browser-react'
+          ],
+          exclude: ['@vitest/browser']
         },
         resolve: {
           alias: {

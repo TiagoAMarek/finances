@@ -1,4 +1,7 @@
-import { vi, beforeEach, afterEach } from "vitest";
+/// <reference types="@vitest/browser/providers/playwright" />
+/// <reference types="@vitest/browser/matchers" />
+
+import { vi, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
 import 'vitest-browser-react';
 
 // Browser-specific test setup for Playwright/Vitest browser mode
@@ -23,7 +26,7 @@ vi.mock("next/navigation", () => ({
 
 // Mock next/image for browser tests
 vi.mock("next/image", () => ({
-  default: (props: { src: string; alt: string; [key: string]: unknown }) => {
+  default: (props: { src: string; alt: string;[key: string]: unknown }) => {
     const { src, alt, ...rest } = props;
     return {
       type: "img",
@@ -58,6 +61,17 @@ if (typeof window !== 'undefined') {
   window.fetch = vi.fn();
 }
 
+// Ensure process object exists for Next.js environment variables in browser environment
+// This should be defined by Vitest config, but we ensure it exists
+if (typeof process === 'undefined') {
+  (globalThis as any).process = {
+    env: {
+      NEXT_PUBLIC_API_URL: '',
+      NODE_ENV: 'test',
+    },
+  };
+}
+
 // Browser-specific configurations
 // Set up any browser-specific global configurations here
 
@@ -68,13 +82,37 @@ if (typeof window !== 'undefined') {
 // Browser test utilities
 // Add any browser-specific test utilities here
 
+// MSW setup for browser tests
+import { worker } from '@/src/mocks/browser';
+
+// Start the MSW worker before all tests
+beforeAll(async () => {
+  // Start MSW with better config for browser tests
+  await worker.start({
+    onUnhandledRequest: 'bypass',
+    quiet: true,
+    // Better service worker handling
+    serviceWorker: {
+      url: '/mockServiceWorker.js'
+    }
+  });
+});
+
+// Stop the worker after all tests
+afterAll(async () => {
+  await worker.stop();
+});
+
 // Global test cleanup for browser tests
 beforeEach(() => {
-  // Clear any browser-specific state before each test
-  // This might include clearing localStorage, sessionStorage, etc.
+  // Clear browser state more comprehensively
   if (typeof window !== 'undefined') {
     window.localStorage.clear();
     window.sessionStorage.clear();
+    // Clear any focus states
+    if (document.activeElement && 'blur' in document.activeElement) {
+      (document.activeElement as HTMLElement).blur?.();
+    }
   }
 });
 
@@ -82,4 +120,7 @@ afterEach(() => {
   // Clean up after each browser test
   // This is important for browser tests to avoid state leakage
   vi.clearAllMocks();
+  
+  // Reset any MSW handlers that were overridden in tests
+  worker.resetHandlers();
 });

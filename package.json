@@ -25,7 +25,8 @@
     "test:browser": "vitest run --project browser",
     "test:browser:watch": "vitest --project browser",
     "test:browser:coverage": "vitest run --coverage --project browser",
-    "test:browser:ui": "vitest --ui --project browser"
+    "test:browser:ui": "vitest --ui --project browser",
+    "test:browser:ci": "playwright install chromium && vitest run --project browser"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
