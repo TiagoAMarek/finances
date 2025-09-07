@@ -22,6 +22,7 @@ interface CreateAccountModalProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: BankAccountCreateInput) => void;
   isLoading: boolean;
+  errorMessage?: string;
 }
 
 export function CreateAccountModal({
@@ -29,6 +30,7 @@ export function CreateAccountModal({
   onOpenChange,
   onSubmit,
   isLoading,
+  errorMessage,
 }: CreateAccountModalProps) {
   // Memoize resolver to prevent recreation on every render
   const resolver = useMemo(() => zodResolver(BankAccountFormSchema), []);
@@ -68,6 +70,7 @@ export function CreateAccountModal({
       onOpenChange={onOpenChange}
       variant="create"
       size="md"
+      confirmOnDirtyClose={true}
       trigger={
         <QuickCreateButton onClick={() => onOpenChange(true)}>
           Nova Conta
@@ -82,7 +85,11 @@ export function CreateAccountModal({
         description="Cadastre uma nova conta para controlar suas finanças pessoais"
       />
 
-      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+      <FormModalFormWithHook
+        form={form}
+        onSubmit={handleSubmit}
+        nonFieldError={errorMessage}
+      >
         <FormModalField
           form={form}
           name="name"

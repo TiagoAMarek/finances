@@ -26,6 +26,9 @@ export type {
   ModalSize,
   ModalVariant,
   FieldValidationState,
+
+  // Legacy types (kept for backward compatibility)
+  FormModalActionsWithFormProps,
 } from "./types";
 
 // Re-export utilities for advanced usage

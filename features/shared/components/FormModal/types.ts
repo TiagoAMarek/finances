@@ -33,13 +33,17 @@ export interface FormModalProps {
   trigger?: ReactNode;
   /** Modal content */
   children: ReactNode;
-  /** 
+  /**
+   * Whether to show confirmation dialog when closing with unsaved changes
+   */
+  confirmOnDirtyClose?: boolean;
+  /**
    * Escape hatch: Additional props to pass to the underlying Dialog component
    * Allows customization of dialog behavior like onPointerDownOutside, onEscapeKeyDown, etc.
    */
   dialogProps?: Omit<ComponentProps<typeof DialogPrimitive.Root>, 'open' | 'onOpenChange' | 'children'>;
-  /** 
-   * Escape hatch: Additional props to pass to the DialogContent component
+  /**
+   * Escape hatch: Additional props to the DialogContent component
    * Allows customization of content behavior and styling
    */
   dialogContentProps?: Omit<ComponentProps<typeof DialogPrimitive.Content>, 'children'>;
@@ -89,6 +93,8 @@ export interface FormModalFormWithHookProps<T extends FieldValues = FieldValues>
   onSubmit: (data: T) => void;
   /** Form content and fields */
   children: ReactNode;
+  /** Non-field error message (e.g., API errors) */
+  nonFieldError?: string | ReactNode;
 }
 
 /**

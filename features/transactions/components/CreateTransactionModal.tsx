@@ -88,8 +88,10 @@ export function CreateTransactionModal({
   const handleSubmit = useCallback(
     (data: TransactionFormInput) => {
       onSubmit(data);
+      // Close modal after successful submission
+      onOpenChange(false);
     },
-    [onSubmit],
+    [onSubmit, onOpenChange],
   );
 
   // Handle clearing opposite field when source type changes
