@@ -216,7 +216,7 @@ export const TransactionFormSchema = z.object({
   accountId: z.number().optional(),
   creditCardId: z.number().optional(),
   toAccountId: z.number().optional(),
-  sourceType: z.enum(["account", "creditCard"]).default("account"),
+  sourceType: z.enum(["account", "creditCard"]).optional(),
 })
   .refine(
     (data) => {
