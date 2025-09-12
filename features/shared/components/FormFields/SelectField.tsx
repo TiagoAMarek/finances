@@ -1,4 +1,4 @@
-import { Controller } from "react-hook-form";
+import { Controller, FieldValues } from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -12,7 +12,7 @@ import type { BaseFieldProps, SelectOption } from "./types";
 /**
  * Select field component with consistent styling and RHF integration
  */
-export function SelectField<T extends Record<string, any>>({
+export function SelectField<T extends FieldValues>({
   form,
   name,
   label,
@@ -21,7 +21,6 @@ export function SelectField<T extends Record<string, any>>({
   disabled = false,
   className,
   placeholder,
-  autoFocus = false,
   options,
   "data-testid": testId,
 }: BaseFieldProps<T> & {

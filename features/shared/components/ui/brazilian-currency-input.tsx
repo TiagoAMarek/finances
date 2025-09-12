@@ -6,6 +6,7 @@ import { ComponentProps } from "react";
 export interface BrazilianCurrencyInputProps<TFieldValues extends FieldValues> 
   extends Omit<ComponentProps<'input'>, 'form'> {
   form: UseFormReturn<TFieldValues>;
+  name: Path<TFieldValues>;
 }
 
 /**
@@ -17,11 +18,9 @@ export interface BrazilianCurrencyInputProps<TFieldValues extends FieldValues>
  */
 export function BrazilianCurrencyInput<TFieldValues extends FieldValues>({
   form,
+  name,
   ...props
 }: BrazilianCurrencyInputProps<TFieldValues>) {
-  // This component is specifically designed for the "amount" field
-  // If you need a more generic currency input, create a new component
-  const name = "amount" as keyof TFieldValues as Path<TFieldValues>;
 
   return (
     <div className="relative">

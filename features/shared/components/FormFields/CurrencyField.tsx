@@ -1,4 +1,4 @@
-import { Controller } from "react-hook-form";
+import { Controller, FieldValues } from "react-hook-form";
 import { FormattedInput } from "@/features/shared/components/ui";
 import { brazilianCurrencyFormatter } from "@/lib/formatters";
 import { FormModalField } from "@/features/shared/components/FormModal";
@@ -7,7 +7,7 @@ import type { BaseFieldProps } from "./types";
 /**
  * Currency input field component with Brazilian formatting and RHF integration
  */
-export function CurrencyField<T extends Record<string, any>>({
+export function CurrencyField<T extends FieldValues>({
   form,
   name,
   label,
@@ -41,7 +41,7 @@ export function CurrencyField<T extends Record<string, any>>({
         <Controller
           control={form.control}
           name={name}
-          render={({ field: { onChange, value, ...fieldProps } }) => (
+          render={({ field: { ...fieldProps } }) => (
             <FormattedInput
               {...fieldProps}
               control={form.control}

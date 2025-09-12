@@ -64,12 +64,23 @@ if (typeof window !== 'undefined') {
 // Ensure process object exists for Next.js environment variables in browser environment
 // This should be defined by Vitest config, but we ensure it exists
 if (typeof process === 'undefined') {
-  (globalThis as any).process = {
+  (globalThis as typeof globalThis & { process: NodeJS.Process }).process = {
     env: {
       NEXT_PUBLIC_API_URL: '',
       NODE_ENV: 'test',
     },
-  };
+    // Provide minimal required properties to satisfy the Process type
+    version: '18.0.0',
+    versions: {} as NodeJS.ProcessVersions,
+    arch: 'x64',
+    platform: 'browser' as NodeJS.Platform,
+    argv: [],
+    execPath: '',
+    pid: 0,
+    cwd: () => '/',
+    chdir: () => { },
+    exit: () => { },
+  } as unknown as NodeJS.Process;
 }
 
 // Browser-specific configurations
@@ -120,7 +131,7 @@ afterEach(() => {
   // Clean up after each browser test
   // This is important for browser tests to avoid state leakage
   vi.clearAllMocks();
-  
+
   // Reset any MSW handlers that were overridden in tests
   worker.resetHandlers();
 });

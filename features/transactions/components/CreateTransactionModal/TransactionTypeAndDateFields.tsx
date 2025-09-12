@@ -9,14 +9,14 @@ interface TransactionTypeAndDateFieldsProps {
 
 export function TransactionTypeAndDateFields({ form }: TransactionTypeAndDateFieldsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
       <FormModalField form={form} name="type" label="Tipo" required>
         <Controller
           control={form.control}
           name="type"
           render={({ field }) => (
             <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger className="h-11" data-testid="type-select">
+              <SelectTrigger className="h-11 w-full min-w-0 text-left" data-testid="type-select">
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -39,7 +39,7 @@ export function TransactionTypeAndDateFields({ form }: TransactionTypeAndDateFie
       </FormModalField>
 
       <FormModalField form={form} name="date" label="Data" required>
-        <Input type="date" className="h-11" data-testid="date-input" {...form.register("date")} />
+        <Input type="date" className="h-11 w-full min-w-0" data-testid="date-input" {...form.register("date")} />
       </FormModalField>
     </div>
   );

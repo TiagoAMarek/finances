@@ -21,7 +21,7 @@ export function AccountSelector({ form, accounts }: AccountSelectorProps) {
       label="Selecione a Conta Bancária"
       required
     >
-      <div>
+      <div className="min-w-0">
         <Controller
           control={form.control}
           name="accountId"
@@ -32,7 +32,7 @@ export function AccountSelector({ form, accounts }: AccountSelectorProps) {
                 field.onChange(value ? parseInt(value) : undefined)
               }
             >
-              <SelectTrigger className="h-11">
+              <SelectTrigger className="h-11 w-full min-w-0 text-left">
                 <SelectValue placeholder="Escolha uma conta bancária" />
               </SelectTrigger>
               <SelectContent>

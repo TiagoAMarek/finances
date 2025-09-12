@@ -1,3 +1,4 @@
+import { FieldValues } from "react-hook-form";
 import { Textarea } from "@/features/shared/components/ui";
 import { FormModalField } from "@/features/shared/components/FormModal";
 import type { BaseFieldProps } from "./types";
@@ -5,7 +6,7 @@ import type { BaseFieldProps } from "./types";
 /**
  * Text area field component with consistent styling and RHF integration
  */
-export function TextArea<T extends Record<string, any>>({
+export function TextArea<T extends FieldValues>({
   form,
   name,
   label,

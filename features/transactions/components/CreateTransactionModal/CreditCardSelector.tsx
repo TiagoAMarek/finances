@@ -21,7 +21,7 @@ export function CreditCardSelector({ form, creditCards }: CreditCardSelectorProp
       label="Selecione o Cartão de Crédito"
       required
     >
-      <div>
+      <div className="min-w-0">
         <Controller
           control={form.control}
           name="creditCardId"
@@ -32,7 +32,7 @@ export function CreditCardSelector({ form, creditCards }: CreditCardSelectorProp
                 field.onChange(value ? parseInt(value) : undefined)
               }
             >
-              <SelectTrigger className="h-11">
+              <SelectTrigger className="h-11 w-full min-w-0 text-left">
                 <SelectValue placeholder="Escolha um cartão de crédito" />
               </SelectTrigger>
               <SelectContent>

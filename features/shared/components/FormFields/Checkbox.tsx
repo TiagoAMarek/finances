@@ -1,12 +1,12 @@
-import { Controller } from "react-hook-form";
-import { Checkbox as UICheckbox } from "@/features/shared/components/ui";
+import { Controller, FieldValues } from "react-hook-form";
+import { Checkbox as UICheckbox } from "@/components/ui/checkbox";
 import { FormModalField } from "@/features/shared/components/FormModal";
 import type { BaseFieldProps } from "./types";
 
 /**
  * Checkbox field component with RHF integration
  */
-export function Checkbox<T extends Record<string, any>>({
+export function Checkbox<T extends FieldValues>({
   form,
   name,
   label,

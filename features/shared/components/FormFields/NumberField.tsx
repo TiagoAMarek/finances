@@ -1,11 +1,12 @@
+import { FieldValues } from "react-hook-form";
 import { Input } from "@/features/shared/components/ui";
 import { FormModalField } from "@/features/shared/components/FormModal";
-import type { BaseFieldProps, NumberFieldProps } from "./types";
+import type { BaseFieldProps } from "./types";
 
 /**
  * Number input field component with consistent styling and RHF integration
  */
-export function NumberField<T extends Record<string, any>>({
+export function NumberField<T extends FieldValues>({
   form,
   name,
   label,

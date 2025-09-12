@@ -1,3 +1,4 @@
+import { FieldValues } from "react-hook-form";
 import { Input } from "@/features/shared/components/ui";
 import { FormModalField } from "@/features/shared/components/FormModal";
 import type { BaseFieldProps } from "./types";
@@ -5,7 +6,7 @@ import type { BaseFieldProps } from "./types";
 /**
  * File input field component with consistent styling and RHF integration
  */
-export function FileInput<T extends Record<string, any>>({
+export function FileInput<T extends FieldValues>({
   form,
   name,
   label,
@@ -44,10 +45,10 @@ export function FileInput<T extends Record<string, any>>({
         multiple={multiple}
         data-testid={testId}
         {...form.register(name, {
-          validate: (files) => {
+          validate: (files: FileList | null) => {
             if (!files || files.length === 0) return true;
 
-            const fileList = Array.from(files as FileList);
+            const fileList = Array.from(files);
             for (const file of fileList) {
               if (maxSize && file.size > maxSize) {
                 return `Arquivo ${file.name} é muito grande. Tamanho máximo: ${Math.round(maxSize / 1024 / 1024)}MB`;

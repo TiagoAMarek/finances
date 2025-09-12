@@ -24,7 +24,8 @@ export function useTransactionActions() {
 
   const createTransaction = async (data: TransactionFormInput) => {
     // Remove UI-only fields before API validation
-    const { sourceType, ...apiData } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { sourceType: _, ...apiData } = data;
 
     // Validate against the create schema before submitting
     const parseResult = TransactionCreateSchema.safeParse(apiData);

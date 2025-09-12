@@ -39,7 +39,7 @@ export function SourceAccountFields({ form, accounts, creditCards }: SourceAccou
   }, [sourceType, setValue]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0">
       <SourceTypeSelector form={form} />
 
       {sourceType === "account" && (

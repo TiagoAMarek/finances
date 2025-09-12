@@ -1,4 +1,4 @@
-import { Controller } from "react-hook-form";
+import { Controller, FieldValues } from "react-hook-form";
 import { RadioGroup as UIRadioGroup, RadioGroupItem } from "@/features/shared/components/ui";
 import { FormModalField } from "@/features/shared/components/FormModal";
 import type { BaseFieldProps, SelectOption } from "./types";
@@ -6,7 +6,7 @@ import type { BaseFieldProps, SelectOption } from "./types";
 /**
  * Radio group field component with RHF integration
  */
-export function RadioGroup<T extends Record<string, any>>({
+export function RadioGroup<T extends FieldValues>({
   form,
   name,
   label,

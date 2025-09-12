@@ -9,7 +9,7 @@ interface TransactionBasicFieldsProps {
 
 export function TransactionBasicFields({ form }: TransactionBasicFieldsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
       <FormModalField
         form={form}
         name="description"
@@ -19,7 +19,7 @@ export function TransactionBasicFields({ form }: TransactionBasicFieldsProps) {
         <Input
           type="text"
           placeholder="Ex: Compra no supermercado"
-          className="h-11"
+          className="h-11 w-full min-w-0"
           autoFocus
           data-testid="description-input"
           {...form.register("description")}
@@ -32,7 +32,12 @@ export function TransactionBasicFields({ form }: TransactionBasicFieldsProps) {
         label="Valor"
         required
       >
-        <BrazilianCurrencyInput form={form} data-testid="amount-input" />
+        <BrazilianCurrencyInput
+          form={form}
+          name="amount"
+          data-testid="amount-input"
+          className="h-11 pl-10 w-full min-w-0"
+        />
       </FormModalField>
     </div>
   );

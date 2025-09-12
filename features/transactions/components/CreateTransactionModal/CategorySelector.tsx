@@ -72,7 +72,7 @@ export function CategorySelector({ form, categories }: CategorySelectorProps) {
                 field.onChange(value ? parseInt(value) : undefined)
               }
             >
-              <SelectTrigger className="h-11">
+              <SelectTrigger className="h-11 w-full min-w-0 text-left">
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
