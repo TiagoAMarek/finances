@@ -23,16 +23,19 @@ export function useTransactionActions() {
   const deleteTransactionMutation = useDeleteTransaction();
 
   const createTransaction = async (data: TransactionFormInput) => {
+    // Remove UI-only fields before API validation
+    const { sourceType, ...apiData } = data;
+
     // Validate against the create schema before submitting
-    const parseResult = TransactionCreateSchema.safeParse(data);
-    
+    const parseResult = TransactionCreateSchema.safeParse(apiData);
+
     if (!parseResult.success) {
       // If validation fails, show the first error and reject
       const firstError = parseResult.error.errors[0];
       toast.error(firstError.message);
       return Promise.reject(new Error(firstError.message));
     }
-    
+
     const createInput: TransactionCreateInput = parseResult.data;
     
     return new Promise<void>((resolve, reject) => {

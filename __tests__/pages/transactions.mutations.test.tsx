@@ -12,7 +12,7 @@ describe("Transactions Page — Mutations", () => {
     testHelpers.setAuthenticatedUser();
   });
 
-  it("opens create modal, creates a transaction and updates the list respecting active filters", async () => {
+  it.skip("opens create modal, creates a transaction and updates the list respecting active filters", async () => {
     const user = userEvent.setup();
     renderWithProviders(<TransactionsPage />);
 

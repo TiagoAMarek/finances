@@ -11,13 +11,13 @@ export function createBrazilianCurrencyFormatter(): Formatter<string> {
   });
 
   return {
-    format: (value: number) => {
-      return numberFormatter.format(value);
+    format: (value: string | number) => {
+      const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
+      return numberFormatter.format(numValue);
     },
     parse: (value: string) => {
       const rawValue = parseInt(value.replace(/\D/g, ""), 10) || 0;
-
-      return rawValue / 100;
+      return (rawValue / 100).toString();
     },
   };
 }

@@ -41,6 +41,7 @@ export default defineConfig({
             "hooks/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
           ],
           exclude: [
+            "__tests__/browser/**",  // Exclude browser-specific tests
             "node_modules/**",
             "dist/**",
             ".next/**",
@@ -107,10 +108,10 @@ export default defineConfig({
         },
         optimizeDeps: {
           include: [
-            'react/jsx-dev-runtime', 
-            'react', 
-            'react-dom', 
-            'next/navigation', 
+            'react/jsx-dev-runtime',
+            'react',
+            'react-dom',
+            'next/navigation',
             'next/image',
             '@vitest/browser/context',
             'vitest-browser-react'

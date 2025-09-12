@@ -15,11 +15,13 @@ export interface BrazilianCurrencyInputProps<TFieldValues extends FieldValues>
  * For React Hook Form integration, prefer using FormattedInput with Controller pattern
  * This component is kept for backward compatibility and direct usage scenarios
  */
-export function BrazilianCurrencyInput<TFieldValues extends FieldValues>({ 
-  form, 
-  ...props 
+export function BrazilianCurrencyInput<TFieldValues extends FieldValues>({
+  form,
+  ...props
 }: BrazilianCurrencyInputProps<TFieldValues>) {
-  const name = "amount" as Path<TFieldValues>;
+  // This component is specifically designed for the "amount" field
+  // If you need a more generic currency input, create a new component
+  const name = "amount" as keyof TFieldValues as Path<TFieldValues>;
 
   return (
     <div className="relative">

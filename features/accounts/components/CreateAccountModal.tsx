@@ -1,13 +1,12 @@
 import { useMemo } from "react";
-import { 
+import {
   FormModal,
   FormModalHeader,
-  FormModalField,
   FormModalActions,
   FormModalFormWithHook
 } from "@/features/shared/components/FormModal";
 import { QuickCreateButton } from "@/features/shared/components";
-import { Input } from "@/features/shared/components/ui";
+import { TextField, CurrencyField } from "@/features/shared/components/FormFields";
 import {
   BankAccountCreateInput,
   BankAccountFormInput,
@@ -85,48 +84,29 @@ export function CreateAccountModal({
         description="Cadastre uma nova conta para controlar suas finanças pessoais"
       />
 
-      <FormModalFormWithHook
-        form={form}
-        onSubmit={handleSubmit}
-        nonFieldError={errorMessage}
-      >
-        <FormModalField
-          form={form}
-          name="name"
-          label="Nome da Conta"
-          description="Escolha um nome que facilite a identificação da conta"
-          required
-        >
-          <Input
-            type="text"
-            placeholder="Ex: Conta Corrente Santander"
-            className="h-11"
-            autoFocus
-            {...form.register("name")}
-          />
-        </FormModalField>
+       <FormModalFormWithHook
+         form={form}
+         onSubmit={handleSubmit}
+         nonFieldError={errorMessage}
+       >
+         <TextField
+           form={form}
+           name="name"
+           label="Nome da Conta"
+           description="Escolha um nome que facilite a identificação da conta"
+           required
+           placeholder="Ex: Conta Corrente Santander"
+           autoFocus
+         />
 
-        <FormModalField
-          form={form}
-          name="balance"
-          label="Saldo Inicial"
-          description="Informe o saldo atual da sua conta bancária"
-          required
-        >
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-              R$
-            </span>
-            <Input
-              type="number"
-              placeholder="0,00"
-              className="h-11 pl-10"
-              step="0.01"
-              min="0"
-              {...form.register("balance")}
-            />
-          </div>
-        </FormModalField>
+         <CurrencyField
+           form={form}
+           name="balance"
+           label="Saldo Inicial"
+           description="Informe o saldo atual da sua conta bancária"
+           required
+           placeholder="0,00"
+         />
 
         <FormModalActions
           form={form}
