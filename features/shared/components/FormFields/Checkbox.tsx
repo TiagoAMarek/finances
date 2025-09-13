@@ -1,5 +1,5 @@
 import { Controller, FieldValues } from "react-hook-form";
-import { Checkbox as UICheckbox } from "@/components/ui/checkbox";
+import { Checkbox as UICheckbox } from "@/features/shared/components/ui/checkbox";
 import { FormModalField } from "@/features/shared/components/FormModal";
 import type { BaseFieldProps } from "./types";
 
