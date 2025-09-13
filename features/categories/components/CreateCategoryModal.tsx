@@ -1,34 +1,29 @@
-import { QuickCreateButton } from "@/features/shared/components";
+import { useMemo } from "react";
+import { 
+  FormModal,
+  FormModalHeader,
+  FormModalField,
+  FormModalActions,
+  FormModalFormWithHook,
+  QuickCreateButton
+} from "@/features/shared/components";
 import {
-  Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/features/shared/components/ui";
-import { Loader2Icon, PlusIcon, TagIcon } from "lucide-react";
-import { useState } from "react";
+import { CategoryCreateInput, CategoryCreateSchema } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PlusIcon, TagIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 interface CreateCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: {
-    name: string;
-    type: "income" | "expense" | "both";
-    color?: string;
-    icon?: string;
-  }) => void;
+  onSubmit: (data: CategoryCreateInput) => void;
   isLoading: boolean;
 }
 
@@ -74,165 +69,132 @@ export function CreateCategoryModal({
   onSubmit,
   isLoading,
 }: CreateCategoryModalProps) {
-  const [name, setName] = useState("");
-  const [type, setType] = useState<"income" | "expense" | "both">("expense");
-  const [color, setColor] = useState(CATEGORY_COLORS[0]);
-  const [icon, setIcon] = useState(CATEGORY_ICONS[0]);
+  // Memoize resolver to prevent recreation on every render
+  const resolver = useMemo(() => zodResolver(CategoryCreateSchema), []);
+  
+  // Memoize default values to prevent recreation on every render
+  const defaultValues = useMemo(() => ({
+    name: "",
+    type: "expense" as const,
+    color: CATEGORY_COLORS[0],
+    icon: CATEGORY_ICONS[0],
+  }), []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      name,
-      type,
-      color,
-      icon,
-    });
-    resetForm();
-  };
+  const form = useForm<CategoryCreateInput>({
+    resolver,
+    mode: "onTouched", // Less aggressive validation for better performance
+    defaultValues,
+  });
 
-  const resetForm = () => {
-    setName("");
-    setType("expense");
-    setColor(CATEGORY_COLORS[0]);
-    setIcon(CATEGORY_ICONS[0]);
+  const handleSubmit = (data: CategoryCreateInput) => {
+    onSubmit(data);
+    handleClose();
   };
 
   const handleClose = () => {
-    resetForm();
+    form.reset();
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
+    <FormModal
+      open={open}
+      onOpenChange={onOpenChange}
+      variant="create"
+      size="md"
+      trigger={
         <QuickCreateButton onClick={() => onOpenChange(true)}>
           Nova Categoria
         </QuickCreateButton>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="text-center space-y-3 pb-4">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <TagIcon className="h-6 w-6 text-primary" />
+      }
+    >
+      <FormModalHeader
+        icon={TagIcon}
+        iconColor="text-primary"
+        iconBgColor="bg-primary/10"
+        title="Nova Categoria"
+        description="Crie uma nova categoria para organizar suas transações"
+      />
+
+      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+        <FormModalField
+          form={form}
+          name="name"
+          label="Nome da Categoria"
+          required
+        >
+          <Input
+            type="text"
+            placeholder="Ex: Alimentação"
+            className="h-11"
+            autoFocus
+            {...form.register("name")}
+          />
+        </FormModalField>
+
+        <FormModalField form={form} name="type" label="Tipo" required>
+          <Select
+            value={form.watch("type")}
+            onValueChange={(value) =>
+              form.setValue("type", value as "income" | "expense" | "both")
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="income">Receita</SelectItem>
+              <SelectItem value="expense">Despesa</SelectItem>
+              <SelectItem value="both">Ambos</SelectItem>
+            </SelectContent>
+          </Select>
+        </FormModalField>
+
+        <FormModalField form={form} name="color" label="Cor">
+          <div className="flex flex-wrap gap-2">
+            {CATEGORY_COLORS.map((colorOption) => (
+              <button
+                key={colorOption}
+                type="button"
+                className={`w-8 h-8 rounded-full border-2 ${
+                  form.watch("color") === colorOption
+                    ? "border-primary"
+                    : "border-transparent"
+                }`}
+                style={{ backgroundColor: colorOption }}
+                onClick={() => form.setValue("color", colorOption)}
+              />
+            ))}
           </div>
-          <div className="space-y-1">
-            <DialogTitle className="text-xl">Nova Categoria</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Crie uma nova categoria para organizar suas transações
-            </DialogDescription>
+        </FormModalField>
+
+        <FormModalField form={form} name="icon" label="Ícone">
+          <div className="flex flex-wrap gap-2">
+            {CATEGORY_ICONS.map((iconOption) => (
+              <button
+                key={iconOption}
+                type="button"
+                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${
+                  form.watch("icon") === iconOption
+                    ? "border-primary bg-primary/10"
+                    : "border-border hover:border-primary/50"
+                }`}
+                onClick={() => form.setValue("icon", iconOption)}
+              >
+                {iconOption}
+              </button>
+            ))}
           </div>
-        </DialogHeader>
+        </FormModalField>
 
-        <Card className="border-dashed">
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="categoryName"
-                  className="text-sm font-medium flex items-center gap-2"
-                >
-                  <TagIcon className="h-4 w-4" />
-                  Nome da Categoria
-                </Label>
-                <Input
-                  type="text"
-                  id="categoryName"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex: Alimentação"
-                  className="h-11"
-                  autoFocus
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Tipo</Label>
-                <Select
-                  value={type}
-                  onValueChange={(value: "income" | "expense" | "both") =>
-                    setType(value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="income">Receita</SelectItem>
-                    <SelectItem value="expense">Despesa</SelectItem>
-                    <SelectItem value="both">Ambos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Cor</Label>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORY_COLORS.map((colorOption) => (
-                    <button
-                      key={colorOption}
-                      type="button"
-                      className={`w-8 h-8 rounded-full border-2 ${color === colorOption
-                          ? "border-primary"
-                          : "border-transparent"
-                        }`}
-                      style={{ backgroundColor: colorOption }}
-                      onClick={() => setColor(colorOption)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Ícone</Label>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORY_ICONS.map((iconOption) => (
-                    <button
-                      key={iconOption}
-                      type="button"
-                      className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${icon === iconOption
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                        }`}
-                      onClick={() => setIcon(iconOption)}
-                    >
-                      {iconOption}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  className="flex-1"
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading || !name.trim()}
-                  className="flex-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2Icon className="h-4 w-4 animate-spin" />
-                      Criando...
-                    </>
-                  ) : (
-                    <>
-                      <PlusIcon className="h-4 w-4" />
-                      Criar Categoria
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </DialogContent>
-    </Dialog>
+        <FormModalActions
+          form={form}
+          onCancel={handleClose}
+          submitText="Criar Categoria"
+          submitIcon={PlusIcon}
+          isLoading={isLoading}
+        />
+      </FormModalFormWithHook>
+    </FormModal>
   );
 }

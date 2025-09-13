@@ -16,7 +16,7 @@ export interface FormFieldProps {
   description?: string;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({
+export function FormField({
   label,
   htmlFor,
   error,
@@ -25,7 +25,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   className,
   description,
-}) => {
+}: FormFieldProps) {
   const generatedId = React.useId();
   const fieldId = htmlFor || generatedId;
   const descriptionId = description ? `${fieldId}-description` : undefined;
@@ -71,7 +71,7 @@ export const FormField: React.FC<FormFieldProps> = ({
                 children as React.ReactElement<
                   React.HTMLAttributes<HTMLElement>
                 >
-              ).props.className,
+              ).props?.className,
               error && "border-destructive focus-visible:ring-destructive",
               isValid &&
                 !error &&
@@ -94,6 +94,4 @@ export const FormField: React.FC<FormFieldProps> = ({
       )}
     </div>
   );
-};
-
-export default FormField;
+}

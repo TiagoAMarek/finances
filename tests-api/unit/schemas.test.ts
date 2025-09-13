@@ -259,7 +259,7 @@ describe("Schemas Zod", () => {
 
       if (!result.success) {
         expect(result.error.issues[0].message).toBe(
-          "Configuração de transação inválida",
+          "Para receitas e despesas, selecione apenas uma conta ou cartão de crédito",
         );
       }
     });

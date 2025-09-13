@@ -41,6 +41,7 @@ export default defineConfig({
             "hooks/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
           ],
           exclude: [
+            "__tests__/browser/**",  // Exclude browser-specific tests
             "node_modules/**",
             "dist/**",
             ".next/**",
@@ -51,7 +52,71 @@ export default defineConfig({
           hookTimeout: 10000,
         },
         esbuild: {
-          jsxInject: `import React from 'react'`,
+          jsx: 'automatic',
+        },
+        resolve: {
+          alias: {
+            "@": path.resolve(__dirname, "./"),
+          },
+        },
+        define: {
+          "process.env": process.env,
+        },
+      },
+      // Projeto Browser (Playwright environment)
+      {
+        test: {
+          name: "browser",
+          browser: {
+            enabled: true,
+            provider: "playwright",
+            instances: [
+              { browser: "chromium" }  // Single browser for faster testing
+            ],
+            headless: true,
+            viewport: {
+              width: 1280,
+              height: 720
+            },
+            // Enhanced browser configuration following latest Vitest docs
+            screenshotFailures: false,
+            ui: false, // Since we're running headless
+            api: {
+              port: 63315, // Default port, explicit is better
+            }
+          },
+          globals: true,
+          setupFiles: ["./__tests__/browser-setup.ts"],
+          include: [
+            "__tests__/browser/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+            "**/*.browser.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"
+          ],
+          exclude: [
+            "node_modules/**",
+            "dist/**",
+            ".next/**",
+            "coverage/**",
+            "**/examples/**",
+            "**/*.{node,server}.{test,spec}.*",  // Exclude server tests
+            "**/api/**"  // Exclude API tests
+          ],
+          testTimeout: 5000,      // Optimized for browser tests
+          hookTimeout: 3000,      // Optimized for browser tests
+        },
+        esbuild: {
+          jsx: 'automatic',
+        },
+        optimizeDeps: {
+          include: [
+            'react/jsx-dev-runtime',
+            'react',
+            'react-dom',
+            'next/navigation',
+            'next/image',
+            '@vitest/browser/context',
+            'vitest-browser-react'
+          ],
+          exclude: ['@vitest/browser']
         },
         resolve: {
           alias: {

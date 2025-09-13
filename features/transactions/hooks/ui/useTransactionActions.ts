@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { toast } from "sonner";
+import { TransactionCreateInput, TransactionFormInput, TransactionCreateSchema } from "@/lib/schemas";
 import {
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransaction,
 } from "../data";
 import { Transaction } from "@/lib/schemas";
+import { toast } from "sonner";
 
 /**
  * Hook for managing transaction actions and UI state
@@ -21,17 +22,25 @@ export function useTransactionActions() {
   const updateTransactionMutation = useUpdateTransaction();
   const deleteTransactionMutation = useDeleteTransaction();
 
-  const createTransaction = async (data: {
-    description: string;
-    amount: string;
-    type: "income" | "expense" | "transfer";
-    date: string;
-    categoryId: number;
-    accountId?: number;
-    creditCardId?: number;
-  }) => {
+  const createTransaction = async (data: TransactionFormInput) => {
+    // Remove UI-only fields before API validation
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { sourceType: _, ...apiData } = data;
+
+    // Validate against the create schema before submitting
+    const parseResult = TransactionCreateSchema.safeParse(apiData);
+
+    if (!parseResult.success) {
+      // If validation fails, show the first error and reject
+      const firstError = parseResult.error.errors[0];
+      toast.error(firstError.message);
+      return Promise.reject(new Error(firstError.message));
+    }
+
+    const createInput: TransactionCreateInput = parseResult.data;
+    
     return new Promise<void>((resolve, reject) => {
-      createTransactionMutation.mutate(data, {
+      createTransactionMutation.mutate(createInput, {
         onSuccess: () => {
           toast.success("Transação criada com sucesso!");
           setCreateModalOpen(false);

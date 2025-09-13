@@ -1,24 +1,22 @@
-import {
-  Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Label,
-} from "@/features/shared/components/ui";
-import { BankAccount } from "@/lib/schemas";
+import { useMemo } from "react";
+import { 
+  FormModal,
+  FormModalHeader,
+  FormModalField,
+  FormModalActions,
+  FormModalFormWithHook,
+  FormModalPreview
+} from "@/features/shared/components";
+import { Input } from "@/features/shared/components/ui";
+import { BankAccount, BankAccountFormInput, BankAccountFormSchema } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CreditCardIcon,
-  DollarSignIcon,
   EditIcon,
-  Loader2Icon,
   SaveIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 interface EditAccountModalProps {
   account: BankAccount | null;
@@ -35,36 +33,47 @@ export function EditAccountModal({
   onSave,
   isLoading,
 }: EditAccountModalProps) {
-  const [name, setName] = useState("");
-  const [balance, setBalance] = useState<number>(0);
+  // Memoize resolver to prevent recreation on every render
+  const resolver = useMemo(() => zodResolver(BankAccountFormSchema), []);
+  
+  // Memoize default values to prevent recreation on every render
+  const defaultValues = useMemo(() => ({
+    name: "",
+    balance: "0",
+    currency: "BRL" as const,
+  }), []);
 
+  const form = useForm<BankAccountFormInput>({
+    resolver,
+    mode: "onTouched", // Less aggressive validation for better performance
+    defaultValues,
+  });
+
+  // Update form values when account changes
   useEffect(() => {
     if (account) {
-      setName(account.name);
-      setBalance(parseFloat(account.balance));
+      form.reset({
+        name: account.name,
+        balance: account.balance,
+        currency: account.currency,
+      });
     }
-  }, [account]);
+  }, [account, form]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (data: BankAccountFormInput) => {
     if (!account) return;
 
     onSave({
       ...account,
-      name,
-      balance: balance.toString(),
+      name: data.name,
+      balance: data.balance,
+      currency: data.currency,
     });
-  };
-
-  const resetForm = () => {
-    if (account) {
-      setName(account.name);
-      setBalance(parseFloat(account.balance));
-    }
+    handleClose();
   };
 
   const handleClose = () => {
-    resetForm();
+    form.reset();
     onOpenChange(false);
   };
 
@@ -78,123 +87,81 @@ export function EditAccountModal({
   if (!account) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="text-center space-y-3 pb-4">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-orange-500/10">
-            <EditIcon className="h-6 w-6 text-orange-500" />
-          </div>
-          <div className="space-y-1">
-            <DialogTitle className="text-xl">Editar Conta Bancária</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Atualize os dados da sua conta bancária
-            </DialogDescription>
-          </div>
-        </DialogHeader>
+    <FormModal
+      open={open}
+      onOpenChange={onOpenChange}
+      variant="edit"
+      size="md"
+    >
+      <FormModalHeader
+        icon={EditIcon}
+        iconColor="text-orange-500"
+        iconBgColor="bg-orange-500/10"
+        title="Editar Conta Bancária"
+        description="Atualize os dados da sua conta bancária"
+      />
 
-        {/* Preview da conta atual */}
-        <div className="bg-muted/30 rounded-lg p-4 border border-dashed mb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <CreditCardIcon className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium text-foreground">{account.name}</p>
-              <p className="text-sm text-muted-foreground">
-                Saldo atual: {formatCurrency(parseFloat(account.balance))}
-              </p>
-            </div>
+      <FormModalPreview>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <CreditCardIcon className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="font-medium text-foreground">{account.name}</p>
+            <p className="text-sm text-muted-foreground">
+              Saldo atual: {formatCurrency(parseFloat(account.balance))}
+            </p>
           </div>
         </div>
+      </FormModalPreview>
 
-        <Card className="border-dashed">
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="editAccountName"
-                  className="text-sm font-medium flex items-center gap-2"
-                >
-                  <CreditCardIcon className="h-4 w-4" />
-                  Nome da Conta
-                </Label>
-                <Input
-                  type="text"
-                  id="editAccountName"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex: Conta Corrente Santander"
-                  className="h-11"
-                  autoFocus
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  Escolha um nome que facilite a identificação da conta
-                </p>
-              </div>
+      <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
+        <FormModalField
+          form={form}
+          name="name"
+          label="Nome da Conta"
+          description="Escolha um nome que facilite a identificação da conta"
+          required
+        >
+          <Input
+            type="text"
+            placeholder="Ex: Conta Corrente Santander"
+            className="h-11"
+            autoFocus
+            {...form.register("name")}
+          />
+        </FormModalField>
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="editAccountBalance"
-                  className="text-sm font-medium flex items-center gap-2"
-                >
-                  <DollarSignIcon className="h-4 w-4" />
-                  Saldo Atual
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                    R$
-                  </span>
-                  <Input
-                    type="number"
-                    id="editAccountBalance"
-                    value={balance || ""}
-                    onChange={(e) =>
-                      setBalance(parseFloat(e.target.value) || 0)
-                    }
-                    placeholder="0,00"
-                    className="h-11 pl-10"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Atualize o saldo atual da sua conta bancária
-                </p>
-              </div>
+        <FormModalField
+          form={form}
+          name="balance"
+          label="Saldo Atual"
+          description="Atualize o saldo atual da sua conta bancária"
+          required
+        >
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+              R$
+            </span>
+            <Input
+              type="number"
+              placeholder="0,00"
+              className="h-11 pl-10"
+              step="0.01"
+              min="0"
+              {...form.register("balance")}
+            />
+          </div>
+        </FormModalField>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  className="flex-1"
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading || !name.trim()}
-                  className="flex-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2Icon className="h-4 w-4 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    <>
-                      <SaveIcon className="h-4 w-4" />
-                      Salvar Alterações
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </DialogContent>
-    </Dialog>
+        <FormModalActions
+          form={form}
+          onCancel={handleClose}
+          submitText="Salvar Alterações"
+          submitIcon={SaveIcon}
+          isLoading={isLoading}
+        />
+      </FormModalFormWithHook>
+    </FormModal>
   );
 }

@@ -6,6 +6,9 @@
       "dom.iterable",
       "esnext"
     ],
+    "types": [
+      "@vitest/browser/providers/playwright"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

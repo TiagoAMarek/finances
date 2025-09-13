@@ -27,6 +27,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm test:client:watch` - Watch client-side tests
 - `pnpm test:server:coverage` - Server tests with coverage
 - `pnpm test:client:coverage` - Client tests with coverage
+- `pnpm test:browser` - Run browser tests with Playwright
+- `pnpm test:browser:watch` - Watch browser tests
+- `pnpm test:browser:coverage` - Browser tests with coverage
+- `pnpm test:browser:ui` - Open browser test UI
 
 ### Database
 
@@ -84,11 +88,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 #### Testing Architecture
 
-- **Dual Environment**: Separate server (Node) and client (jsdom) test projects
+- **Triple Environment**: Separate server (Node), client (jsdom), and browser (Playwright) test projects
 - **MSW Integration**: Complete Mock Service Worker setup for API testing
 - **Coverage Thresholds**: 80% coverage requirement across branches, functions, lines, statements
-- **Test Organization**: Unit tests in `tests/unit/`, integration tests in `tests/integration/`, component tests in `__tests__/`
+- **Test Organization**: Unit tests in `tests/unit/`, integration tests in `tests/integration/`, component tests in `__tests__/`, browser tests in `__tests__/browser/`
 - **Authentication Mocking**: Comprehensive auth testing utilities in `__tests__/mocks/`
+- **Browser Testing**: Real browser interaction tests using Playwright with screenshot capabilities
 
 #### Data Flow
 
@@ -99,10 +104,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Database Schema Structure
 
-- **users**: Basic authentication (id, email, hashedPassword)
-- **bankAccounts**: User bank accounts with balance tracking
-- **creditCards**: Credit cards with limits and current bill tracking
-- **transactions**: All financial transactions (income, expense, transfer) with references to accounts/cards
+- **users**: Basic authentication (id, name, email, hashedPassword)
+- **categories**: Transaction categories with user ownership (id, name, type, color, icon, isDefault, ownerId)
+- **defaultCategories**: System-wide category templates for seeding new users
+- **bankAccounts**: User bank accounts with balance tracking (id, name, balance, currency, ownerId)
+- **creditCards**: Credit cards with limits and current bill tracking (id, name, limit, currentBill, ownerId)
+- **transactions**: All financial transactions (id, description, amount, type, date, categoryId, ownerId, accountId, creditCardId, toAccountId for transfers)
 
 ### Import Patterns
 
@@ -111,6 +118,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - API utilities from `@/utils/api`
 - Components use absolute imports with `@/components/`
 - shadcn/ui components from `@/components/ui`
+- Feature imports: `@/features/[feature]/*` with dedicated paths in tsconfig.json
+- Features export from `features/[feature]/index.ts` for clean imports
 
 ### Error Handling
 
@@ -146,6 +155,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Server tests (`pnpm test:server`) run in Node environment for API route testing
 - Client tests (`pnpm test:client`) run in jsdom environment for component testing
+- Browser tests (`pnpm test:browser`) run in real Playwright browser for E2E testing
 - Shared setup files configure MSW and test utilities
 - Coverage reports generated separately for each environment
 
@@ -156,6 +166,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Error simulation for network and validation failures
 - Protected route testing patterns with automatic token handling
 
+#### Browser Testing Capabilities
+
+- Real browser interactions using Playwright with Chrome
+- Automated screenshot capture for visual regression testing
+- Form interaction testing with real user events
+- Component behavior validation in actual browser environment
+
 ### shadcn/ui Configuration
 
 - Style: New York variant
@@ -164,8 +181,83 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Icons: Lucide React
 - All UI components follow shadcn/ui patterns and conventions
 
+## FormModal System
+
+### Reusable FormModal Components
+
+- **Location**: `features/shared/components/FormModal/`
+- **Architecture**: Modular system with individual component exports (not compound)
+- **Integration**: React Hook Form + Zod validation + TypeScript
+- **Components**: FormModalBase, FormModalHeader, FormModalFormWithHook, FormModalActions, FormModalField
+- **Features**: Automatic validation state management, escape hatches for customization, preview mode for edit modals
+
+### Usage Pattern
+
+```typescript
+// Import individual components
+import { 
+  FormModalBase, 
+  FormModalHeader, 
+  FormModalFormWithHook, 
+  FormModalField,
+  FormModalActions 
+} from '@/features/shared/components/FormModal'
+
+// Standard usage with react-hook-form
+<FormModalBase open={isOpen} onOpenChange={setIsOpen}>
+  <FormModalHeader icon={Plus} title="Create Account" description="Add a new bank account" />
+  <FormModalFormWithHook form={form} onSubmit={onSubmit}>
+    <FormModalField form={form} name="name" label="Account Name" required>
+      <Input placeholder="Enter account name" />
+    </FormModalField>
+  </FormModalFormWithHook>
+  <FormModalActions form={form} onCancel={handleCancel} submitText="Create Account" isLoading={isLoading} />
+</FormModalBase>
+```
+
+## Component Organization
+
+### Feature-Based Structure
+
+- **Features Directory**: `features/[feature-name]/`
+- **Components**: `components/` - Feature-specific UI components
+- **Hooks**: `hooks/` - Split into `data/` (API) and `ui/` (component logic)
+- **Index Exports**: Clean imports via `features/[feature]/index.ts`
+
+### Shared Components
+
+- **Location**: `features/shared/components/`
+- **UI Components**: Enhanced versions of shadcn/ui components with Brazilian localization
+- **Business Components**: Charts, forms, and financial-specific components
+- **Layout Components**: AppLayout, AppSidebar, PageHeader, etc.
+
+## Development Practices
+
+### Code Quality
+
+- **Linting**: Next.js ESLint config with auto-fixing via `pnpm lint`
+- **Type Checking**: Strict TypeScript with separate configs for main and test files
+- **Validation**: Zod schemas with Portuguese error messages
+- **Error Messages**: Centralized in `lib/validation-messages.ts`
+
+### State Management Patterns
+
+- **Server State**: TanStack Query with feature-specific hooks
+- **Client State**: React state and localStorage for auth tokens
+- **Form State**: React Hook Form with Zod resolvers
+- **Global State**: Minimal - prefer server state and prop drilling
+
+### API Integration
+
+- **Authentication**: `fetchWithAuth()` utility with automatic token handling
+- **Error Handling**: Consistent error format with Portuguese messages
+- **Validation**: Shared Zod schemas between frontend and backend
+- **Route Pattern**: RESTful `/api/[resource]/` and `/api/[resource]/[id]/`
+
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+- always try to search on the web how to test shadcn components
+- always try to use regex to query for elements when writing tests

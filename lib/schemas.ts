@@ -1,24 +1,25 @@
 import { z } from "zod";
+import { VALIDATION_MESSAGES, requiredMessage, formatMessage } from "./validation-messages";
 
 // Auth schemas
 export const LoginSchema = z.object({
-  email: z.string().email("Formato de email inválido"),
-  password: z.string().min(1, "Senha é obrigatória"),
+  email: z.string().email(formatMessage("email")),
+  password: z.string().min(1, requiredMessage("password")),
 });
 
 // API register schema (what gets sent to the API)
 export const RegisterApiSchema = z.object({
-  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  email: z.string().email("Formato de email inválido"),
+  name: z.string().min(2, VALIDATION_MESSAGES.length.nameMin),
+  email: z.string().email(formatMessage("email")),
   password: z
     .string()
-    .min(8, "Senha deve ter pelo menos 8 caracteres")
-    .regex(/[A-Z]/, "Senha deve conter pelo menos uma letra maiúscula")
-    .regex(/[a-z]/, "Senha deve conter pelo menos uma letra minúscula")
-    .regex(/[0-9]/, "Senha deve conter pelo menos um número")
+    .min(8, VALIDATION_MESSAGES.length.passwordMin)
+    .regex(/[A-Z]/, VALIDATION_MESSAGES.password.uppercase)
+    .regex(/[a-z]/, VALIDATION_MESSAGES.password.lowercase)
+    .regex(/[0-9]/, VALIDATION_MESSAGES.password.number)
     .regex(
       /[^A-Za-z0-9]/,
-      "Senha deve conter pelo menos um caractere especial",
+      VALIDATION_MESSAGES.password.special,
     ),
 });
 
@@ -26,7 +27,7 @@ export const RegisterApiSchema = z.object({
 export const RegisterSchema = RegisterApiSchema.extend({
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem",
+  message: VALIDATION_MESSAGES.password.match,
   path: ["confirmPassword"],
 });
 
@@ -39,14 +40,22 @@ export const BankAccountSchema = z.object({
   ownerId: z.number(),
 });
 
+// API schema with defaults for server processing
 export const BankAccountCreateSchema = z.object({
-  name: z.string().min(1, "Nome da conta é obrigatório"),
-  balance: z.string().default("0"),
-  currency: z.string().default("BRL"),
+  name: z.string().min(1, VALIDATION_MESSAGES.required.accountName),
+  balance: z.string().min(1, requiredMessage("balance")).default("0"),
+  currency: z.string().min(1, requiredMessage("currency")).default("BRL"),
+});
+
+// Form schema for react-hook-form (without defaults to keep types clean)
+export const BankAccountFormSchema = z.object({
+  name: z.string().min(1, requiredMessage("name")),
+  balance: z.string().min(1, requiredMessage("balance")),
+  currency: z.string().min(1, requiredMessage("currency")),
 });
 
 export const BankAccountUpdateSchema = z.object({
-  name: z.string().min(1, "Nome da conta é obrigatório").optional(),
+  name: z.string().min(1, VALIDATION_MESSAGES.required.accountName).optional(),
   balance: z.string().optional(),
   currency: z.string().optional(),
 });
@@ -61,13 +70,13 @@ export const CreditCardSchema = z.object({
 });
 
 export const CreditCardCreateSchema = z.object({
-  name: z.string().min(1, "Nome do cartão é obrigatório"),
-  limit: z.string().default("0"),
-  currentBill: z.string().default("0"),
+  name: z.string().min(1, VALIDATION_MESSAGES.required.cardName),
+  limit: z.string().min(1, requiredMessage("limit")),
+  currentBill: z.string().min(1, requiredMessage("currentBill")),
 });
 
 export const CreditCardUpdateSchema = z.object({
-  name: z.string().min(1, "Nome do cartão é obrigatório").optional(),
+  name: z.string().min(1, VALIDATION_MESSAGES.required.cardName).optional(),
   limit: z.string().optional(),
   currentBill: z.string().optional(),
 });
@@ -85,33 +94,33 @@ export const CategorySchema = z.object({
 });
 
 export const CategoryCreateSchema = z.object({
-  name: z.string().min(1, "Nome da categoria é obrigatório"),
+  name: z.string().min(1, requiredMessage("name")),
   type: z.enum(["income", "expense", "both"], {
     errorMap: () => ({
-      message: "Tipo deve ser 'income', 'expense' ou 'both'",
+      message: VALIDATION_MESSAGES.enums.categoryType,
     }),
   }),
   color: z
     .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato hexadecimal")
+    .regex(/^#[0-9A-F]{6}$/i, formatMessage("hexColor"))
     .optional(),
-  icon: z.string().min(1, "Ícone é obrigatório").optional(),
+  icon: z.string().min(1, requiredMessage("icon")).optional(),
 });
 
 export const CategoryUpdateSchema = z.object({
-  name: z.string().min(1, "Nome da categoria é obrigatório").optional(),
+  name: z.string().min(1, requiredMessage("name")).optional(),
   type: z
     .enum(["income", "expense", "both"], {
       errorMap: () => ({
-        message: "Tipo deve ser 'income', 'expense' ou 'both'",
+        message: VALIDATION_MESSAGES.enums.categoryType,
       }),
     })
     .optional(),
   color: z
     .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato hexadecimal")
+    .regex(/^#[0-9A-F]{6}$/i, formatMessage("hexColor"))
     .optional(),
-  icon: z.string().min(1, "Ícone é obrigatório").optional(),
+  icon: z.string().min(1, requiredMessage("icon")).optional(),
 });
 
 // Default category schema (for seeding)
@@ -139,17 +148,31 @@ export const TransactionSchema = z.object({
   toAccountId: z.number().nullable().optional(), // For transfers
 });
 
+// Base schema for API - categoryId is required for income/expense
 export const TransactionCreateSchema = z
   .object({
-    description: z.string().min(1, "Descrição é obrigatória"),
-    amount: z.string().min(1, "Valor é obrigatório"),
+    description: z.string().min(1, requiredMessage("description")),
+    amount: z.string().min(1, requiredMessage("amount")),
     type: z.enum(["income", "expense", "transfer"]),
-    date: z.string().min(1, "Data é obrigatória"),
-    categoryId: z.number({ required_error: "Categoria é obrigatória" }),
+    date: z.string().min(1, requiredMessage("date")),
+    categoryId: z.number().optional(),
     accountId: z.number().optional(),
     creditCardId: z.number().optional(),
     toAccountId: z.number().optional(), // For transfers
   })
+  .refine(
+    (data) => {
+      // Category is required for income and expense
+      if (data.type !== "transfer" && !data.categoryId) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.categoryRequired,
+      path: ["categoryId"],
+    },
+  )
   .refine(
     (data) => {
       if (data.type === "transfer") {
@@ -159,19 +182,91 @@ export const TransactionCreateSchema = z
           data.accountId !== data.toAccountId
         );
       }
-      return (
-        !!(data.accountId || data.creditCardId) &&
-        !(data.accountId && data.creditCardId)
-      );
+      return true;
     },
     {
-      message: "Configuração de transação inválida",
+      message: VALIDATION_MESSAGES.business.transferAccounts,
+      path: ["toAccountId"],
+    },
+  )
+  .refine(
+    (data) => {
+      // For income/expense, either accountId or creditCardId is required but not both
+      if (data.type !== "transfer") {
+        return (
+          !!(data.accountId || data.creditCardId) &&
+          !(data.accountId && data.creditCardId)
+        );
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.singleSource,
+      path: ["accountId"],
+    },
+  );
+
+// Form schema for React Hook Form - includes business validation rules
+export const TransactionFormSchema = z.object({
+  description: z.string().min(1, requiredMessage("description")),
+  amount: z.string().min(1, requiredMessage("amount")),
+  type: z.enum(["income", "expense", "transfer"]),
+  date: z.string().min(1, requiredMessage("date")),
+  categoryId: z.number().optional(),
+  accountId: z.number().optional(),
+  creditCardId: z.number().optional(),
+  toAccountId: z.number().optional(),
+  sourceType: z.enum(["account", "creditCard"]).optional(),
+})
+  .refine(
+    (data) => {
+      // Category is required for income and expense
+      if (data.type !== "transfer" && !data.categoryId) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.categoryRequired,
+      path: ["categoryId"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === "transfer") {
+        return (
+          data.accountId &&
+          data.toAccountId &&
+          data.accountId !== data.toAccountId
+        );
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.transferAccounts,
+      path: ["toAccountId"],
+    },
+  )
+  .refine(
+    (data) => {
+      // For income/expense, either accountId or creditCardId is required but not both
+      if (data.type !== "transfer") {
+        return (
+          !!(data.accountId || data.creditCardId) &&
+          !(data.accountId && data.creditCardId)
+        );
+      }
+      return true;
+    },
+    {
+      message: VALIDATION_MESSAGES.business.singleSource,
+      path: ["accountId"],
     },
   );
 
 export const TransactionUpdateSchema = z.object({
   id: z.number(),
-  description: z.string().min(1, "Descrição é obrigatória").optional(),
+  description: z.string().min(1, requiredMessage("description")).optional(),
   amount: z.string().optional(),
   type: z.enum(["income", "expense", "transfer"]).optional(),
   date: z.string().optional(),
@@ -184,14 +279,14 @@ export const TransactionUpdateSchema = z.object({
 // Transfer schema
 export const TransferCreateSchema = z
   .object({
-    description: z.string().min(1, "Descrição é obrigatória"),
-    amount: z.string().min(1, "Valor é obrigatório"),
-    date: z.string().min(1, "Data é obrigatória"),
+    description: z.string().min(1, requiredMessage("description")),
+    amount: z.string().min(1, requiredMessage("amount")),
+    date: z.string().min(1, requiredMessage("date")),
     fromAccountId: z.number(),
     toAccountId: z.number(),
   })
   .refine((data) => data.fromAccountId !== data.toAccountId, {
-    message: "Não é possível transferir para a mesma conta",
+    message: VALIDATION_MESSAGES.business.sameAccount,
   });
 
 // Monthly summary schema - reflecting API structure
@@ -248,12 +343,14 @@ export type LoginInput = z.infer<typeof LoginSchema>;
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type RegisterApiInput = z.infer<typeof RegisterApiSchema>;
 export type BankAccountCreateInput = z.infer<typeof BankAccountCreateSchema>;
+export type BankAccountFormInput = z.infer<typeof BankAccountFormSchema>;
 export type BankAccountUpdateInput = z.infer<typeof BankAccountUpdateSchema>;
 export type CreditCardCreateInput = z.infer<typeof CreditCardCreateSchema>;
 export type CreditCardUpdateInput = z.infer<typeof CreditCardUpdateSchema>;
 export type CategoryCreateInput = z.infer<typeof CategoryCreateSchema>;
 export type CategoryUpdateInput = z.infer<typeof CategoryUpdateSchema>;
 export type TransactionCreateInput = z.infer<typeof TransactionCreateSchema>;
+export type TransactionFormInput = z.infer<typeof TransactionFormSchema>;
 export type TransactionUpdateInput = z.infer<typeof TransactionUpdateSchema>;
 export type TransferCreateInput = z.infer<typeof TransferCreateSchema>;
 export type MonthlySummaryRequestInput = z.infer<

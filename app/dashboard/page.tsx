@@ -10,6 +10,7 @@ import { useDashboardData } from "@/features/dashboard/hooks/ui/useDashboardData
 import { PageHeader, QuickCreateButton } from "@/features/shared/components";
 import { CreateTransactionModal } from "@/features/transactions/components";
 import { useTransactionActions } from "@/features/transactions/hooks/ui/useTransactionActions";
+import { TransactionCreateInput } from "@/lib/schemas";
 import { BarChart3 } from "lucide-react";
 import type { NextPage } from "next";
 import { useCallback, useState } from "react";
@@ -26,15 +27,7 @@ const DashboardPage: NextPage = () => {
   }, []);
 
   const handleCreateTransactionSubmit = useCallback(
-    async (data: {
-      description: string;
-      amount: string;
-      type: "income" | "expense" | "transfer";
-      date: string;
-      categoryId: number;
-      accountId?: number;
-      creditCardId?: number;
-    }) => {
+    async (data: TransactionCreateInput) => {
       await createTransaction(data);
       setIsCreateModalOpen(false);
     },

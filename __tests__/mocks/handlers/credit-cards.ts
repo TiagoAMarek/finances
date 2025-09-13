@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { mockCreditCards } from "../data/credit-cards";
+import { CreditCardCreateInput, CreditCardUpdateInput } from "@/lib/schemas";
 
 export const creditCardHandlers = [
   // GET /api/credit_cards - Fetch all credit cards
@@ -13,14 +14,11 @@ export const creditCardHandlers = [
 
   // POST /api/credit_cards - Create new credit card
   http.post("/api/credit_cards", async ({ request }) => {
-    const newCard = (await request.json()) as any;
+    const newCard = (await request.json()) as CreditCardCreateInput;
     const creditCard = {
       id: Math.max(...mockCreditCards.map((c) => c.id)) + 1,
       ...newCard,
-      userId: 1,
-      currentBill: newCard.currentBill || "0.00",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      ownerId: 1,
     };
 
     mockCreditCards.push(creditCard);
@@ -30,7 +28,7 @@ export const creditCardHandlers = [
   // PUT /api/credit_cards/:id - Update credit card
   http.put("/api/credit_cards/:id", async ({ request, params }) => {
     const cardId = parseInt(params.id as string);
-    const updatedData = (await request.json()) as any;
+    const updatedData = (await request.json()) as CreditCardUpdateInput;
     const cardIndex = mockCreditCards.findIndex((c) => c.id === cardId);
 
     if (cardIndex === -1) {
@@ -43,7 +41,6 @@ export const creditCardHandlers = [
     mockCreditCards[cardIndex] = {
       ...mockCreditCards[cardIndex],
       ...updatedData,
-      updatedAt: new Date().toISOString(),
     };
 
     return HttpResponse.json({ creditCard: mockCreditCards[cardIndex] });

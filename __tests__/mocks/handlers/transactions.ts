@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { mockTransactions } from "../data/transactions";
+import { TransactionCreateInput, TransactionUpdateInput } from "@/lib/schemas";
 
 export const transactionHandlers = [
   // GET /api/transactions - Fetch all transactions
@@ -13,26 +14,30 @@ export const transactionHandlers = [
 
   // POST /api/transactions - Create new transaction
   http.post("http://localhost:3000/api/transactions", async ({ request }) => {
-    const newTransaction = (await request.json()) as any;
+    const newTransaction = (await request.json()) as TransactionCreateInput;
     const transaction = {
       id: Math.max(...mockTransactions.map((t) => t.id)) + 1,
       ...newTransaction,
-      userId: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      ownerId: 1,
+      categoryId: newTransaction.categoryId ?? null,
+      accountId: newTransaction.accountId ?? null,
+      creditCardId: newTransaction.creditCardId ?? null,
+      toAccountId: newTransaction.toAccountId ?? null,
     };
 
     mockTransactions.push(transaction);
     return HttpResponse.json({ transaction });
   }),
   http.post("/api/transactions", async ({ request }) => {
-    const newTransaction = (await request.json()) as any;
+    const newTransaction = (await request.json()) as TransactionCreateInput;
     const transaction = {
       id: Math.max(...mockTransactions.map((t) => t.id)) + 1,
       ...newTransaction,
-      userId: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      ownerId: 1,
+      categoryId: newTransaction.categoryId ?? null,
+      accountId: newTransaction.accountId ?? null,
+      creditCardId: newTransaction.creditCardId ?? null,
+      toAccountId: newTransaction.toAccountId ?? null,
     };
 
     mockTransactions.push(transaction);
@@ -42,7 +47,7 @@ export const transactionHandlers = [
   // PUT /api/transactions/:id - Update transaction
   http.put("/api/transactions/:id", async ({ request, params }) => {
     const transactionId = parseInt(params.id as string);
-    const updatedData = (await request.json()) as any;
+    const updatedData = (await request.json()) as TransactionUpdateInput;
     const transactionIndex = mockTransactions.findIndex(
       (t) => t.id === transactionId,
     );
@@ -57,7 +62,6 @@ export const transactionHandlers = [
     mockTransactions[transactionIndex] = {
       ...mockTransactions[transactionIndex],
       ...updatedData,
-      updatedAt: new Date().toISOString(),
     };
 
     return HttpResponse.json({

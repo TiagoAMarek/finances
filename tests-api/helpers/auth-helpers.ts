@@ -7,7 +7,7 @@ export const createNextRequest = (
   url: string,
   options: {
     method?: string;
-    body?: any;
+    body?: Record<string, unknown> | unknown[] | string;
     token?: string;
     headers?: Record<string, string>;
   } = {},

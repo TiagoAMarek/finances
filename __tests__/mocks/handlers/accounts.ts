@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { mockAccounts } from "../data/accounts";
+import { BankAccountCreateInput, BankAccountUpdateInput } from "@/lib/schemas";
 
 export const accountHandlers = [
   // GET /api/accounts - Fetch all accounts
@@ -13,14 +14,13 @@ export const accountHandlers = [
 
   // POST /api/accounts - Create new account
   http.post("/api/accounts", async ({ request }) => {
-    const newAccount = (await request.json()) as any;
+    const newAccount = (await request.json()) as BankAccountCreateInput;
     const account = {
       id: Math.max(...mockAccounts.map((a) => a.id)) + 1,
       ...newAccount,
-      userId: 1,
+      ownerId: 1,
       balance: newAccount.balance || "0.00",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      currency: newAccount.currency || "BRL",
     };
 
     mockAccounts.push(account);
@@ -30,7 +30,7 @@ export const accountHandlers = [
   // PUT /api/accounts/:id - Update account
   http.put("/api/accounts/:id", async ({ request, params }) => {
     const accountId = parseInt(params.id as string);
-    const updatedData = (await request.json()) as any;
+    const updatedData = (await request.json()) as BankAccountUpdateInput;
     const accountIndex = mockAccounts.findIndex((a) => a.id === accountId);
 
     if (accountIndex === -1) {
@@ -43,7 +43,6 @@ export const accountHandlers = [
     mockAccounts[accountIndex] = {
       ...mockAccounts[accountIndex],
       ...updatedData,
-      updatedAt: new Date().toISOString(),
     };
 
     return HttpResponse.json({ account: mockAccounts[accountIndex] });
