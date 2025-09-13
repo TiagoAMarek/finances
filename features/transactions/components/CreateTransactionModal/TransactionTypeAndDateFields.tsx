@@ -39,7 +39,7 @@ export function TransactionTypeAndDateFields({ form }: TransactionTypeAndDateFie
       </FormModalField>
 
       <FormModalField form={form} name="date" label="Data" required>
-        <Input type="date" className="h-11 w-full min-w-0" data-testid="date-input" {...form.register("date")} />
+        <Input type="date" className="h-11 w-full min-w-0 block" data-testid="date-input" {...form.register("date")} />
       </FormModalField>
     </div>
   );
