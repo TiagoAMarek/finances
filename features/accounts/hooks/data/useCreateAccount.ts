@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/utils/api";
+
 import { BankAccount, BankAccountCreateInput } from "@/lib/schemas";
+import { fetchWithAuth } from "@/utils/api";
 
 /**
  * Hook for creating a new bank account

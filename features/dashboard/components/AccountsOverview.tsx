@@ -1,5 +1,7 @@
-import { BankAccount } from "@/lib/schemas";
 import { Banknote, Settings } from "lucide-react";
+
+import { BankAccount } from "@/lib/schemas";
+
 import { BankAccountItem, ResourceCard } from "./";
 
 interface AccountsOverviewProps {
@@ -15,13 +17,13 @@ export function AccountsOverview({
     return (
       <ResourceCard>
         <ResourceCard.Empty
-          title="Contas Bancárias"
-          icon={Banknote}
-          iconColor="text-blue-500"
-          iconBgColor="bg-blue-500/10"
-          emptyMessage="Nenhuma conta cadastrada"
-          actionText="Adicionar Conta"
           actionHref="/accounts"
+          actionText="Adicionar Conta"
+          emptyMessage="Nenhuma conta cadastrada"
+          icon={Banknote}
+          iconBgColor="bg-blue-500/10"
+          iconColor="text-blue-500"
+          title="Contas Bancárias"
         />
       </ResourceCard>
     );
@@ -30,11 +32,11 @@ export function AccountsOverview({
   return (
     <ResourceCard>
       <ResourceCard.Header
-        title="Contas Bancárias"
-        icon={Banknote}
-        iconColor="text-blue-500"
-        iconBgColor="bg-blue-500/10"
         count={accounts.length}
+        icon={Banknote}
+        iconBgColor="bg-blue-500/10"
+        iconColor="text-blue-500"
+        title="Contas Bancárias"
       />
       <ResourceCard.Content>
         <ResourceCard.Summary
@@ -51,9 +53,9 @@ export function AccountsOverview({
           {accounts.map((account) => (
             <BankAccountItem
               key={account.id}
+              balance={parseFloat(account.balance)}
               id={account.id}
               name={account.name}
-              balance={parseFloat(account.balance)}
             />
           ))}
         </ResourceCard.List>

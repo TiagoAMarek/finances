@@ -1,14 +1,15 @@
-import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { db } from "../lib/db";
-import { categories } from "../lib/schema";
-import { CategoryCreateSchema } from "../lib/validation";
+import { NextRequest } from "next/server";
+
 import {
   getUserFromRequest,
   createErrorResponse,
   createSuccessResponse,
   handleZodError,
 } from "../lib/auth";
+import { db } from "../lib/db";
+import { categories } from "../lib/schema";
+import { CategoryCreateSchema } from "../lib/validation";
 
 // GET /api/categories - List user's categories
 export async function GET(request: NextRequest) {

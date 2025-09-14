@@ -1,10 +1,12 @@
+import { CreditCardIcon, Wallet } from "lucide-react";
+
 import { Badge, Separator, Skeleton } from "@/features/shared/components/ui";
 import {
   RowList,
   RowListSkeleton,
 } from "@/features/shared/components/ui/row-list";
 import { CreditCard } from "@/lib/schemas";
-import { CreditCardIcon, Wallet } from "lucide-react";
+
 import { CreditCardItem } from "./CreditCardItem";
 import { CreditCardsMetricsGrid } from "./CreditCardsMetricsGrid";
 
@@ -92,7 +94,7 @@ export function CreditCardsList({
               Seus Cartões de Crédito
             </h2>
           </div>
-          <Badge variant="secondary" className="text-xs">
+          <Badge className="text-xs" variant="secondary">
             {cards.length} {cards.length === 1 ? "cartão" : "cartões"}
           </Badge>
         </div>
@@ -102,9 +104,9 @@ export function CreditCardsList({
             <CreditCardItem
               key={card.id}
               card={card}
-              onEdit={onEdit}
-              onDelete={onDelete}
               isDeleting={isDeleting}
+              onDelete={onDelete}
+              onEdit={onEdit}
             />
           ))}
         </RowList>

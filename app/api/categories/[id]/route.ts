@@ -1,14 +1,15 @@
-import { NextRequest } from "next/server";
 import { eq, and } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { categories, transactions } from "../../lib/schema";
-import { CategoryUpdateSchema } from "../../lib/validation";
+import { NextRequest } from "next/server";
+
 import {
   getUserFromRequest,
   createErrorResponse,
   createSuccessResponse,
   handleZodError,
 } from "../../lib/auth";
+import { db } from "../../lib/db";
+import { categories, transactions } from "../../lib/schema";
+import { CategoryUpdateSchema } from "../../lib/validation";
 
 // GET /api/categories/[id] - Get specific category
 export async function GET(

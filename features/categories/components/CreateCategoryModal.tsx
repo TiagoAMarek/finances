@@ -1,4 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PlusIcon, TagIcon } from "lucide-react";
 import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+
 import { 
   FormModal,
   FormModalHeader,
@@ -16,9 +20,6 @@ import {
   SelectValue,
 } from "@/features/shared/components/ui";
 import { CategoryCreateInput, CategoryCreateSchema } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon, TagIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
 
 interface CreateCategoryModalProps {
   open: boolean;
@@ -99,40 +100,40 @@ export function CreateCategoryModal({
   return (
     <FormModal
       open={open}
-      onOpenChange={onOpenChange}
-      variant="create"
       size="md"
       trigger={
         <QuickCreateButton onClick={() => onOpenChange(true)}>
           Nova Categoria
         </QuickCreateButton>
       }
+      variant="create"
+      onOpenChange={onOpenChange}
     >
       <FormModalHeader
-        icon={TagIcon}
-        iconColor="text-primary"
-        iconBgColor="bg-primary/10"
-        title="Nova Categoria"
         description="Crie uma nova categoria para organizar suas transações"
+        icon={TagIcon}
+        iconBgColor="bg-primary/10"
+        iconColor="text-primary"
+        title="Nova Categoria"
       />
 
       <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
         <FormModalField
           form={form}
-          name="name"
           label="Nome da Categoria"
+          name="name"
           required
         >
           <Input
-            type="text"
-            placeholder="Ex: Alimentação"
-            className="h-11"
             autoFocus
+            className="h-11"
+            placeholder="Ex: Alimentação"
+            type="text"
             {...form.register("name")}
           />
         </FormModalField>
 
-        <FormModalField form={form} name="type" label="Tipo" required>
+        <FormModalField form={form} label="Tipo" name="type" required>
           <Select
             value={form.watch("type")}
             onValueChange={(value) =>
@@ -150,35 +151,35 @@ export function CreateCategoryModal({
           </Select>
         </FormModalField>
 
-        <FormModalField form={form} name="color" label="Cor">
+        <FormModalField form={form} label="Cor" name="color">
           <div className="flex flex-wrap gap-2">
             {CATEGORY_COLORS.map((colorOption) => (
               <button
                 key={colorOption}
-                type="button"
                 className={`w-8 h-8 rounded-full border-2 ${
                   form.watch("color") === colorOption
                     ? "border-primary"
                     : "border-transparent"
                 }`}
                 style={{ backgroundColor: colorOption }}
+                type="button"
                 onClick={() => form.setValue("color", colorOption)}
               />
             ))}
           </div>
         </FormModalField>
 
-        <FormModalField form={form} name="icon" label="Ícone">
+        <FormModalField form={form} label="Ícone" name="icon">
           <div className="flex flex-wrap gap-2">
             {CATEGORY_ICONS.map((iconOption) => (
               <button
                 key={iconOption}
-                type="button"
                 className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${
                   form.watch("icon") === iconOption
                     ? "border-primary bg-primary/10"
                     : "border-border hover:border-primary/50"
                 }`}
+                type="button"
                 onClick={() => form.setValue("icon", iconOption)}
               >
                 {iconOption}
@@ -189,10 +190,10 @@ export function CreateCategoryModal({
 
         <FormModalActions
           form={form}
-          onCancel={handleClose}
-          submitText="Criar Categoria"
-          submitIcon={PlusIcon}
           isLoading={isLoading}
+          submitIcon={PlusIcon}
+          submitText="Criar Categoria"
+          onCancel={handleClose}
         />
       </FormModalFormWithHook>
     </FormModal>

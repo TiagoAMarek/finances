@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
+import { describe, it, expect, vi } from "vitest";
+
 import { TransactionFiltersComponent, TransactionFilters } from "@/features/transactions/components/TransactionFilters";
 
 vi.mock("@/features/accounts/hooks/data", () => ({
@@ -23,9 +24,9 @@ function Harness({ initial }: { initial?: Partial<TransactionFilters> }) {
   });
   return (
     <TransactionFiltersComponent
+      categories={["Alimentação", "Transporte"]}
       filters={filters}
       onFiltersChange={setFilters}
-      categories={["Alimentação", "Transporte"]}
     />
   );
 }

@@ -1,18 +1,19 @@
-import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderWithProviders, screen, fireEvent, act } from "../../utils/test-utils";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Input } from "@/features/shared/components/ui/input";
 import { Plus, Edit } from "lucide-react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { z } from "zod";
 
 // Import FormModal components
-import { FormModalBase } from "@/features/shared/components/FormModal/FormModalBase";
-import { FormModalHeader } from "@/features/shared/components/FormModal/FormModalHeader";
-import { FormModalFormWithHook } from "@/features/shared/components/FormModal/FormModalFormWithHook";
-import { FormModalField } from "@/features/shared/components/FormModal/FormModalField";
 import { FormModalActions } from "@/features/shared/components/FormModal/FormModalActions";
+import { FormModalBase } from "@/features/shared/components/FormModal/FormModalBase";
+import { FormModalField } from "@/features/shared/components/FormModal/FormModalField";
+import { FormModalFormWithHook } from "@/features/shared/components/FormModal/FormModalFormWithHook";
+import { FormModalHeader } from "@/features/shared/components/FormModal/FormModalHeader";
+import { Input } from "@/features/shared/components/ui/input";
+
+import { renderWithProviders, screen, fireEvent, act } from "../../utils/test-utils";
 
 // Test schema for form validation
 const testSchema = z.object({
@@ -59,24 +60,24 @@ const TestFormModal = ({
   return (
     <FormModalBase
       open={open}
-      onOpenChange={onOpenChange}
-      variant={variant}
       size={size}
       trigger={trigger}
+      variant={variant}
+      onOpenChange={onOpenChange}
     >
       <FormModalHeader
+        description={variant === "create" ? "Adicione um novo usuário ao sistema" : "Edite as informações do usuário"}
         icon={variant === "create" ? Plus : Edit}
         title={variant === "create" ? "Criar Usuário" : "Editar Usuário"}
-        description={variant === "create" ? "Adicione um novo usuário ao sistema" : "Edite as informações do usuário"}
       />
 
       <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
         <div className="space-y-4">
-          <FormModalField form={form} name="name" label="Nome" required>
+          <FormModalField form={form} label="Nome" name="name" required>
             <Input {...form.register("name")} placeholder="Digite o nome" />
           </FormModalField>
 
-          <FormModalField form={form} name="email" label="Email" required>
+          <FormModalField form={form} label="Email" name="email" required>
             <Input {...form.register("email")} placeholder="Digite o email" type="email" />
           </FormModalField>
         </div>
@@ -84,10 +85,10 @@ const TestFormModal = ({
 
       <FormModalActions
         form={form}
-        onCancel={handleCancel}
-        submitText={variant === "create" ? "Criar" : "Salvar"}
-        submitIcon={variant === "create" ? Plus : Edit}
         isLoading={false}
+        submitIcon={variant === "create" ? Plus : Edit}
+        submitText={variant === "create" ? "Criar" : "Salvar"}
+        onCancel={handleCancel}
       />
     </FormModalBase>
   );
@@ -201,11 +202,11 @@ describe("FormModal Core Behaviors", () => {
 
       renderWithProviders(
         <TestFormModal
+          defaultValues={defaultValues}
           open={true}
+          variant="edit"
           onOpenChange={mockOnOpenChange}
           onSubmit={mockOnSubmit}
-          variant="edit"
-          defaultValues={defaultValues}
         />
       );
 
@@ -220,9 +221,9 @@ describe("FormModal Core Behaviors", () => {
       const { rerender } = renderWithProviders(
         <TestFormModal
           open={true}
+          size="sm"
           onOpenChange={mockOnOpenChange}
           onSubmit={mockOnSubmit}
-          size="sm"
         />
       );
 
@@ -232,9 +233,9 @@ describe("FormModal Core Behaviors", () => {
       rerender(
         <TestFormModal
           open={true}
+          size="md"
           onOpenChange={mockOnOpenChange}
           onSubmit={mockOnSubmit}
-          size="md"
         />
       );
 
@@ -244,9 +245,9 @@ describe("FormModal Core Behaviors", () => {
       rerender(
         <TestFormModal
           open={true}
+          size="lg"
           onOpenChange={mockOnOpenChange}
           onSubmit={mockOnSubmit}
-          size="lg"
         />
       );
 
@@ -320,9 +321,9 @@ describe("FormModal Core Behaviors", () => {
       const { rerender } = renderWithProviders(
         <TestFormModal
           open={true}
+          variant="create"
           onOpenChange={mockOnOpenChange}
           onSubmit={mockOnSubmit}
-          variant="create"
         />
       );
 
@@ -332,9 +333,9 @@ describe("FormModal Core Behaviors", () => {
       rerender(
         <TestFormModal
           open={true}
+          variant="edit"
           onOpenChange={mockOnOpenChange}
           onSubmit={mockOnSubmit}
-          variant="edit"
         />
       );
 

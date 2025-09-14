@@ -1,6 +1,8 @@
 import { FieldValues } from "react-hook-form";
-import { Textarea } from "@/features/shared/components/ui";
+
 import { FormModalField } from "@/features/shared/components/FormModal";
+import { Textarea } from "@/features/shared/components/ui";
+
 import type { BaseFieldProps } from "./types";
 
 /**
@@ -27,21 +29,21 @@ export function TextArea<T extends FieldValues>({
 }) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <Textarea
-        placeholder={placeholder}
-        className={`h-auto min-h-[80px] ${className || ""}`}
-        disabled={disabled}
         autoFocus={autoFocus}
-        rows={rows}
-        maxLength={maxLength}
-        style={{ resize }}
+        className={`h-auto min-h-[80px] ${className || ""}`}
         data-testid={testId}
+        disabled={disabled}
+        maxLength={maxLength}
+        placeholder={placeholder}
+        rows={rows}
+        style={{ resize }}
         {...form.register(name)}
       />
     </FormModalField>

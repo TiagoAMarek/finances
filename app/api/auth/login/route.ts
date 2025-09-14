@@ -1,8 +1,6 @@
-import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { users } from "../../lib/schema";
-import { LoginSchema } from "../../lib/validation";
+import { NextRequest } from "next/server";
+
 import {
   verifyPassword,
   signToken,
@@ -10,6 +8,9 @@ import {
   createSuccessResponse,
   handleZodError,
 } from "../../lib/auth";
+import { db } from "../../lib/db";
+import { users } from "../../lib/schema";
+import { LoginSchema } from "../../lib/validation";
 
 export async function POST(request: NextRequest) {
   try {

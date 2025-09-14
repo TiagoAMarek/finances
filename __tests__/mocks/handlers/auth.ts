@@ -1,6 +1,8 @@
 import { http, HttpResponse } from "msw";
-import { mockUsers, authHelpers } from "../data/auth";
+
 import { LoginSchema, RegisterSchema } from "@/lib/schemas";
+
+import { mockUsers, authHelpers } from "../data/auth";
 
 /**
  * MSW handlers for authentication endpoints

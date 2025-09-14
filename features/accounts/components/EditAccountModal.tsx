@@ -1,4 +1,13 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CreditCardIcon,
+  EditIcon,
+  SaveIcon,
+} from "lucide-react";
 import { useMemo } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+
 import { 
   FormModal,
   FormModalHeader,
@@ -9,14 +18,6 @@ import {
 } from "@/features/shared/components";
 import { Input } from "@/features/shared/components/ui";
 import { BankAccount, BankAccountFormInput, BankAccountFormSchema } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  CreditCardIcon,
-  EditIcon,
-  SaveIcon,
-} from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 
 interface EditAccountModalProps {
   account: BankAccount | null;
@@ -89,16 +90,16 @@ export function EditAccountModal({
   return (
     <FormModal
       open={open}
-      onOpenChange={onOpenChange}
-      variant="edit"
       size="md"
+      variant="edit"
+      onOpenChange={onOpenChange}
     >
       <FormModalHeader
-        icon={EditIcon}
-        iconColor="text-orange-500"
-        iconBgColor="bg-orange-500/10"
-        title="Editar Conta Bancária"
         description="Atualize os dados da sua conta bancária"
+        icon={EditIcon}
+        iconBgColor="bg-orange-500/10"
+        iconColor="text-orange-500"
+        title="Editar Conta Bancária"
       />
 
       <FormModalPreview>
@@ -117,26 +118,26 @@ export function EditAccountModal({
 
       <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
         <FormModalField
-          form={form}
-          name="name"
-          label="Nome da Conta"
           description="Escolha um nome que facilite a identificação da conta"
+          form={form}
+          label="Nome da Conta"
+          name="name"
           required
         >
           <Input
-            type="text"
-            placeholder="Ex: Conta Corrente Santander"
-            className="h-11"
             autoFocus
+            className="h-11"
+            placeholder="Ex: Conta Corrente Santander"
+            type="text"
             {...form.register("name")}
           />
         </FormModalField>
 
         <FormModalField
-          form={form}
-          name="balance"
-          label="Saldo Atual"
           description="Atualize o saldo atual da sua conta bancária"
+          form={form}
+          label="Saldo Atual"
+          name="balance"
           required
         >
           <div className="relative">
@@ -144,11 +145,11 @@ export function EditAccountModal({
               R$
             </span>
             <Input
-              type="number"
-              placeholder="0,00"
               className="h-11 pl-10"
-              step="0.01"
               min="0"
+              placeholder="0,00"
+              step="0.01"
+              type="number"
               {...form.register("balance")}
             />
           </div>
@@ -156,10 +157,10 @@ export function EditAccountModal({
 
         <FormModalActions
           form={form}
-          onCancel={handleClose}
-          submitText="Salvar Alterações"
-          submitIcon={SaveIcon}
           isLoading={isLoading}
+          submitIcon={SaveIcon}
+          submitText="Salvar Alterações"
+          onCancel={handleClose}
         />
       </FormModalFormWithHook>
     </FormModal>

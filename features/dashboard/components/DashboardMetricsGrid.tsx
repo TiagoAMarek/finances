@@ -1,7 +1,8 @@
-import { MonthlyMetrics } from "@/features/dashboard/utils/dashboard-calculations";
-import { MetricCard } from "@/features/shared/components/ui";
 import { BarChart3, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { memo } from "react";
+
+import { MonthlyMetrics } from "@/features/dashboard/utils/dashboard-calculations";
+import { MetricCard } from "@/features/shared/components/ui";
 
 /**
  * Props for DashboardMetricsGrid component
@@ -26,46 +27,46 @@ export const DashboardMetricsGrid = memo<DashboardMetricsGridProps>(
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
-          title="Receitas do Mês"
-          value={monthlyMetrics.incomes}
           description={new Date().toLocaleDateString("pt-BR", {
             month: "long",
           })}
+          formatValue="currency"
           icon={TrendingUp}
           iconTheme="success"
+          title="Receitas do Mês"
+          value={monthlyMetrics.incomes}
           valueTheme="success"
-          formatValue="currency"
         />
         <MetricCard
-          title="Despesas do Mês"
-          value={monthlyMetrics.expenses}
           description={new Date().toLocaleDateString("pt-BR", {
             month: "long",
           })}
+          formatValue="currency"
           icon={TrendingDown}
           iconTheme="danger"
+          title="Despesas do Mês"
+          value={monthlyMetrics.expenses}
           valueTheme="danger"
-          formatValue="currency"
         />
         <MetricCard
-          title="Balanço Mensal"
-          value={monthlyMetrics.balance}
           description={(value) =>
             Number(value) >= 0 ? "Superávit no mês" : "Déficit no mês"
           }
+          formatValue="currency"
           icon={BarChart3}
           iconTheme={(value) => (Number(value) >= 0 ? "primary" : "orange")}
+          title="Balanço Mensal"
+          value={monthlyMetrics.balance}
           valueTheme={(value) => (Number(value) >= 0 ? "primary" : "orange")}
-          formatValue="currency"
         />
         <MetricCard
-          title="Saldo Total"
-          value={totalBalance}
           description="Todas as contas"
+          formatValue="currency"
           icon={Wallet}
           iconTheme={(value) => (Number(value) >= 0 ? "primary" : "neutral")}
+          title="Saldo Total"
+          value={totalBalance}
           valueTheme={(value) => (Number(value) >= 0 ? "primary" : "neutral")}
-          formatValue="currency"
         />
       </div>
     );

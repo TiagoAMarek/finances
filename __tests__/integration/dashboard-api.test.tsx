@@ -1,7 +1,9 @@
-import DashboardPage from "@/app/dashboard/page";
 import { screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
+
+import DashboardPage from "@/app/dashboard/page";
+
 import { server } from "../mocks/server";
 import { ENDPOINTS } from "../utils/endpoints";
 import {
@@ -12,6 +14,7 @@ import {
   setupEmptyDataHandlers,
 } from "../utils/integration-tests-helpers";
 import { renderWithProviders, testHelpers } from "../utils/test-utils";
+
 import { TEST_CONSTANTS, TEST_DATA } from "./fixtures/dashboard-api";
 
 // ============================================================================

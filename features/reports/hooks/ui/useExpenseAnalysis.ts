@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Transaction } from "@/lib/schemas";
+
 import { TransactionFilter } from "@/lib/chart-utils";
 import {
   ExpenseChartPoint,
@@ -14,6 +14,7 @@ import {
   formatExpenseChartData,
   getExpensePeriodDescription,
 } from "@/lib/expense-utils";
+import { Transaction } from "@/lib/schemas";
 
 /**
  * Hook return type for expense analysis data

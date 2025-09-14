@@ -1,6 +1,8 @@
 import { http, HttpResponse } from "msw";
-import { mockCreditCards } from "../data/credit-cards";
+
 import { CreditCardCreateInput, CreditCardUpdateInput } from "@/lib/schemas";
+
+import { mockCreditCards } from "../data/credit-cards";
 
 export const creditCardHandlers = [
   // GET /api/credit_cards - Fetch all credit cards

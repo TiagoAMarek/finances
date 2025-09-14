@@ -1,15 +1,16 @@
+import { PieChart } from "lucide-react";
+
 import { PageHeader } from "@/features/shared/components";
 import { Skeleton } from "@/features/shared/components/ui";
-import { PieChart } from "lucide-react";
 
 export function ExpenseAnalysisPageSkeleton() {
   return (
     <>
       <PageHeader
-        title="Análise Detalhada de Gastos"
+        action={<Skeleton className="h-9 w-32" />}
         description="Insights avançados sobre seus padrões de consumo"
         icon={PieChart}
-        action={<Skeleton className="h-9 w-32" />}
+        title="Análise Detalhada de Gastos"
       />
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">

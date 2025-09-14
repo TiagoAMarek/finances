@@ -1,10 +1,12 @@
+import { Loader2Icon } from "lucide-react";
 import { useMemo, useCallback } from "react";
 import { FieldValues } from "react-hook-form";
+
 import { Button } from "../ui/button";
-import { Loader2Icon } from "lucide-react";
+
 import { DEFAULT_MODAL_CONFIG } from "./constants";
-import { getLoadingText, renderIcon } from "./utils";
 import type { FormModalActionsProps } from "./types";
+import { getLoadingText, renderIcon } from "./utils";
 
 /**
  * Unified FormModal Actions - handles both traditional and hook form approaches
@@ -55,18 +57,18 @@ function FormModalActionsImpl<T extends FieldValues = FieldValues>({
   return (
     <div className="flex gap-3 pt-4">
       <Button
+        className="flex-1"
+        disabled={isLoading}
         type="button"
         variant="outline"
         onClick={handleCancel}
-        className="flex-1"
-        disabled={isLoading}
       >
         {cancelText}
       </Button>
       <Button
-        type="submit"
-        disabled={isSubmitDisabled}
         className="flex-1"
+        disabled={isSubmitDisabled}
+        type="submit"
       >
         {isLoading ? (
           <>

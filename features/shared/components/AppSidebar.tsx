@@ -1,6 +1,20 @@
 "use client";
 
 import {
+  Activity,
+  Banknote,
+  CreditCard,
+  Home,
+  LogOut,
+  PieChart,
+  Receipt,
+  Tag,
+  User,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+
+import {
   Avatar,
   AvatarFallback,
   Sidebar,
@@ -14,19 +28,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/features/shared/components/ui";
-import {
-  Activity,
-  Banknote,
-  CreditCard,
-  Home,
-  LogOut,
-  PieChart,
-  Receipt,
-  Tag,
-  User,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 
 const navLinks = [
   {
@@ -83,7 +84,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton asChild size="lg">
               <Link href="/dashboard">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Banknote className="size-4" />
@@ -174,7 +175,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} tooltip="Sair">
+            <SidebarMenuButton tooltip="Sair" onClick={handleLogout}>
               <LogOut className="size-4" />
               <span>Sair</span>
             </SidebarMenuButton>

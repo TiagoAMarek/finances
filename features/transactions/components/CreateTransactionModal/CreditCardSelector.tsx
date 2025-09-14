@@ -1,6 +1,7 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/features/shared/components/ui";
-import { FormModalField } from "@/features/shared/components/FormModal";
 import { UseFormReturn, Controller } from "react-hook-form";
+
+import { FormModalField } from "@/features/shared/components/FormModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/features/shared/components/ui";
 import { TransactionFormInput } from "@/lib/schemas";
 
 interface CreditCard {
@@ -17,8 +18,8 @@ export function CreditCardSelector({ form, creditCards }: CreditCardSelectorProp
   return (
     <FormModalField
       form={form}
-      name="creditCardId"
       label="Selecione o Cartão de Crédito"
+      name="creditCardId"
       required
     >
       <div className="min-w-0">

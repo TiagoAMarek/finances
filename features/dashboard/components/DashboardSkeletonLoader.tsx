@@ -1,6 +1,7 @@
+import { memo } from "react";
+
 import { PageHeader } from "@/features/shared/components";
 import { Skeleton } from "@/features/shared/components/ui";
-import { memo } from "react";
 
 /**
  * Skeleton loading component for Dashboard
@@ -92,9 +93,9 @@ export const DashboardSkeletonLoader = memo(function DashboardSkeletonLoader() {
   return (
     <>
       <PageHeader
-        title="Dashboard"
-        description="Visão geral das suas finanças e transações recentes"
         action={<Skeleton className="h-9 w-32" />}
+        description="Visão geral das suas finanças e transações recentes"
+        title="Dashboard"
       />
 
       <div

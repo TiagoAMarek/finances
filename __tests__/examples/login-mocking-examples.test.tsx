@@ -1,11 +1,13 @@
+import { QueryClient } from "@tanstack/react-query";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { QueryClient } from "@tanstack/react-query";
-import { renderWithProviders, testHelpers } from "../utils/test-utils";
-import { authTestHelpers } from "../utils/auth-helpers";
+
 import { useLogin } from "@/features/auth/hooks/data/useLogin";
 import { fetchWithAuth } from "@/utils/api";
+
+import { authTestHelpers } from "../utils/auth-helpers";
+import { renderWithProviders, testHelpers } from "../utils/test-utils";
 
 /**
  * Comprehensive examples demonstrating MSW authentication mocking
@@ -37,33 +39,33 @@ const LoginTestComponent = () => {
       <div>
         <label htmlFor="email">Email</label>
         <input
+          data-testid="email-input"
           id="email"
           type="email"
           value={credentials.email}
           onChange={(e) =>
             setCredentials({ ...credentials, email: e.target.value })
           }
-          data-testid="email-input"
         />
       </div>
 
       <div>
         <label htmlFor="password">Senha</label>
         <input
+          data-testid="password-input"
           id="password"
           type="password"
           value={credentials.password}
           onChange={(e) =>
             setCredentials({ ...credentials, password: e.target.value })
           }
-          data-testid="password-input"
         />
       </div>
 
       <button
-        onClick={handleLogin}
-        disabled={loginMutation.isPending}
         data-testid="login-button"
+        disabled={loginMutation.isPending}
+        onClick={handleLogin}
       >
         {loginMutation.isPending ? "Entrando..." : "Entrar"}
       </button>

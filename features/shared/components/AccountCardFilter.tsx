@@ -1,5 +1,8 @@
 "use client";
 
+import { Banknote, CreditCard as CreditCardIcon, Filter } from "lucide-react";
+import * as React from "react";
+
 import { FilterState, useAccountCardFilters } from "@/features";
 import {
   Badge,
@@ -15,8 +18,6 @@ import {
 } from "@/features/shared/components/ui/popover";
 import { BankAccount, CreditCard } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
-import { Banknote, CreditCard as CreditCardIcon, Filter } from "lucide-react";
-import * as React from "react";
 
 interface AccountCardFilterProps {
   accounts: BankAccount[];
@@ -53,22 +54,22 @@ export function AccountCardFilter({
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
-          size="sm"
           className={cn("flex items-center gap-2", className)}
+          size="sm"
+          variant="outline"
         >
           <Filter className="h-4 w-4" />
           <span className="hidden sm:inline">Filtros</span>
           <Badge
-            variant={hasActiveFilters ? "default" : "secondary"}
             className="text-xs"
+            variant={hasActiveFilters ? "default" : "secondary"}
           >
             {activeFiltersCount}/{totalFiltersCount}
           </Badge>
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-96 p-0" align="end">
+      <PopoverContent align="end" className="w-96 p-0">
         <div className="p-4 border-b">
           <h4 className="font-medium">Filtros de Contas e Cartões</h4>
           <p className="text-sm text-muted-foreground">
@@ -87,10 +88,10 @@ export function AccountCardFilter({
                     <span className="font-medium">Contas Bancárias</span>
                   </div>
                   <Toggle
-                    pressed={allAccountsSelected}
-                    onPressedChange={toggleAllAccounts}
-                    size="sm"
                     className="text-xs"
+                    pressed={allAccountsSelected}
+                    size="sm"
+                    onPressedChange={toggleAllAccounts}
                   >
                     Todas
                   </Toggle>
@@ -100,10 +101,10 @@ export function AccountCardFilter({
                   {accounts.map((account) => (
                     <Toggle
                       key={account.id}
-                      pressed={filters.accounts.includes(account.id)}
-                      onPressedChange={() => toggleAccount(account.id)}
-                      variant="outline"
                       className="justify-start h-auto p-3"
+                      pressed={filters.accounts.includes(account.id)}
+                      variant="outline"
+                      onPressedChange={() => toggleAccount(account.id)}
                     >
                       <div className="flex items-center gap-2">
                         <Banknote className="h-4 w-4" />
@@ -127,10 +128,10 @@ export function AccountCardFilter({
                     <span className="font-medium">Cartões de Crédito</span>
                   </div>
                   <Toggle
-                    pressed={allCreditCardsSelected}
-                    onPressedChange={toggleAllCreditCards}
-                    size="sm"
                     className="text-xs"
+                    pressed={allCreditCardsSelected}
+                    size="sm"
+                    onPressedChange={toggleAllCreditCards}
                   >
                     Todos
                   </Toggle>
@@ -140,10 +141,10 @@ export function AccountCardFilter({
                   {creditCards.map((card) => (
                     <Toggle
                       key={card.id}
-                      pressed={filters.creditCards.includes(card.id)}
-                      onPressedChange={() => toggleCreditCard(card.id)}
-                      variant="outline"
                       className="justify-start h-auto p-3"
+                      pressed={filters.creditCards.includes(card.id)}
+                      variant="outline"
+                      onPressedChange={() => toggleCreditCard(card.id)}
                     >
                       <div className="flex items-center gap-2">
                         <CreditCardIcon className="h-4 w-4" />

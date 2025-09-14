@@ -1,5 +1,8 @@
 "use client";
 
+import { AlertCircle, Filter, Tag } from "lucide-react";
+import { useMemo, useState } from "react";
+
 import {
   useCategoryActions,
   useGetCategoriesWithStats,
@@ -24,8 +27,6 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/features/shared/components/ui";
-import { AlertCircle, Filter, Tag } from "lucide-react";
-import { useMemo, useState } from "react";
 
 export default function CategoriesPage() {
   const {
@@ -77,16 +78,16 @@ export default function CategoriesPage() {
       </CardHeader>
       <CardContent>
         <ToggleGroup
+          aria-label="Filtrar categorias por tipo"
+          className="h-11 sm:h-9 w-full grid grid-cols-3 gap-0 border border-border rounded-md overflow-hidden"
           type="single"
           value={filter}
           onValueChange={(v) => v && setFilter(v as typeof filter)}
-          aria-label="Filtrar categorias por tipo"
-          className="h-11 sm:h-9 w-full grid grid-cols-3 gap-0 border border-border rounded-md overflow-hidden"
         >
           <ToggleGroupItem
-            value="all"
             aria-label={`Mostrar todas as categorias (${getFilterCount("all")})`}
             className="min-w-0 text-xs sm:text-sm font-medium border-r border-border last:border-r-0 px-2 sm:px-3 h-full flex items-center justify-center"
+            value="all"
           >
             <span className="truncate">
               <span className="sm:hidden">Todas</span>
@@ -96,9 +97,9 @@ export default function CategoriesPage() {
             </span>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="income"
             aria-label={`Mostrar apenas receitas (${getFilterCount("income")})`}
             className="min-w-0 text-xs sm:text-sm font-medium border-r border-border last:border-r-0 px-2 sm:px-3 h-full flex items-center justify-center"
+            value="income"
           >
             <span className="truncate">
               <span className="sm:hidden">Receitas</span>
@@ -108,9 +109,9 @@ export default function CategoriesPage() {
             </span>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="expense"
             aria-label={`Mostrar apenas despesas (${getFilterCount("expense")})`}
             className="min-w-0 text-xs sm:text-sm font-medium border-r border-border last:border-r-0 px-2 sm:px-3 h-full flex items-center justify-center"
+            value="expense"
           >
             <span className="truncate">
               <span className="sm:hidden">Despesas</span>
@@ -127,20 +128,20 @@ export default function CategoriesPage() {
   return (
     <>
       <PageHeader
-        title="Categorias"
-        description="Gerencie suas categorias de transações"
-        icon={Tag}
-        iconColor="text-blue-500"
         action={
           <CreateCategoryModal
+            isLoading={isCreating}
             open={isCreateModalOpen}
             onOpenChange={(open) =>
               open ? openCreateModal() : closeCreateModal()
             }
             onSubmit={handleCreateCategory}
-            isLoading={isCreating}
           />
         }
+        description="Gerencie suas categorias de transações"
+        icon={Tag}
+        iconColor="text-blue-500"
+        title="Categorias"
       />
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">
@@ -196,44 +197,44 @@ export default function CategoriesPage() {
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState
-            title="Nenhuma categoria ainda"
             description="Crie categorias para organizar suas receitas e despesas."
+            title="Nenhuma categoria ainda"
           >
             <CreateCategoryModal
+              isLoading={isCreating}
               open={isCreateModalOpen}
               onOpenChange={(open) =>
                 open ? openCreateModal() : closeCreateModal()
               }
               onSubmit={handleCreateCategory}
-              isLoading={isCreating}
             />
           </EmptyState>
         ) : (
           <>
             <ListHeader
-              title="Todas as categorias"
               count={filtered.length}
               right={null}
+              title="Todas as categorias"
             />
             <CategoriesList
               categories={filtered || []}
-              onEdit={openEditModal}
-              onDelete={handleDeleteCategory}
               isDeleting={isDeleting}
+              onDelete={handleDeleteCategory}
+              onEdit={openEditModal}
             />
           </>
         )}
 
         <EditCategoryModal
+          category={editingCategory}
+          isLoading={isUpdating}
           open={isEditModalOpen}
           onOpenChange={closeEditModal}
-          category={editingCategory}
           onSubmit={(data) => {
             if (editingCategoryId && editingCategory) {
               handleUpdateCategory(editingCategoryId, data);
             }
           }}
-          isLoading={isUpdating}
         />
       </div>
     </>

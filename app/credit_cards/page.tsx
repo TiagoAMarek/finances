@@ -1,5 +1,8 @@
 "use client";
 
+import { CreditCard } from "lucide-react";
+import type { NextPage } from "next";
+
 import {
   CreateCardModal,
   CreditCardsList,
@@ -10,8 +13,6 @@ import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 import { useCreditCardActions } from "@/features/credit-cards/hooks/ui";
 import { PageHeader } from "@/features/shared/components";
 import { Skeleton } from "@/features/shared/components/ui";
-import { CreditCard } from "lucide-react";
-import type { NextPage } from "next";
 
 const CreditCardsPage: NextPage = () => {
   const { data: creditCards = [], isLoading, error } = useGetCreditCards();
@@ -33,17 +34,17 @@ const CreditCardsPage: NextPage = () => {
     return (
       <>
         <PageHeader
-          title="Meus Cartões de Crédito"
-          description="Gerencie seus cartões de crédito e limites"
           action={<Skeleton className="h-9 w-28" />}
+          description="Gerencie seus cartões de crédito e limites"
+          title="Meus Cartões de Crédito"
         />
         <div className="space-y-8 px-4 lg:px-6 pb-8">
           <CreditCardsList
             cards={[]}
-            isLoading={true}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
             isDeleting={actionLoading.delete}
+            isLoading={true}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
           />
         </div>
       </>
@@ -53,18 +54,18 @@ const CreditCardsPage: NextPage = () => {
   return (
     <>
       <PageHeader
-        title="Meus Cartões de Crédito"
-        description="Gerencie seus cartões de crédito e limites"
-        icon={CreditCard}
-        iconColor="text-indigo-500"
         action={
           <CreateCardModal
+            isLoading={actionLoading.create}
             open={createModalOpen}
             onOpenChange={setCreateModalOpen}
             onSubmit={handleCreate}
-            isLoading={actionLoading.create}
           />
         }
+        description="Gerencie seus cartões de crédito e limites"
+        icon={CreditCard}
+        iconColor="text-indigo-500"
+        title="Meus Cartões de Crédito"
       />
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">
@@ -72,18 +73,18 @@ const CreditCardsPage: NextPage = () => {
 
         <CreditCardsList
           cards={creditCards}
-          isLoading={false}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
           isDeleting={actionLoading.delete}
+          isLoading={false}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
         />
 
         <EditCardModal
           card={editingCard}
+          isLoading={actionLoading.update}
           open={editModalOpen}
           onOpenChange={setEditModalOpen}
           onSave={handleUpdate}
-          isLoading={actionLoading.update}
         />
       </div>
     </>

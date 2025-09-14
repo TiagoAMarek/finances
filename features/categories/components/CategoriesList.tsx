@@ -1,7 +1,9 @@
+import { TagIcon } from "lucide-react";
+
 import { CategoryWithStats } from "@/features/categories/hooks/data";
 import { RowList } from "@/features/shared/components/ui";
 import { Category } from "@/lib/schemas";
-import { TagIcon } from "lucide-react";
+
 import { CategoryItem } from "./CategoryItem";
 
 interface CategoriesListProps {
@@ -50,9 +52,9 @@ export function CategoriesList({
               <CategoryItem
                 key={category.id}
                 category={category}
-                onEdit={onEdit}
-                onDelete={onDelete}
                 isDeleting={isDeleting}
+                onDelete={onDelete}
+                onEdit={onEdit}
               />
             ))}
           </RowList>
@@ -69,9 +71,9 @@ export function CategoriesList({
               <CategoryItem
                 key={category.id}
                 category={category}
-                onEdit={onEdit}
-                onDelete={onDelete}
                 isDeleting={isDeleting}
+                onDelete={onDelete}
+                onEdit={onEdit}
               />
             ))}
           </RowList>
@@ -88,9 +90,9 @@ export function CategoriesList({
               <CategoryItem
                 key={category.id}
                 category={category}
-                onEdit={onEdit}
-                onDelete={onDelete}
                 isDeleting={isDeleting}
+                onDelete={onDelete}
+                onEdit={onEdit}
               />
             ))}
           </RowList>

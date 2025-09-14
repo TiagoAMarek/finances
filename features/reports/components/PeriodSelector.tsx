@@ -1,10 +1,11 @@
+import { CalendarDays, ChevronDown } from "lucide-react";
+
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
 } from "@/features/shared/components/ui/select";
-import { CalendarDays, ChevronDown } from "lucide-react";
 
 interface PeriodSelectorProps {
   selectedMonth: number;
@@ -71,8 +72,8 @@ export function PeriodSelector({
               {months.map((month) => (
                 <SelectItem
                   key={`${month.value}-${year}`}
-                  value={`${month.value}-${year}`}
                   className="pl-4"
+                  value={`${month.value}-${year}`}
                 >
                   {month.fullLabel}
                 </SelectItem>

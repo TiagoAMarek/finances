@@ -1,5 +1,9 @@
 "use client";
 
+import { ChartLine } from "lucide-react";
+import type { NextPage } from "next";
+import { useState } from "react";
+
 import { FilterState } from "@/features/accounts/hooks/ui";
 import { PeriodSelector } from "@/features/reports/components";
 import {
@@ -11,9 +15,6 @@ import {
 } from "@/features/shared/components";
 import { Skeleton } from "@/features/shared/components/ui";
 import { useFilteredTransactions } from "@/features/transactions";
-import { ChartLine } from "lucide-react";
-import type { NextPage } from "next";
-import { useState } from "react";
 
 const PerformancePage: NextPage = () => {
   // Estados dos filtros
@@ -55,9 +56,9 @@ const PerformancePage: NextPage = () => {
     return (
       <>
         <PageHeader
-          title="Performance Financeira"
-          description="Análise da evolução das suas finanças ao longo do tempo"
           action={<Skeleton className="h-9 w-32" />}
+          description="Análise da evolução das suas finanças ao longo do tempo"
+          title="Performance Financeira"
         />
 
         <div className="space-y-8 px-4 lg:px-6 pb-8">
@@ -117,32 +118,32 @@ const PerformancePage: NextPage = () => {
       <div className="space-y-8 px-4 lg:px-6 pb-8">
         {/* Cards de Performance Mensais */}
         <MonthlyPerformanceCards
-          transactions={filteredTransactions}
-          monthlyIncomes={monthlyIncomes}
-          monthlyExpenses={monthlyExpenses}
           monthlyBalance={monthlyBalance}
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
+          monthlyExpenses={monthlyExpenses}
+          monthlyIncomes={monthlyIncomes}
           selectedAccountId={null}
           selectedCreditCardId={null}
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          transactions={filteredTransactions}
         />
 
         {/* Gráficos de Evolução Semanal */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <IncomeVsExpenseChart
-            transactions={filteredTransactions}
-            periodType="current-month"
             dateFilter={{
               selectedMonth,
               selectedYear,
             }}
+            periodType="current-month"
+            transactions={filteredTransactions}
           />
           <AdvancedExpenseAnalysis
-            transactions={filteredTransactions}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
             selectedAccountId={selectedAccountId}
             selectedCreditCardId={selectedCreditCardId}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            transactions={filteredTransactions}
           />
         </div>
       </div>

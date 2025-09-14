@@ -1,3 +1,5 @@
+import { expect } from "vitest";
+
 import type {
   ApiErrorResponse,
   LoginInput,
@@ -5,7 +7,7 @@ import type {
   RegisterInput,
   RegisterResponse,
 } from "@/lib/schemas";
-import { expect } from "vitest";
+
 import {
   authScenarios,
   mockTokens,
@@ -14,6 +16,7 @@ import {
 } from "../mocks/data/auth";
 import { authErrorHandlers } from "../mocks/handlers/auth";
 import { server } from "../mocks/server";
+
 import { localStorageMock } from "./test-utils";
 
 /**

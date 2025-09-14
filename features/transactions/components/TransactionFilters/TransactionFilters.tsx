@@ -1,3 +1,16 @@
+import {
+  BanknoteIcon,
+  CalendarIcon,
+  ChevronDownIcon,
+  CreditCardIcon,
+  FilterIcon,
+  SearchIcon,
+  TagIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 import { Button, Input } from "@/features/shared/components/ui";
@@ -18,18 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/features/shared/components/ui/select";
-import {
-  BanknoteIcon,
-  CalendarIcon,
-  ChevronDownIcon,
-  CreditCardIcon,
-  FilterIcon,
-  SearchIcon,
-  TagIcon,
-  TrendingDownIcon,
-  TrendingUpIcon,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { ActiveFiltersBadges } from "./ActiveFiltersBadges";
 import { AdvancedFiltersForm } from "./AdvancedFiltersForm";
 import {
@@ -214,10 +216,10 @@ export function TransactionFiltersComponent({
           <div className="flex items-center gap-2">
             {hasActiveFilters && (
               <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
                 className="h-8 px-3 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                size="sm"
+                variant="ghost"
+                onClick={clearFilters}
               >
                 Limpar
               </Button>
@@ -226,17 +228,17 @@ export function TransactionFiltersComponent({
             <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
               <CollapsibleTrigger asChild>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 px-3 transition-all hover:bg-accent data-[state=open]:bg-accent"
                   aria-label={
                     isExpanded ? "Recolher filtros" : "Expandir filtros"
                   }
+                  className="h-8 px-3 transition-all hover:bg-accent data-[state=open]:bg-accent"
+                  size="sm"
+                  variant="ghost"
                 >
                   <ChevronDownIcon
+                    aria-hidden="true"
                     className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180"
                     data-state={isExpanded ? "open" : "closed"}
-                    aria-hidden="true"
                   />
                 </Button>
               </CollapsibleTrigger>
@@ -253,10 +255,10 @@ export function TransactionFiltersComponent({
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 aria-label="Buscar"
+                className="pl-10 transition-all focus:ring-2 focus:ring-primary/20"
                 placeholder="Buscar por descrição..."
                 value={filters.search}
                 onChange={(e) => updateFilter("search", e.target.value)}
-                className="pl-10 transition-all focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
@@ -265,8 +267,8 @@ export function TransactionFiltersComponent({
               onValueChange={(value) => updateFilter("type", value)}
             >
               <SelectTrigger
-                className="w-full sm:w-48 transition-all hover:border-primary/50"
                 aria-label="Tipo"
+                className="w-full sm:w-48 transition-all hover:border-primary/50"
                 data-testid="type-filter"
               >
                 <SelectValue placeholder="Todos os tipos" />
@@ -308,10 +310,10 @@ export function TransactionFiltersComponent({
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CollapsibleContent>
             <AdvancedFiltersForm
-              filters={filters}
-              categories={categories}
               accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
+              categories={categories}
               creditCards={creditCards.map((c) => ({ id: c.id, name: c.name }))}
+              filters={filters}
               onChange={updateFilter}
             />
           </CollapsibleContent>

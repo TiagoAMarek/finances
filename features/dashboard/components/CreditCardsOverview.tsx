@@ -1,5 +1,7 @@
-import { CreditCard } from "@/lib/schemas";
 import { CreditCard as CreditCardIcon, Settings } from "lucide-react";
+
+import { CreditCard } from "@/lib/schemas";
+
 import { CreditCardItem, ResourceCard } from "./";
 
 interface CreditCardsOverviewProps {
@@ -17,13 +19,13 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
     return (
       <ResourceCard>
         <ResourceCard.Empty
-          title="Cartões de Crédito"
-          icon={CreditCardIcon}
-          iconColor="text-purple-500"
-          iconBgColor="bg-purple-500/10"
-          emptyMessage="Nenhum cartão cadastrado"
-          actionText="Adicionar Cartão"
           actionHref="/credit_cards"
+          actionText="Adicionar Cartão"
+          emptyMessage="Nenhum cartão cadastrado"
+          icon={CreditCardIcon}
+          iconBgColor="bg-purple-500/10"
+          iconColor="text-purple-500"
+          title="Cartões de Crédito"
         />
       </ResourceCard>
     );
@@ -32,11 +34,11 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
   return (
     <ResourceCard>
       <ResourceCard.Header
-        title="Cartões de Crédito"
-        icon={CreditCardIcon}
-        iconColor="text-purple-500"
-        iconBgColor="bg-purple-500/10"
         count={creditCards.length}
+        icon={CreditCardIcon}
+        iconBgColor="bg-purple-500/10"
+        iconColor="text-purple-500"
+        title="Cartões de Crédito"
       />
       <ResourceCard.Content>
         <ResourceCard.Summary
@@ -49,10 +51,10 @@ export function CreditCardsOverview({ creditCards }: CreditCardsOverviewProps) {
           {creditCards.map((card) => (
             <CreditCardItem
               key={card.id}
-              id={card.id}
-              name={card.name}
               currentBill={parseFloat(card.currentBill)}
+              id={card.id}
               limit={parseFloat(card.limit)}
+              name={card.name}
             />
           ))}
         </ResourceCard.List>

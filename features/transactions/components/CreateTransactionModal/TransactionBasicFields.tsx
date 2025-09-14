@@ -1,6 +1,7 @@
-import { Input, BrazilianCurrencyInput } from "@/features/shared/components/ui";
-import { FormModalField } from "@/features/shared/components/FormModal";
 import { UseFormReturn } from "react-hook-form";
+
+import { FormModalField } from "@/features/shared/components/FormModal";
+import { Input, BrazilianCurrencyInput } from "@/features/shared/components/ui";
 import { TransactionFormInput } from "@/lib/schemas";
 
 interface TransactionBasicFieldsProps {
@@ -12,31 +13,31 @@ export function TransactionBasicFields({ form }: TransactionBasicFieldsProps) {
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
       <FormModalField
         form={form}
-        name="description"
         label="Descrição"
+        name="description"
         required
       >
         <Input
-          type="text"
-          placeholder="Ex: Compra no supermercado"
-          className="h-11 w-full min-w-0"
           autoFocus
+          className="h-11 w-full min-w-0"
           data-testid="description-input"
+          placeholder="Ex: Compra no supermercado"
+          type="text"
           {...form.register("description")}
         />
       </FormModalField>
 
       <FormModalField
         form={form}
-        name="amount"
         label="Valor"
+        name="amount"
         required
       >
         <BrazilianCurrencyInput
+          className="h-11 pl-10 w-full min-w-0"
+          data-testid="amount-input"
           form={form}
           name="amount"
-          data-testid="amount-input"
-          className="h-11 pl-10 w-full min-w-0"
         />
       </FormModalField>
     </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import { Banknote } from "lucide-react";
+import type { NextPage } from "next";
+
 import {
   AccountsList,
   AccountsMetricsGrid,
@@ -11,8 +14,6 @@ import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useAccountActions } from "@/features/accounts/hooks/ui";
 import { PageHeader } from "@/features/shared/components";
 import { Skeleton } from "@/features/shared/components/ui";
-import { Banknote } from "lucide-react";
-import type { NextPage } from "next";
 
 const AccountsPage: NextPage = () => {
   const { data: accounts = [], isLoading, error } = useGetAccounts();
@@ -34,9 +35,9 @@ const AccountsPage: NextPage = () => {
     return (
       <>
         <PageHeader
-          title="Minhas Contas Bancárias"
-          description="Gerencie suas contas bancárias e saldos"
           action={<Skeleton className="h-9 w-28" />}
+          description="Gerencie suas contas bancárias e saldos"
+          title="Minhas Contas Bancárias"
         />
         <div className="space-y-8 px-4 lg:px-6 pb-8">
           {/* Metrics Cards Skeleton */}
@@ -50,10 +51,10 @@ const AccountsPage: NextPage = () => {
 
           <AccountsList
             accounts={[]}
-            isLoading={true}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
             isDeleting={false}
+            isLoading={true}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
           />
         </div>
       </>
@@ -63,18 +64,18 @@ const AccountsPage: NextPage = () => {
   return (
     <>
       <PageHeader
-        title="Minhas Contas Bancárias"
-        description="Gerencie suas contas bancárias e saldos"
-        icon={Banknote}
-        iconColor="text-green-500"
         action={
           <CreateAccountModal
+            isLoading={actionLoading.create}
             open={createModalOpen}
             onOpenChange={setCreateModalOpen}
             onSubmit={handleCreate}
-            isLoading={actionLoading.create}
           />
         }
+        description="Gerencie suas contas bancárias e saldos"
+        icon={Banknote}
+        iconColor="text-green-500"
+        title="Minhas Contas Bancárias"
       />
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">
@@ -85,18 +86,18 @@ const AccountsPage: NextPage = () => {
 
         <AccountsList
           accounts={accounts}
-          isLoading={false}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
           isDeleting={actionLoading.delete}
+          isLoading={false}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
         />
 
         <EditAccountModal
           account={editingAccount}
+          isLoading={actionLoading.update}
           open={editModalOpen}
           onOpenChange={setEditModalOpen}
           onSave={handleUpdate}
-          isLoading={actionLoading.update}
         />
       </div>
     </>

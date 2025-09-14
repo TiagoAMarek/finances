@@ -1,9 +1,11 @@
-import DashboardPage from "@/app/dashboard/page";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
-import { renderWithProviders, testHelpers } from "../utils/test-utils";
+
+import DashboardPage from "@/app/dashboard/page";
+
 import { server } from "../mocks/server";
+import { renderWithProviders, testHelpers } from "../utils/test-utils";
 
 describe("Dashboard User Interaction Flows", () => {
   beforeEach(() => {

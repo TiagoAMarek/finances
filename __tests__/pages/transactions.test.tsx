@@ -1,6 +1,8 @@
-import TransactionsPage from "@/app/transactions/page";
 import { screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+
+import TransactionsPage from "@/app/transactions/page";
+
 import { renderWithProviders, testHelpers } from "../utils/test-utils";
 
 // Initial smoke/integration tests for Transactions page

@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -5,7 +7,6 @@ import {
   CardTitle,
 } from "@/features/shared/components/ui/card";
 import { cn, formatCurrency } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
 
 type ColorTheme =
   | "success"

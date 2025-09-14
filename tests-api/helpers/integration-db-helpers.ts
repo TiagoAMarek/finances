@@ -1,5 +1,7 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+
+import { hashPassword } from "@/app/api/lib/auth";
 import {
   users,
   bankAccounts,
@@ -8,7 +10,6 @@ import {
   categories,
   defaultCategories,
 } from "@/app/api/lib/schema";
-import { hashPassword } from "@/app/api/lib/auth";
 
 // Create a real SQLite in-memory database for integration tests
 export function createIntegrationTestDb() {

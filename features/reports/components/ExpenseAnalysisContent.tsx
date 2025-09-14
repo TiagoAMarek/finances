@@ -34,19 +34,19 @@ export function ExpenseAnalysisContent({
       {/* Visão Geral */}
       <div className="space-y-4">
         <IncomeVsExpenseChart
-          transactions={transactions}
           periodType={getPeriodType(periodFilter)}
+          transactions={transactions}
         />
       </div>
 
       {/* Análise Detalhada */}
       <div className="space-y-4">
         <AdvancedExpenseAnalysis
-          transactions={transactions}
+          isLoading={isLoading}
+          periodFilter={periodFilter}
           selectedAccountId={null}
           selectedCreditCardId={null}
-          periodFilter={periodFilter}
-          isLoading={isLoading}
+          transactions={transactions}
         />
       </div>
     </div>

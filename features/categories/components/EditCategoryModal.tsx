@@ -1,4 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SaveIcon, TagIcon } from "lucide-react";
 import { useMemo } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+
 import { 
   FormModal,
   FormModalHeader,
@@ -16,10 +21,6 @@ import {
   SelectValue,
 } from "@/features/shared/components/ui";
 import { Category, CategoryCreateInput, CategoryCreateSchema } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SaveIcon, TagIcon } from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 
 interface EditCategoryModalProps {
   open: boolean;
@@ -126,16 +127,16 @@ export function EditCategoryModal({
   return (
     <FormModal
       open={open}
-      onOpenChange={onOpenChange}
-      variant="edit"
       size="md"
+      variant="edit"
+      onOpenChange={onOpenChange}
     >
       <FormModalHeader
-        icon={TagIcon}
-        iconColor="text-primary"
-        iconBgColor="bg-primary/10"
-        title="Editar Categoria"
         description="Atualize as informações da categoria"
+        icon={TagIcon}
+        iconBgColor="bg-primary/10"
+        iconColor="text-primary"
+        title="Editar Categoria"
       />
 
       <FormModalPreview>
@@ -155,35 +156,35 @@ export function EditCategoryModal({
 
       <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
         <FormModalField
-          form={form}
-          name="name"
-          label="Nome da Categoria"
           description={category.isDefault ? "Categorias padrão não podem ser editadas" : "Escolha um nome descritivo para a categoria"}
+          form={form}
+          label="Nome da Categoria"
+          name="name"
           required
         >
           <Input
-            type="text"
-            placeholder="Ex: Alimentação"
-            className="h-11"
             autoFocus
+            className="h-11"
             disabled={category.isDefault}
+            placeholder="Ex: Alimentação"
+            type="text"
             {...form.register("name")}
           />
         </FormModalField>
 
         <FormModalField
-          form={form}
-          name="type"
-          label="Tipo"
           description="Defina se a categoria é para receitas, despesas ou ambos"
+          form={form}
+          label="Tipo"
+          name="type"
           required
         >
           <Select
+            disabled={category.isDefault}
             value={form.watch("type")}
             onValueChange={(value: "income" | "expense" | "both") =>
               form.setValue("type", value)
             }
-            disabled={category.isDefault}
           >
             <SelectTrigger className="h-11">
               <SelectValue placeholder="Selecione o tipo" />
@@ -202,15 +203,15 @@ export function EditCategoryModal({
             {CATEGORY_COLORS.map((colorOption) => (
               <button
                 key={colorOption}
-                type="button"
                 className={`w-8 h-8 rounded-full border-2 ${
                   form.watch("color") === colorOption
                     ? "border-primary"
                     : "border-transparent"
                 }`}
-                style={{ backgroundColor: colorOption }}
-                onClick={() => form.setValue("color", colorOption)}
                 disabled={category.isDefault}
+                style={{ backgroundColor: colorOption }}
+                type="button"
+                onClick={() => form.setValue("color", colorOption)}
               />
             ))}
           </div>
@@ -225,14 +226,14 @@ export function EditCategoryModal({
             {CATEGORY_ICONS.map((iconOption) => (
               <button
                 key={iconOption}
-                type="button"
                 className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg ${
                   form.watch("icon") === iconOption
                     ? "border-primary bg-primary/10"
                     : "border-border hover:border-primary/50"
                 }`}
-                onClick={() => form.setValue("icon", iconOption)}
                 disabled={category.isDefault}
+                type="button"
+                onClick={() => form.setValue("icon", iconOption)}
               >
                 {iconOption}
               </button>
@@ -244,11 +245,11 @@ export function EditCategoryModal({
         </div>
 
         <FormModalActions
-          onCancel={handleClose}
-          submitText="Salvar Alterações"
-          submitIcon={SaveIcon}
-          isLoading={isLoading}
           isDisabled={!form.watch("name")?.trim() || category.isDefault}
+          isLoading={isLoading}
+          submitIcon={SaveIcon}
+          submitText="Salvar Alterações"
+          onCancel={handleClose}
         />
       </FormModalFormWithHook>
     </FormModal>

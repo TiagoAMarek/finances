@@ -1,8 +1,8 @@
+import { createErrorResponse, createSuccessResponse } from "../../lib/auth";
 import {
   migrateCategoriesData,
   checkMigrationStatus,
 } from "../../lib/migrateCategoriesData";
-import { createErrorResponse, createSuccessResponse } from "../../lib/auth";
 
 // GET /api/admin/migrate-categories - Check migration status
 export async function GET() {

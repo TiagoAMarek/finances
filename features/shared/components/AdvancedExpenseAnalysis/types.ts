@@ -1,5 +1,5 @@
-import { Transaction } from "@/lib/schemas";
 import { ExpensePeriodFilter } from "@/lib/expense-utils";
+import { Transaction } from "@/lib/schemas";
 
 /**
  * Type definitions for AdvancedExpenseAnalysis components

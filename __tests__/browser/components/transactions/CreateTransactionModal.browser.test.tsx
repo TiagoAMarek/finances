@@ -1,13 +1,14 @@
-import { expect, test, describe, beforeEach, vi } from 'vitest'
-import { page, userEvent } from '@vitest/browser/context'
-import { render } from 'vitest-browser-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { page, userEvent } from '@vitest/browser/context'
+import { expect, test, describe, beforeEach, vi } from 'vitest'
+import { render } from 'vitest-browser-react'
+
+import { mockAccounts } from '@/__tests__/mocks/data/accounts'
+import { mockCategories } from '@/__tests__/mocks/data/categories'
+import { mockCreditCards } from '@/__tests__/mocks/data/credit-cards'
 import { CreateTransactionModal } from '@/features/transactions/components/CreateTransactionModal'
 
 // Mock data
-import { mockAccounts } from '@/__tests__/mocks/data/accounts'
-import { mockCreditCards } from '@/__tests__/mocks/data/credit-cards'
-import { mockCategories } from '@/__tests__/mocks/data/categories'
 
 // Mock the data hooks to return consistent data for browser tests
 vi.mock('@/features/accounts/hooks/data', () => ({

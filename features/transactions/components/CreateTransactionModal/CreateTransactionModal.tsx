@@ -1,3 +1,5 @@
+import { Receipt, PlusIcon } from "lucide-react";
+
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCategories } from "@/features/categories/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
@@ -8,12 +10,13 @@ import {
   FormModalFormWithHook,
 } from "@/features/shared/components/FormModal";
 import { TransactionFormInput } from "@/lib/schemas";
-import { Receipt, PlusIcon } from "lucide-react";
+
 import { useTransactionForm } from "../../hooks/ui/useTransactionForm";
-import { TransactionBasicFields } from "./TransactionBasicFields";
-import { TransactionTypeAndDateFields } from "./TransactionTypeAndDateFields";
+
 import { CategorySelector } from "./CategorySelector";
 import { SourceAccountFields } from "./SourceAccountFields";
+import { TransactionBasicFields } from "./TransactionBasicFields";
+import { TransactionTypeAndDateFields } from "./TransactionTypeAndDateFields";
 
 interface CreateTransactionModalProps {
   open: boolean;
@@ -38,29 +41,29 @@ export function CreateTransactionModal({
   });
 
   return (
-    <FormModal open={open} onOpenChange={onOpenChange} size="lg">
+    <FormModal open={open} size="lg" onOpenChange={onOpenChange}>
       <FormModalHeader
+        description="Registre uma receita, despesa ou transferência"
         icon={Receipt}
         title="Novo Lançamento"
-        description="Registre uma receita, despesa ou transferência"
       />
 
       <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
         <TransactionBasicFields form={form} />
         <TransactionTypeAndDateFields form={form} />
-        <CategorySelector form={form} categories={categories} />
+        <CategorySelector categories={categories} form={form} />
         <SourceAccountFields
-          form={form}
           accounts={accounts}
           creditCards={creditCards}
+          form={form}
         />
 
         <FormModalActions
           form={form}
-          onCancel={handleClose}
-          submitText="Criar Lançamento"
-          submitIcon={PlusIcon}
           isLoading={isLoading}
+          submitIcon={PlusIcon}
+          submitText="Criar Lançamento"
+          onCancel={handleClose}
         />
       </FormModalFormWithHook>
     </FormModal>

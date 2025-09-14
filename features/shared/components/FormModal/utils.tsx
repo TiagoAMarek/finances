@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+
 import { LOADING_TEXT_MAP } from "./constants";
 
 /**

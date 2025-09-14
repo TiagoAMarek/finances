@@ -1,3 +1,7 @@
+import { AlertCircle, BarChart3, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { memo } from "react";
+
 import { useCurrentMonth } from "@/features/dashboard/hooks/ui";
 import {
   MonthlyMetrics,
@@ -7,9 +11,7 @@ import {
 import { IncomeVsExpenseChart } from "@/features/shared/components";
 import { Button } from "@/features/shared/components/ui";
 import { Transaction } from "@/lib/schemas";
-import { AlertCircle, BarChart3, TrendingUp } from "lucide-react";
-import Link from "next/link";
-import { memo } from "react";
+
 import { DashboardAccordion } from "./DashboardAccordion";
 import { FinancialInsights } from "./FinancialInsights";
 
@@ -52,8 +54,8 @@ export const ReportsAccordion = memo<ReportsAccordionProps>(
     ];
 
     const actionButton = (
-      <Button asChild variant="outline" size="sm" className="hidden md:flex">
-        <Link href="/reports" className="flex items-center gap-1 text-xs">
+      <Button asChild className="hidden md:flex" size="sm" variant="outline">
+        <Link className="flex items-center gap-1 text-xs" href="/reports">
           Ver Completos
         </Link>
       </Button>
@@ -61,33 +63,33 @@ export const ReportsAccordion = memo<ReportsAccordionProps>(
 
     return (
       <DashboardAccordion
-        title="Relatórios"
+        actionButton={actionButton}
+        badges={badges}
+        defaultValue="reports"
         icon={BarChart3}
         iconColor="text-green-500"
-        badges={badges}
-        actionButton={actionButton}
-        defaultValue="reports"
+        title="Relatórios"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
           <div>
             <FinancialInsights
-              transactions={transactions}
-              monthlyIncomes={monthlyMetrics.incomes}
-              monthlyExpenses={monthlyMetrics.expenses}
               monthlyBalance={monthlyMetrics.balance}
+              monthlyExpenses={monthlyMetrics.expenses}
+              monthlyIncomes={monthlyMetrics.incomes}
+              transactions={transactions}
             />
           </div>
           <div>
             <IncomeVsExpenseChart
-              transactions={transactions}
-              dateFilter={{
-                selectedMonth: currentMonth,
-                selectedYear: currentYear,
-              }}
               accountFilter={{
                 selectedAccountId: null,
                 selectedCreditCardId: null,
               }}
+              dateFilter={{
+                selectedMonth: currentMonth,
+                selectedYear: currentYear,
+              }}
+              transactions={transactions}
             />
           </div>
         </div>

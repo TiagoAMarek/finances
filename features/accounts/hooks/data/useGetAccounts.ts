@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/utils/api";
+
 import { BankAccount } from "@/lib/schemas";
+import { fetchWithAuth } from "@/utils/api";
 
 /**
  * Hook for fetching all bank accounts

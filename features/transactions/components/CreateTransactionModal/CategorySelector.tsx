@@ -1,8 +1,9 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/features/shared/components/ui";
-import { FormModalField } from "@/features/shared/components/FormModal";
-import { UseFormReturn, Controller, useWatch } from "react-hook-form";
-import { TransactionFormInput } from "@/lib/schemas";
 import { useMemo, useEffect } from "react";
+import { UseFormReturn, Controller, useWatch } from "react-hook-form";
+
+import { FormModalField } from "@/features/shared/components/FormModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/features/shared/components/ui";
+import { TransactionFormInput } from "@/lib/schemas";
 
 interface Category {
   id: number;
@@ -57,8 +58,8 @@ export function CategorySelector({ form, categories }: CategorySelectorProps) {
   return (
     <FormModalField
       form={form}
-      name="categoryId"
       label="Categoria"
+      name="categoryId"
       required
     >
       <div>

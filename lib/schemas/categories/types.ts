@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { CategorySchema, DefaultCategorySchema } from "./entity";
+
 import { CategoryCreateSchema, CategoryUpdateSchema } from "./api";
+import { CategorySchema, DefaultCategorySchema } from "./entity";
 
 // Entity types (API responses)
 export type Category = z.infer<typeof CategorySchema>;

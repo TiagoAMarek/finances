@@ -1,5 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Check, Loader2 } from "lucide-react";
+import type { NextPage } from "next";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
 import { useLogin } from "@/features/auth/hooks/data";
 import { Button, Input, Label } from "@/features/shared/components/ui";
 import { Alert, AlertDescription } from "@/features/shared/components/ui/alert";
@@ -10,12 +17,6 @@ import {
   CardTitle,
 } from "@/features/shared/components/ui/card";
 import { LoginSchema, type LoginInput } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Loader2 } from "lucide-react";
-import type { NextPage } from "next";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 
 const LoginPage: NextPage = () => {
   const router = useRouter();
@@ -100,11 +101,11 @@ const LoginPage: NextPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             {loginMutation.error && loadingState === "idle" && (
               <Alert
-                variant="destructive"
                 className="animate-in fade-in-50 slide-in-from-top-1"
+                variant="destructive"
               >
                 <AlertDescription>
                   {loginMutation.error.message}
@@ -119,12 +120,12 @@ const LoginPage: NextPage = () => {
             >
               <Label htmlFor="email">E-mail</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="seuemail@exemplo.com"
                 autoComplete="email"
                 autoFocus
                 disabled={isLoading}
+                id="email"
+                placeholder="seuemail@exemplo.com"
+                type="email"
                 {...register("email")}
               />
               {errors.email && (
@@ -141,11 +142,11 @@ const LoginPage: NextPage = () => {
             >
               <Label htmlFor="password">Senha</Label>
               <Input
-                id="password"
-                type="password"
-                placeholder="Digite sua senha"
                 autoComplete="current-password"
                 disabled={isLoading}
+                id="password"
+                placeholder="Digite sua senha"
+                type="password"
                 {...register("password")}
               />
               {errors.password && (
@@ -156,13 +157,13 @@ const LoginPage: NextPage = () => {
             </div>
 
             <Button
-              type="submit"
               className={`w-full transition-all duration-300 ${
                 loadingState === "success"
                   ? "bg-green-600 hover:bg-green-600"
                   : ""
               }`}
               disabled={isLoading}
+              type="submit"
             >
               <span className="flex items-center justify-center gap-2 transition-all duration-200">
                 {getButtonContent()}
@@ -170,10 +171,10 @@ const LoginPage: NextPage = () => {
             </Button>
           </form>
           <div className="mt-4 flex items-center justify-between text-sm">
-            <a href="#" className="text-primary hover:underline">
+            <a className="text-primary hover:underline" href="#">
               Esqueceu a senha?
             </a>
-            <a href="/register" className="text-primary hover:underline">
+            <a className="text-primary hover:underline" href="/register">
               Criar uma conta
             </a>
           </div>

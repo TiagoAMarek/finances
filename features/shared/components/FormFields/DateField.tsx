@@ -1,6 +1,8 @@
 import { FieldValues } from "react-hook-form";
-import { Input } from "@/features/shared/components/ui";
+
 import { FormModalField } from "@/features/shared/components/FormModal";
+import { Input } from "@/features/shared/components/ui";
+
 import type { BaseFieldProps } from "./types";
 
 /**
@@ -25,21 +27,21 @@ export function DateField<T extends FieldValues>({
 }) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <Input
-        type="date"
-        placeholder={placeholder}
-        className={`h-11 ${className || ""}`}
-        disabled={disabled}
         autoFocus={autoFocus}
-        min={min}
-        max={max}
+        className={`h-11 ${className || ""}`}
         data-testid={testId}
+        disabled={disabled}
+        max={max}
+        min={min}
+        placeholder={placeholder}
+        type="date"
         {...form.register(name)}
       />
     </FormModalField>

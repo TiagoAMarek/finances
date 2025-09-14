@@ -1,7 +1,8 @@
-import { db } from "./db";
-import { transactions, categories } from "./schema";
 import { sql } from "drizzle-orm";
+
+import { db } from "./db";
 import { DEFAULT_CATEGORIES } from "./defaultCategories";
+import { transactions, categories } from "./schema";
 
 interface CategoryMigrationStats {
   totalTransactions: number;

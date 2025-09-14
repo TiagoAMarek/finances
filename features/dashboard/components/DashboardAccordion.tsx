@@ -1,10 +1,12 @@
+import { LucideIcon } from "lucide-react";
+import { memo, ReactNode } from "react";
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
 } from "@/features/shared/components/ui/accordion";
-import { LucideIcon } from "lucide-react";
-import { memo, ReactNode } from "react";
+
 import { DashboardAccordionTrigger } from "./DashboardAccordionTrigger";
 
 /**
@@ -54,18 +56,18 @@ export const DashboardAccordion = memo<DashboardAccordionProps>(
   }) {
     return (
       <Accordion
-        type="single"
-        collapsible
         className="w-full"
+        collapsible
         defaultValue={defaultValue}
+        type="single"
       >
         <AccordionItem value={defaultValue}>
           <DashboardAccordionTrigger
-            title={title}
+            actionButton={actionButton}
+            badges={badges}
             icon={icon}
             iconColor={iconColor}
-            badges={badges}
-            actionButton={actionButton}
+            title={title}
           />
           <AccordionContent>{children}</AccordionContent>
         </AccordionItem>

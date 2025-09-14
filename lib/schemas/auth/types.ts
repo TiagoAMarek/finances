@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { LoginSchema } from "./login";
 import { RegisterSchema, RegisterApiSchema } from "./register";
 

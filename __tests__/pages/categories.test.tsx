@@ -1,15 +1,17 @@
+import { http, HttpResponse } from "msw";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import CategoriesPage from "@/app/categories/page";
+
+import { server } from "../mocks/server";
 import {
   renderWithProviders,
   screen,
   waitFor,
   testHelpers,
 } from "../utils/test-utils";
-import { server } from "../mocks/server";
-import { http, HttpResponse } from "msw";
 
-import CategoriesPage from "@/app/categories/page";
 
 // Ensure we reset auth mock state between tests
 afterEach(() => {

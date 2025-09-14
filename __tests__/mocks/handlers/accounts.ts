@@ -1,6 +1,8 @@
 import { http, HttpResponse } from "msw";
-import { mockAccounts } from "../data/accounts";
+
 import { BankAccountCreateInput, BankAccountUpdateInput } from "@/lib/schemas";
+
+import { mockAccounts } from "../data/accounts";
 
 export const accountHandlers = [
   // GET /api/accounts - Fetch all accounts

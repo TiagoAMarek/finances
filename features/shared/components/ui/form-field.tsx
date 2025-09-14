@@ -1,9 +1,11 @@
 "use client";
 
-import * as React from "react";
-import { cn } from "@/lib/utils";
-import { Label } from "./label";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
+import * as React from "react";
+
+import { cn } from "@/lib/utils";
+
+import { Label } from "./label";
 
 export interface FormFieldProps {
   label: string;
@@ -34,16 +36,16 @@ export function FormField({
   return (
     <div className={cn("space-y-2", className)}>
       <Label
-        htmlFor={fieldId}
         className={cn(
           "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
           error && "text-destructive",
           isValid && !error && "text-green-700",
         )}
+        htmlFor={fieldId}
       >
         {label}
         {required && (
-          <span className="text-destructive ml-1" aria-label="obrigatório">
+          <span aria-label="obrigatório" className="text-destructive ml-1">
             *
           </span>
         )}
@@ -53,7 +55,7 @@ export function FormField({
       </Label>
 
       {description && (
-        <p id={descriptionId} className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground" id={descriptionId}>
           {description}
         </p>
       )}
@@ -83,10 +85,10 @@ export function FormField({
 
       {error && (
         <div
-          id={errorId}
-          className="flex items-center space-x-2 text-sm text-destructive"
-          role="alert"
           aria-live="polite"
+          className="flex items-center space-x-2 text-sm text-destructive"
+          id={errorId}
+          role="alert"
         >
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           <span>{error}</span>

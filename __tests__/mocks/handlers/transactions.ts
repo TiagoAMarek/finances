@@ -1,6 +1,8 @@
 import { http, HttpResponse } from "msw";
-import { mockTransactions } from "../data/transactions";
+
 import { TransactionCreateInput, TransactionUpdateInput } from "@/lib/schemas";
+
+import { mockTransactions } from "../data/transactions";
 
 export const transactionHandlers = [
   // GET /api/transactions - Fetch all transactions

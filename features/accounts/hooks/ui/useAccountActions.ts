@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useCreateAccount, useUpdateAccount, useDeleteAccount } from "../data";
+
 import { BankAccount } from "@/lib/schemas";
+
+import { useCreateAccount, useUpdateAccount, useDeleteAccount } from "../data";
 
 /**
  * Hook for managing account actions and UI state

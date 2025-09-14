@@ -1,3 +1,15 @@
+import {
+  Edit2,
+  Folder,
+  MoreHorizontal,
+  Shield,
+  ShoppingCart,
+  Trash2,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import { useState } from "react";
+
 import { CategoryWithStats } from "@/features/categories/hooks/data";
 import {
   AlertDialog,
@@ -17,17 +29,6 @@ import {
   RowListItem,
 } from "@/features/shared/components/ui";
 import { Category } from "@/lib/schemas";
-import {
-  Edit2,
-  Folder,
-  MoreHorizontal,
-  Shield,
-  ShoppingCart,
-  Trash2,
-  TrendingUp,
-  Wallet,
-} from "lucide-react";
-import { useState } from "react";
 
 interface CategoryItemProps {
   category: Category | CategoryWithStats;
@@ -118,13 +119,13 @@ export function CategoryItem({
   const subtitle = (
     <div className="flex items-center gap-2">
       <Badge
-        variant="secondary"
         className={`text-xs font-medium ${getTypeColor(category.type)}`}
+        variant="secondary"
       >
         {getTypeLabel(category.type)}
       </Badge>
       {"transactionCount" in category && (
-        <Badge variant="outline" className="text-xs font-medium">
+        <Badge className="text-xs font-medium" variant="outline">
           {category.transactionCount}{" "}
           {category.transactionCount === 1 ? "transação" : "transações"}
         </Badge>
@@ -132,7 +133,7 @@ export function CategoryItem({
       {category.isDefault && (
         <div className="flex items-center gap-1">
           <Shield className="h-3 w-3 text-muted-foreground" />
-          <Badge variant="outline" className="text-xs text-muted-foreground">
+          <Badge className="text-xs text-muted-foreground" variant="outline">
             Padrão
           </Badge>
         </div>
@@ -144,26 +145,26 @@ export function CategoryItem({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
           aria-label={`Ações da categoria ${category.name}`}
+          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
+          size="sm"
+          variant="ghost"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
-          onClick={() => onEdit(category.id)}
           disabled={category.isDefault}
+          onClick={() => onEdit(category.id)}
         >
           <Edit2 className="h-4 w-4 mr-2" />
           Editar
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => setShowDeleteDialog(true)}
-          disabled={category.isDefault || isDeleting}
           className="text-destructive"
+          disabled={category.isDefault || isDeleting}
+          onClick={() => setShowDeleteDialog(true)}
         >
           <Trash2 className="h-4 w-4 mr-2" />
           Excluir
@@ -175,12 +176,12 @@ export function CategoryItem({
   return (
     <>
       <RowListItem
-        icon={icon}
-        title={category.name}
-        subtitle={subtitle}
         actions={actions}
+        icon={icon}
         isLoading={isDeleting}
         loadingText="Processando..."
+        subtitle={subtitle}
+        title={category.name}
       />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -196,8 +197,8 @@ export function CategoryItem({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDelete}
             >
               Excluir
             </AlertDialogAction>

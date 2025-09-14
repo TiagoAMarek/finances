@@ -1,3 +1,5 @@
+import { memo, useMemo } from "react";
+
 import {
   useChartDescription,
   useChartTotals,
@@ -11,7 +13,7 @@ import {
   CardTitle,
 } from "@/features/shared/components/ui";
 import { TransactionFilter } from "@/lib/chart-utils";
-import { memo, useMemo } from "react";
+
 import { Chart } from "./IncomeVsExpenseChart/Chart";
 import { ChartSummary } from "./IncomeVsExpenseChart/ChartSummary";
 import { IncomeVsExpenseChartProps } from "./IncomeVsExpenseChart/types";

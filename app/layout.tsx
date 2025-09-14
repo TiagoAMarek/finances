@@ -1,8 +1,10 @@
 "use client";
 
+import { Analytics } from "@vercel/analytics/next";
+
 import { AppLayout, ThemeProvider } from "@/features/shared/components";
 import { Toaster } from "@/features/shared/components/ui";
-import { Analytics } from "@vercel/analytics/next";
+
 import { QueryProvider } from "../lib/query-provider";
 import { MSWProvider } from "../src/components/MSWProvider";
 import "../styles/globals.css";
@@ -19,8 +21,8 @@ export default function RootLayout({
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
-            enableSystem={false}
             disableTransitionOnChange
+            enableSystem={false}
           >
             <QueryProvider>
               <AppLayout>

@@ -1,23 +1,3 @@
-import { useGetAccounts } from "@/features/accounts/hooks/data";
-import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  Badge,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/features/shared/components/ui";
-import { Transaction } from "@/lib/schemas";
 import {
   BanknoteIcon,
   CarIcon,
@@ -38,6 +18,27 @@ import {
   UtensilsIcon,
 } from "lucide-react";
 import React, { useState } from "react";
+
+import { useGetAccounts } from "@/features/accounts/hooks/data";
+import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/features/shared/components/ui";
+import { Transaction } from "@/lib/schemas";
 
 interface TransactionListItemProps {
   transaction: Transaction;
@@ -267,16 +268,16 @@ export function TransactionListItem({
               </span>
               {isIncome && (
                 <Badge
-                  variant="outline"
                   className="ml-2 text-xs border-green-200 text-green-700 dark:border-green-800 dark:text-green-400"
+                  variant="outline"
                 >
                   Receita
                 </Badge>
               )}
               {isTransfer && (
                 <Badge
-                  variant="outline"
                   className="ml-2 text-xs border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-400"
+                  variant="outline"
                 >
                   Transferência
                 </Badge>
@@ -288,40 +289,40 @@ export function TransactionListItem({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 hover:bg-muted"
                     aria-label="Mais opções"
+                    className="h-8 w-8 p-0 hover:bg-muted"
                     disabled={isDeleting}
+                    size="sm"
+                    variant="ghost"
                   >
                     <MoreVerticalIcon className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
-                    onClick={() => onEdit(transaction)}
                     className="cursor-pointer"
+                    onClick={() => onEdit(transaction)}
                   >
                     <EditIcon className="h-4 w-4 mr-2" />
                     Editar transação
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={handleDuplicate}
                     className="cursor-pointer"
+                    onClick={handleDuplicate}
                   >
                     <CopyIcon className="h-4 w-4 mr-2" />
                     Duplicar
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={handleCopyDetails}
                     className="cursor-pointer"
+                    onClick={handleCopyDetails}
                   >
                     <CopyIcon className="h-4 w-4 mr-2" />
                     Copiar dados
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={handleAddToTemplate}
                     className="cursor-pointer"
+                    onClick={handleAddToTemplate}
                   >
                     <RepeatIcon className="h-4 w-4 mr-2" />
                     Salvar como modelo
@@ -353,9 +354,9 @@ export function TransactionListItem({
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={handleDelete}
-                          disabled={isDeleting}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          disabled={isDeleting}
+                          onClick={handleDelete}
                         >
                           {isDeleting ? "Excluindo..." : "Excluir"}
                         </AlertDialogAction>

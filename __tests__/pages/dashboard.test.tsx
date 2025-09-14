@@ -1,13 +1,15 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
+import DashboardPage from "@/app/dashboard/page";
+
+import { server } from "../mocks/server";
 import {
   renderWithProviders,
   testHelpers,
   mockLocation,
 } from "../utils/test-utils";
-import DashboardPage from "@/app/dashboard/page";
-import { server } from "../mocks/server";
-import { http, HttpResponse } from "msw";
 
 // Use the same constants as integration tests
 const TEST_CONSTANTS = {

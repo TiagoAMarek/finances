@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/utils/api";
+
 import { LoginResponse, LoginInput } from "@/lib/schemas";
+import { fetchWithAuth } from "@/utils/api";
 
 /**
  * Hook for user login

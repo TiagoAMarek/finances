@@ -1,3 +1,7 @@
+import { LucideIcon, Plus } from "lucide-react";
+import Link from "next/link";
+import { memo, ReactNode } from "react";
+
 import { Badge, Button } from "@/features/shared/components/ui";
 import {
   Card,
@@ -6,9 +10,6 @@ import {
   CardTitle,
 } from "@/features/shared/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
-import { LucideIcon, Plus } from "lucide-react";
-import Link from "next/link";
-import { memo, ReactNode } from "react";
 
 /**
  * Resource card base props
@@ -92,7 +93,7 @@ const ResourceCardHeader = memo<ResourceCardHeaderProps>(
         <CardTitle className="text-base font-medium">{title}</CardTitle>
         <div className="flex items-center gap-2">
           {count !== undefined && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge className="text-xs" variant="secondary">
               {count}
             </Badge>
           )}
@@ -121,10 +122,10 @@ const ResourceCardEmpty = memo<ResourceCardEmptyProps>(
     return (
       <>
         <ResourceCardHeader
-          title={title}
           icon={Icon}
-          iconColor={iconColor}
           iconBgColor={iconBgColor}
+          iconColor={iconColor}
+          title={title}
         />
         <CardContent>
           <div className="text-center py-8">
@@ -132,7 +133,7 @@ const ResourceCardEmpty = memo<ResourceCardEmptyProps>(
               <Plus className="h-6 w-6 text-muted-foreground" />
             </div>
             <p className="text-sm text-muted-foreground mb-3">{emptyMessage}</p>
-            <Button asChild variant="outline" size="sm">
+            <Button asChild size="sm" variant="outline">
               <Link href={actionHref}>{actionText}</Link>
             </Button>
           </div>
@@ -183,8 +184,8 @@ const ResourceCardAction = memo<ResourceCardActionProps>(
   function ResourceCardAction({ href, icon: Icon, children }) {
     return (
       <div className="mt-auto pt-4">
-        <Button asChild variant="outline" size="sm" className="w-full">
-          <Link href={href} className="flex items-center gap-2">
+        <Button asChild className="w-full" size="sm" variant="outline">
+          <Link className="flex items-center gap-2" href={href}>
             <Icon className="h-3 w-3" />
             {children}
           </Link>

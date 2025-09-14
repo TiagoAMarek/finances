@@ -1,5 +1,7 @@
 import { memo } from "react";
+
 import { formatCurrency } from "@/lib/chart-utils";
+
 import { ChartSummaryProps } from "./types";
 
 /**

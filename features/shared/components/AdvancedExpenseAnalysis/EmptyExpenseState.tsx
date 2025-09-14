@@ -1,3 +1,6 @@
+import { AlertCircle } from "lucide-react";
+import { memo } from "react";
+
 import {
   Card,
   CardContent,
@@ -5,8 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/features/shared/components/ui";
-import { AlertCircle } from "lucide-react";
-import { memo } from "react";
 
 /**
  * Props for the empty expense state component

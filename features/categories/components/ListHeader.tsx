@@ -1,5 +1,6 @@
-import { Badge } from "@/features/shared/components/ui";
 import React from "react";
+
+import { Badge } from "@/features/shared/components/ui";
 
 type ListHeaderProps = {
   title: string;
@@ -13,7 +14,7 @@ export function ListHeader({ title, count, right }: ListHeaderProps) {
       <div className="flex items-center gap-2">
         <h2 className="text-sm font-medium text-muted-foreground">{title}</h2>
         {typeof count === "number" ? (
-          <Badge variant="secondary" aria-label={`${count} categorias`}>
+          <Badge aria-label={`${count} categorias`} variant="secondary">
             {count}
           </Badge>
         ) : null}

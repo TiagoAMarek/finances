@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { POST } from "@/app/api/auth/register/route";
+
 import { createMockRequest } from "../../../helpers/auth-helpers";
 
 // Mock database responses

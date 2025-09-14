@@ -1,7 +1,8 @@
 import { z } from "zod";
+
+import { BankAccountCreateSchema, BankAccountUpdateSchema } from "./api";
 import { BankAccountSchema } from "./entity";
 import { BankAccountFormSchema } from "./forms";
-import { BankAccountCreateSchema, BankAccountUpdateSchema } from "./api";
 
 // Entity types (API responses)
 export type BankAccount = z.infer<typeof BankAccountSchema>;

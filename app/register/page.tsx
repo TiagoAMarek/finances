@@ -1,5 +1,10 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { NextPage } from "next";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+
 import { useRegister } from "@/features/auth/hooks/data";
 import {
   Button,
@@ -16,10 +21,6 @@ import {
   CardTitle,
 } from "@/features/shared/components/ui/card";
 import { RegisterSchema, type RegisterInput } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { NextPage } from "next";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 
 const RegisterPage: NextPage = () => {
   const router = useRouter();
@@ -68,7 +69,7 @@ const RegisterPage: NextPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {registerMutation.error && (
               <Alert variant="destructive">
                 <AlertDescription>
@@ -78,44 +79,44 @@ const RegisterPage: NextPage = () => {
             )}
 
             <FormField
-              label="Nome completo"
               error={errors.name?.message}
               isValid={touchedFields.name && !errors.name && !!watchedName}
+              label="Nome completo"
               required
             >
               <Input
-                type="text"
-                placeholder="Digite seu nome completo"
                 autoComplete="name"
+                placeholder="Digite seu nome completo"
+                type="text"
                 {...register("name")}
               />
             </FormField>
 
             <FormField
-              label="E-mail"
               error={errors.email?.message}
               isValid={touchedFields.email && !errors.email && !!watchedEmail}
+              label="E-mail"
               required
             >
               <Input
-                type="email"
-                placeholder="seuemail@exemplo.com"
                 autoComplete="email"
+                placeholder="seuemail@exemplo.com"
+                type="email"
                 {...register("email")}
               />
             </FormField>
 
             <FormField
-              label="Senha"
               error={errors.password?.message}
               isValid={
                 touchedFields.password && !errors.password && !!watchedPassword
               }
+              label="Senha"
               required
             >
               <PasswordInput
-                placeholder="Crie uma senha forte"
                 autoComplete="new-password"
+                placeholder="Crie uma senha forte"
                 {...register("password")}
               />
             </FormField>
@@ -125,33 +126,33 @@ const RegisterPage: NextPage = () => {
             )}
 
             <FormField
-              label="Confirmar senha"
               error={errors.confirmPassword?.message}
               isValid={
                 touchedFields.confirmPassword &&
                 !errors.confirmPassword &&
                 !!watchedConfirmPassword
               }
+              label="Confirmar senha"
               required
             >
               <PasswordInput
-                placeholder="Digite a senha novamente"
                 autoComplete="new-password"
+                placeholder="Digite a senha novamente"
                 showVisibilityToggle={false}
                 {...register("confirmPassword")}
               />
             </FormField>
 
             <Button
-              type="submit"
               className="w-full"
               disabled={registerMutation.isPending || !isValid}
+              type="submit"
             >
               {registerMutation.isPending ? "Criando conta..." : "Criar conta"}
             </Button>
           </form>
           <div className="mt-4 text-center">
-            <a href="/login" className="text-sm text-primary hover:underline">
+            <a className="text-sm text-primary hover:underline" href="/login">
               Já tem uma conta? Entrar
             </a>
           </div>

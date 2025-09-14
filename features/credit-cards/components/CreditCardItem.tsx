@@ -1,3 +1,12 @@
+import {
+  AlertTriangle,
+  CreditCard,
+  Edit2,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
+
 import { Badge, Button, Progress } from "@/features/shared/components/ui";
 import {
   AlertDialog,
@@ -17,14 +26,6 @@ import {
 } from "@/features/shared/components/ui/dropdown-menu";
 import { RowListItem } from "@/features/shared/components/ui/row-list";
 import { CreditCard as CreditCardType } from "@/lib/schemas";
-import {
-  AlertTriangle,
-  CreditCard,
-  Edit2,
-  MoreHorizontal,
-  Trash2,
-} from "lucide-react";
-import { useState } from "react";
 
 interface CreditCardItemProps {
   card: CreditCardType;
@@ -76,12 +77,12 @@ export function CreditCardItem({
   const subtitle = (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <Badge variant="secondary" className="text-xs font-medium">
+        <Badge className="text-xs font-medium" variant="secondary">
           Fatura: {formatCurrency(currentBill)}
         </Badge>
         <Badge
-          variant="secondary"
           className={`text-xs font-medium ${getUsageColor()}`}
+          variant="secondary"
         >
           {usagePercentage.toFixed(1)}% usado
         </Badge>
@@ -89,8 +90,8 @@ export function CreditCardItem({
           <div className="flex items-center gap-1">
             <AlertTriangle className="h-3 w-3 text-amber-500" />
             <Badge
-              variant="secondary"
               className="text-xs text-amber-600 bg-amber-100 dark:bg-amber-900 dark:text-amber-300"
+              variant="secondary"
             >
               Alto uso
             </Badge>
@@ -103,7 +104,6 @@ export function CreditCardItem({
           <span>Disponível: {formatCurrency(availableCredit)}</span>
         </div>
         <Progress
-          value={usagePercentage}
           className={`h-1.5 ${
             isHighUsage
               ? "[&>div]:bg-amber-500"
@@ -111,6 +111,7 @@ export function CreditCardItem({
                 ? "[&>div]:bg-orange-500"
                 : "[&>div]:bg-green-500"
           }`}
+          value={usagePercentage}
         />
       </div>
     </div>
@@ -120,10 +121,10 @@ export function CreditCardItem({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
           aria-label={`Ações do cartão ${card.name}`}
+          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
+          size="sm"
+          variant="ghost"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -134,9 +135,9 @@ export function CreditCardItem({
           Editar
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => setShowDeleteDialog(true)}
-          disabled={isDeleting}
           className="text-destructive"
+          disabled={isDeleting}
+          onClick={() => setShowDeleteDialog(true)}
         >
           <Trash2 className="h-4 w-4 mr-2" />
           Excluir
@@ -148,12 +149,12 @@ export function CreditCardItem({
   return (
     <>
       <RowListItem
-        icon={icon}
-        title={card.name}
-        subtitle={subtitle}
         actions={actions}
+        icon={icon}
         isLoading={isDeleting}
         loadingText="Processando..."
+        subtitle={subtitle}
+        title={card.name}
       />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -169,8 +170,8 @@ export function CreditCardItem({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDelete}
             >
               Excluir
             </AlertDialogAction>

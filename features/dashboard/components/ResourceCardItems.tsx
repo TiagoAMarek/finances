@@ -1,7 +1,8 @@
-import { Progress } from "@/features/shared/components/ui";
-import { formatCurrency } from "@/lib/utils";
 import { AlertTriangle, Banknote, CreditCard, LucideIcon } from "lucide-react";
 import { memo } from "react";
+
+import { Progress } from "@/features/shared/components/ui";
+import { formatCurrency } from "@/lib/utils";
 
 /**
  * Base resource item props
@@ -122,7 +123,6 @@ const CreditCardItem = memo<CreditCardItemProps>(function CreditCardItem({
       </div>
 
       <Progress
-        value={usagePercentage}
         className={`h-2 ${
           isHighUsage
             ? "[&>div]:bg-red-500"
@@ -130,6 +130,7 @@ const CreditCardItem = memo<CreditCardItemProps>(function CreditCardItem({
               ? "[&>div]:bg-orange-500"
               : "[&>div]:bg-green-500"
         }`}
+        value={usagePercentage}
       />
     </div>
   );

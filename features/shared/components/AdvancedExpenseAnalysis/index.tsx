@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import { useExpenseAnalysis } from "@/features/reports/hooks/ui/useExpenseAnalysis";
 import {
   Card,
@@ -6,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/features/shared/components/ui/card";
-import { memo } from "react";
+
 import { EmptyExpenseState } from "./EmptyExpenseState";
 import { ExpenseAnalysisChart } from "./ExpenseAnalysisChart";
 import { ExpenseStatistics } from "./ExpenseStatistics";

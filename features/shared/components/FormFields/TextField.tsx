@@ -1,6 +1,8 @@
 import { FieldValues } from "react-hook-form";
-import { Input } from "@/features/shared/components/ui";
+
 import { FormModalField } from "@/features/shared/components/FormModal";
+import { Input } from "@/features/shared/components/ui";
+
 import type { BaseFieldProps } from "./types";
 
 /**
@@ -27,21 +29,21 @@ export function TextField<T extends FieldValues>({
 }) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <Input
-        type={type}
-        placeholder={placeholder}
-        className={`h-11 ${className || ""}`}
-        disabled={disabled}
         autoFocus={autoFocus}
+        className={`h-11 ${className || ""}`}
+        data-testid={testId}
+        disabled={disabled}
         maxLength={maxLength}
         minLength={minLength}
-        data-testid={testId}
+        placeholder={placeholder}
+        type={type}
         {...form.register(name)}
       />
     </FormModalField>

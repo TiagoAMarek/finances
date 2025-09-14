@@ -1,6 +1,6 @@
+import { createErrorResponse, createSuccessResponse } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { defaultCategories } from "../../lib/schema";
-import { createErrorResponse, createSuccessResponse } from "../../lib/auth";
 
 // GET /api/categories/defaults - Get default categories for seeding
 export async function GET() {

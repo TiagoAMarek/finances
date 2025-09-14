@@ -1,14 +1,15 @@
-import { NextRequest } from "next/server";
 import { eq, and } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { bankAccounts } from "../../lib/schema";
-import { BankAccountUpdateSchema } from "../../lib/validation";
+import { NextRequest } from "next/server";
+
 import {
   getUserFromRequest,
   createErrorResponse,
   createSuccessResponse,
   handleZodError,
 } from "../../lib/auth";
+import { db } from "../../lib/db";
+import { bankAccounts } from "../../lib/schema";
+import { BankAccountUpdateSchema } from "../../lib/validation";
 
 // PUT /api/accounts/[id] - Update bank account
 export async function PUT(

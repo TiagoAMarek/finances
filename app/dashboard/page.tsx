@@ -1,5 +1,9 @@
 "use client";
 
+import { BarChart3 } from "lucide-react";
+import type { NextPage } from "next";
+import { useCallback, useState } from "react";
+
 import {
   DashboardMetricsGrid,
   DashboardSkeletonLoader,
@@ -11,9 +15,6 @@ import { PageHeader, QuickCreateButton } from "@/features/shared/components";
 import { CreateTransactionModal } from "@/features/transactions/components";
 import { useTransactionActions } from "@/features/transactions/hooks/ui/useTransactionActions";
 import { TransactionCreateInput } from "@/lib/schemas";
-import { BarChart3 } from "lucide-react";
-import type { NextPage } from "next";
-import { useCallback, useState } from "react";
 
 const DashboardPage: NextPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -41,15 +42,15 @@ const DashboardPage: NextPage = () => {
   return (
     <>
       <PageHeader
-        title="Dashboard"
-        description="Visão geral das suas finanças e transações recentes"
-        icon={BarChart3}
-        iconColor="text-orange-500"
         action={
           <QuickCreateButton onClick={handleCreateTransaction}>
             Novo Lançamento
           </QuickCreateButton>
         }
+        description="Visão geral das suas finanças e transações recentes"
+        icon={BarChart3}
+        iconColor="text-orange-500"
+        title="Dashboard"
       />
 
       <div className="space-y-8 px-4 lg:px-6 pb-8">
@@ -68,16 +69,16 @@ const DashboardPage: NextPage = () => {
 
         {/* Reports Section */}
         <ReportsAccordion
-          transactions={dashboardData.transactions}
           monthlyMetrics={dashboardData.monthlyMetrics}
+          transactions={dashboardData.transactions}
         />
       </div>
 
       <CreateTransactionModal
+        isLoading={isCreating}
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
         onSubmit={handleCreateTransactionSubmit}
-        isLoading={isCreating}
       />
     </>
   );

@@ -1,5 +1,7 @@
 import { useMemo } from "react";
+
 import { Transaction } from "@/lib/schemas";
+
 import { TransactionListItem } from "./TransactionListItem";
 
 interface TransactionListViewProps {
@@ -82,10 +84,10 @@ export function TransactionListView({
               {dateTransactions.map((transaction) => (
                 <TransactionListItem
                   key={transaction.id}
-                  transaction={transaction}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
                   isDeleting={isDeleting}
+                  transaction={transaction}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
                 />
               ))}
             </div>

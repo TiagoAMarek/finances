@@ -1,3 +1,10 @@
+import {
+  BanknoteIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  TagIcon,
+} from "lucide-react";
+
 import { Input, Label, Separator } from "@/features/shared/components/ui";
 import {
   Select,
@@ -6,12 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/features/shared/components/ui/select";
-import {
-  BanknoteIcon,
-  CalendarIcon,
-  CreditCardIcon,
-  TagIcon,
-} from "lucide-react";
+
 import { TransactionFilters } from "./types";
 
 interface AdvancedFiltersFormProps {
@@ -30,13 +32,13 @@ export function AdvancedFiltersForm({
   onChange,
 }: AdvancedFiltersFormProps) {
   return (
-    <div className="pt-4" aria-labelledby="advanced-filters-heading">
+    <div aria-labelledby="advanced-filters-heading" className="pt-4">
       <Separator className="mb-4" />
       <div className="space-y-6">
         <div>
           <h4
-            id="advanced-filters-heading"
             className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"
+            id="advanced-filters-heading"
           >
             <TagIcon className="h-4 w-4 text-primary" />
             Filtros Avançados
@@ -158,11 +160,11 @@ export function AdvancedFiltersForm({
                 Data Inicial
               </Label>
               <Input
+                className="transition-all hover:border-primary/50 focus:ring-2 focus:ring-primary/20"
                 id="date-from"
                 type="date"
                 value={filters.dateFrom}
                 onChange={(e) => onChange("dateFrom", e.target.value)}
-                className="transition-all hover:border-primary/50 focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -173,11 +175,11 @@ export function AdvancedFiltersForm({
                 Data Final
               </Label>
               <Input
+                className="transition-all hover:border-primary/50 focus:ring-2 focus:ring-primary/20"
                 id="date-to"
                 type="date"
                 value={filters.dateTo}
                 onChange={(e) => onChange("dateTo", e.target.value)}
-                className="transition-all hover:border-primary/50 focus:ring-2 focus:ring-primary/20"
               />
             </div>
           </div>

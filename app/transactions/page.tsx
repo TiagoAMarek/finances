@@ -1,5 +1,8 @@
 "use client";
 
+import { ArrowLeftRight } from "lucide-react";
+import type { NextPage } from "next";
+
 import { useGetAccounts } from "@/features/accounts/hooks/data/useGetAccounts";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data/useGetCreditCards";
 import { PageHeader, QuickCreateButton } from "@/features/shared/components";
@@ -19,8 +22,6 @@ import {
   useTransactionActions,
   useTransactionFilters,
 } from "@/features/transactions/hooks/ui";
-import { ArrowLeftRight } from "lucide-react";
-import type { NextPage } from "next";
 
 const TransactionsPage: NextPage = () => {
   const {
@@ -71,17 +72,17 @@ const TransactionsPage: NextPage = () => {
     return (
       <>
         <PageHeader
-          title="Lançamentos"
-          description="Gerencie suas receitas, despesas e transferências"
           action={<Skeleton className="h-9 w-32" />}
+          description="Gerencie suas receitas, despesas e transferências"
+          title="Lançamentos"
         />
         <div className="space-y-8 px-4 lg:px-6 pb-8">
           <TransactionsList
-            transactions={[]}
-            isLoading={true}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
             isDeleting={false}
+            isLoading={true}
+            transactions={[]}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
           />
         </div>
       </>
@@ -92,16 +93,16 @@ const TransactionsPage: NextPage = () => {
     return (
       <>
         <PageHeader
-          title="Lançamentos"
-          description="Gerencie suas receitas, despesas e transferências"
           action={
             <QuickCreateButton onClick={() => setCreateModalOpen(true)}>
               Novo Lançamento
             </QuickCreateButton>
           }
+          description="Gerencie suas receitas, despesas e transferências"
+          title="Lançamentos"
         />
         <div className="flex items-center justify-center min-h-screen p-4 lg:p-6">
-          <Alert variant="destructive" className="max-w-md">
+          <Alert className="max-w-md" variant="destructive">
             <AlertDescription>Erro: {pageError?.message}</AlertDescription>
           </Alert>
         </div>
@@ -112,10 +113,6 @@ const TransactionsPage: NextPage = () => {
   return (
     <>
       <PageHeader
-        title="Lançamentos"
-        description="Gerencie suas receitas, despesas e transferências"
-        icon={ArrowLeftRight}
-        iconColor="text-purple-500"
         action={
           <QuickCreateButton
             data-testid="open-create-transaction"
@@ -124,45 +121,49 @@ const TransactionsPage: NextPage = () => {
             Novo Lançamento
           </QuickCreateButton>
         }
+        description="Gerencie suas receitas, despesas e transferências"
+        icon={ArrowLeftRight}
+        iconColor="text-purple-500"
+        title="Lançamentos"
       />
       <div className="space-y-8 px-4 lg:px-6 pb-8">
         {pageError && (
-          <Alert variant="destructive" className="mb-6">
+          <Alert className="mb-6" variant="destructive">
             <AlertDescription>{pageError.message}</AlertDescription>
           </Alert>
         )}
 
         <div className="space-y-8">
           <TransactionFiltersComponent
+            categories={categories}
             filters={filters}
             onFiltersChange={setFilters}
-            categories={categories}
           />
 
           <TransactionsList
-            transactions={filteredTransactions}
-            isLoading={isPageLoading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
             isDeleting={isLoading.delete}
             isFiltered={hasActiveFilters}
+            isLoading={isPageLoading}
             totalCount={transactions.length}
+            transactions={filteredTransactions}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
           />
         </div>
 
         <CreateTransactionModal
+          isLoading={isLoading.create}
           open={createModalOpen}
           onOpenChange={setCreateModalOpen}
           onSubmit={handleCreate}
-          isLoading={isLoading.create}
         />
 
         <EditTransactionModal
-          transaction={editingTransaction}
+          isLoading={isLoading.update}
           open={editModalOpen}
+          transaction={editingTransaction}
           onOpenChange={setEditModalOpen}
           onSave={handleUpdate}
-          isLoading={isLoading.update}
         />
       </div>
     </>

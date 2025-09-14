@@ -1,3 +1,6 @@
+import { Banknote, Edit2, MoreHorizontal, Trash2 } from "lucide-react";
+import { useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,8 +21,6 @@ import {
 } from "@/features/shared/components/ui/dropdown-menu";
 import { RowListItem } from "@/features/shared/components/ui/row-list";
 import { BankAccount } from "@/lib/schemas";
-import { Banknote, Edit2, MoreHorizontal, Trash2 } from "lucide-react";
-import { useState } from "react";
 
 interface AccountItemProps {
   account: BankAccount;
@@ -64,13 +65,13 @@ export function AccountItem({
   const subtitle = (
     <>
       <Badge
-        variant={isPositive ? "secondary" : "destructive"}
         className="text-xs font-medium"
+        variant={isPositive ? "secondary" : "destructive"}
       >
         {formatCurrency(balance)}
       </Badge>
       {!isPositive && (
-        <Badge variant="destructive" className="text-xs font-medium">
+        <Badge className="text-xs font-medium" variant="destructive">
           Saldo Negativo
         </Badge>
       )}
@@ -81,10 +82,10 @@ export function AccountItem({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
           aria-label={`Ações da conta ${account.name}`}
+          className="h-8 w-8 p-0 hover:bg-muted/80 opacity-0 group-hover:opacity-100 transition-opacity"
+          size="sm"
+          variant="ghost"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -95,9 +96,9 @@ export function AccountItem({
           Editar
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => setShowDeleteDialog(true)}
-          disabled={isDeleting}
           className="text-destructive"
+          disabled={isDeleting}
+          onClick={() => setShowDeleteDialog(true)}
         >
           <Trash2 className="h-4 w-4 mr-2" />
           Excluir
@@ -109,12 +110,12 @@ export function AccountItem({
   return (
     <>
       <RowListItem
-        icon={icon}
-        title={account.name}
-        subtitle={subtitle}
         actions={actions}
+        icon={icon}
         isLoading={isDeleting}
         loadingText="Processando..."
+        subtitle={subtitle}
+        title={account.name}
       />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -130,8 +131,8 @@ export function AccountItem({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDelete}
             >
               Excluir
             </AlertDialogAction>

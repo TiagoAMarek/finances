@@ -1,4 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreditCardIcon, PlusIcon } from "lucide-react";
 import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+
 import { 
   FormModal,
   FormModalHeader,
@@ -9,9 +13,6 @@ import {
 } from "@/features/shared/components";
 import { Input } from "@/features/shared/components/ui";
 import { CreditCardCreateInput, CreditCardCreateSchema } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreditCardIcon, PlusIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
 
 interface CreateCardModalProps {
   open: boolean;
@@ -55,45 +56,45 @@ export function CreateCardModal({
   return (
     <FormModal
       open={open}
-      onOpenChange={onOpenChange}
-      variant="create"
       size="md"
       trigger={
         <QuickCreateButton onClick={() => onOpenChange(true)}>
           Novo Cartão
         </QuickCreateButton>
       }
+      variant="create"
+      onOpenChange={onOpenChange}
     >
       <FormModalHeader
-        icon={CreditCardIcon}
-        iconColor="text-blue-500"
-        iconBgColor="bg-blue-500/10"
-        title="Novo Cartão de Crédito"
         description="Cadastre um novo cartão para controlar suas despesas"
+        icon={CreditCardIcon}
+        iconBgColor="bg-blue-500/10"
+        iconColor="text-blue-500"
+        title="Novo Cartão de Crédito"
       />
 
       <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
         <FormModalField
-          form={form}
-          name="name"
-          label="Nome do Cartão"
           description="Escolha um nome que facilite a identificação do cartão"
+          form={form}
+          label="Nome do Cartão"
+          name="name"
           required
         >
           <Input
-            type="text"
-            placeholder="Ex: Cartão Principal"
-            className="h-11"
             autoFocus
+            className="h-11"
+            placeholder="Ex: Cartão Principal"
+            type="text"
             {...form.register("name")}
           />
         </FormModalField>
 
         <FormModalField
-          form={form}
-          name="limit"
-          label="Limite do Cartão"
           description="Informe o limite disponível do seu cartão de crédito"
+          form={form}
+          label="Limite do Cartão"
+          name="limit"
           required
         >
           <div className="relative">
@@ -101,32 +102,32 @@ export function CreateCardModal({
               R$
             </span>
             <Input
-              type="number"
-              placeholder="0,00"
               className="h-11 pl-10"
-              step="0.01"
               min="0"
+              placeholder="0,00"
+              step="0.01"
+              type="number"
               {...form.register("limit")}
             />
           </div>
         </FormModalField>
 
         <FormModalField
-          form={form}
-          name="currentBill"
-          label="Fatura Atual"
           description="Valor da fatura atual do cartão (opcional)"
+          form={form}
+          label="Fatura Atual"
+          name="currentBill"
         >
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
               R$
             </span>
             <Input
-              type="number"
-              placeholder="0,00"
               className="h-11 pl-10"
-              step="0.01"
               min="0"
+              placeholder="0,00"
+              step="0.01"
+              type="number"
               {...form.register("currentBill")}
             />
           </div>
@@ -134,10 +135,10 @@ export function CreateCardModal({
 
         <FormModalActions
           form={form}
-          onCancel={handleClose}
-          submitText="Criar Cartão"
-          submitIcon={PlusIcon}
           isLoading={isLoading}
+          submitIcon={PlusIcon}
+          submitText="Criar Cartão"
+          onCancel={handleClose}
         />
       </FormModalFormWithHook>
     </FormModal>

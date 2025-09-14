@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
 import { ChartDataPoint, formatCurrency } from "@/lib/chart-utils";
 
 interface ChartProps {
@@ -21,7 +22,7 @@ interface ChartProps {
 export const Chart = memo<ChartProps>(({ data, height = 200 }) => {
   return (
     <div className="w-full" style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer height="100%" width="100%">
         <BarChart
           data={data}
           margin={{
@@ -31,32 +32,32 @@ export const Chart = memo<ChartProps>(({ data, height = 200 }) => {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+          <CartesianGrid className="stroke-muted" strokeDasharray="3 3" />
           <XAxis
-            dataKey="month"
             axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 12 }}
             className="fill-muted-foreground"
+            dataKey="month"
+            tick={{ fontSize: 12 }}
+            tickLine={false}
           />
           <YAxis
             axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 12 }}
             className="fill-muted-foreground"
+            tick={{ fontSize: 12 }}
             tickFormatter={(value) => formatCurrency(value)}
+            tickLine={false}
           />
           <Legend />
           <Bar
             dataKey="receitas"
-            name="Receitas"
             fill="#22c55e"
+            name="Receitas"
             radius={[2, 2, 0, 0]}
           />
           <Bar
             dataKey="despesas"
-            name="Despesas"
             fill="#ef4444"
+            name="Despesas"
             radius={[2, 2, 0, 0]}
           />
         </BarChart>

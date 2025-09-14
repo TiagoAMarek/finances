@@ -1,7 +1,9 @@
-import TransactionsPage from "@/app/transactions/page";
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
+
+import TransactionsPage from "@/app/transactions/page";
+
 import { renderWithProviders, testHelpers } from "../utils/test-utils";
 
 // Rely on shared MSW handlers that mutate the mock store (absolute and relative URLs)

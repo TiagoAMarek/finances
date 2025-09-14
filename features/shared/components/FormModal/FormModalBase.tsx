@@ -1,5 +1,6 @@
 import { memo, useMemo, useState, useCallback } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import type { UseFormReturn, FieldValues } from "react-hook-form";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,9 +11,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+
 import { MODAL_SIZE_CLASSES, DEFAULT_MODAL_CONFIG } from "./constants";
 import type { FormModalProps } from "./types";
-import type { UseFormReturn, FieldValues } from "react-hook-form";
 
 /**
  * Base FormModal component - container for all form modals

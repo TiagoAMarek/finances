@@ -1,6 +1,8 @@
 import { FieldValues } from "react-hook-form";
-import { Input } from "@/features/shared/components/ui";
+
 import { FormModalField } from "@/features/shared/components/FormModal";
+import { Input } from "@/features/shared/components/ui";
+
 import type { BaseFieldProps } from "./types";
 
 /**
@@ -27,22 +29,22 @@ export function NumberField<T extends FieldValues>({
 }) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <Input
-        type="number"
-        placeholder={placeholder}
-        className={`h-11 ${className || ""}`}
-        disabled={disabled}
         autoFocus={autoFocus}
-        min={min}
-        max={max}
-        step={step}
+        className={`h-11 ${className || ""}`}
         data-testid={testId}
+        disabled={disabled}
+        max={max}
+        min={min}
+        placeholder={placeholder}
+        step={step}
+        type="number"
         {...form.register(name, {
           valueAsNumber: true,
         })}

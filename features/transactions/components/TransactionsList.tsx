@@ -1,3 +1,5 @@
+import { Receipt } from "lucide-react";
+
 import {
   Badge,
   Card,
@@ -5,7 +7,7 @@ import {
   Skeleton,
 } from "@/features/shared/components/ui";
 import { Transaction } from "@/lib/schemas";
-import { Receipt } from "lucide-react";
+
 import { TransactionListView } from "./TransactionListView";
 import { TransactionsMetricsGrid } from "./TransactionsMetricsGrid";
 
@@ -156,7 +158,7 @@ export function TransactionsList({
             </h2>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">
+            <Badge className="text-xs" variant="secondary">
               {transactions.length}{" "}
               {transactions.length === 1 ? "lançamento" : "lançamentos"}
               {isFiltered && totalCount > transactions.length && (
@@ -166,7 +168,7 @@ export function TransactionsList({
               )}
             </Badge>
             {isFiltered && (
-              <Badge variant="outline" className="text-xs">
+              <Badge className="text-xs" variant="outline">
                 Filtrado
               </Badge>
             )}
@@ -174,10 +176,10 @@ export function TransactionsList({
         </div>
 
         <TransactionListView
-          transactions={sortedTransactions}
-          onEdit={onEdit}
-          onDelete={onDelete}
           isDeleting={isDeleting}
+          transactions={sortedTransactions}
+          onDelete={onDelete}
+          onEdit={onEdit}
         />
       </div>
     </div>

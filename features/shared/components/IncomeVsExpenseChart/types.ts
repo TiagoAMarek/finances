@@ -1,5 +1,5 @@
-import { Transaction } from "@/lib/schemas";
 import { PeriodType } from "@/lib/chart-utils";
+import { Transaction } from "@/lib/schemas";
 
 /**
  * Date filter configuration

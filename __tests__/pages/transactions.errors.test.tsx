@@ -1,7 +1,9 @@
-import TransactionsPage from "@/app/transactions/page";
 import { screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
+
+import TransactionsPage from "@/app/transactions/page";
+
 import { server } from "../mocks/server";
 import { renderWithProviders, testHelpers } from "../utils/test-utils";
 

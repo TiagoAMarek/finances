@@ -1,8 +1,10 @@
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, beforeEach } from "vitest";
+
+import Page from "@/app/reports/performance/page";
+
 import { screen, waitFor, within } from "../utils/test-utils";
 import { renderWithProviders, testHelpers } from "../utils/test-utils";
-import userEvent from "@testing-library/user-event";
-import Page from "@/app/reports/performance/page";
 
 
 describe("Performance page (E2E with MSW)", () => {

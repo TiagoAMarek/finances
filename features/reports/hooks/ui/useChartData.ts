@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Transaction } from "@/lib/schemas";
+
 import {
   ChartDataPoint,
   TransactionFilter,
@@ -13,6 +13,7 @@ import {
   filterTransactionsByDateRange,
   filterTransactionsByMonth,
 } from "@/lib/chart-utils";
+import { Transaction } from "@/lib/schemas";
 
 /**
  * Hook for generating daily chart data (last 7 days)

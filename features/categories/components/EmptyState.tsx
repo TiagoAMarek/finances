@@ -1,7 +1,8 @@
-import { Button, Card, CardContent } from "@/features/shared/components/ui";
-import { cn } from "@/lib/utils";
 import { Plus, ShoppingCart, Tag, TrendingUp, Wallet } from "lucide-react";
 import React from "react";
+
+import { Button, Card, CardContent } from "@/features/shared/components/ui";
+import { cn } from "@/lib/utils";
 
 type EmptyStateProps = {
   title?: string;
@@ -71,8 +72,8 @@ export function EmptyState({
           {/* Primary action: accept external trigger (e.g., CreateCategoryModal) */}
           {children ?? (
             <Button
-              size="lg"
               className="shadow-md hover:shadow-lg transition-shadow"
+              size="lg"
             >
               <Plus className="mr-2 h-5 w-5" />
               Criar primeira categoria
@@ -80,8 +81,8 @@ export function EmptyState({
           )}
           {secondaryAction && (
             <Button
-              variant="outline"
               size="lg"
+              variant="outline"
               onClick={secondaryAction.onClick}
             >
               {secondaryAction.label}

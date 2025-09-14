@@ -1,4 +1,13 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CreditCardIcon,
+  EditIcon,
+  SaveIcon,
+} from "lucide-react";
 import { useMemo } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+
 import { 
   FormModal,
   FormModalHeader,
@@ -9,14 +18,6 @@ import {
 } from "@/features/shared/components";
 import { Input } from "@/features/shared/components/ui";
 import { CreditCard, CreditCardCreateInput, CreditCardCreateSchema } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  CreditCardIcon,
-  EditIcon,
-  SaveIcon,
-} from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 
 interface EditCardModalProps {
   card: CreditCard | null;
@@ -94,16 +95,16 @@ export function EditCardModal({
   return (
     <FormModal
       open={open}
-      onOpenChange={onOpenChange}
-      variant="edit"
       size="md"
+      variant="edit"
+      onOpenChange={onOpenChange}
     >
       <FormModalHeader
-        icon={EditIcon}
-        iconColor="text-orange-500"
-        iconBgColor="bg-orange-500/10"
-        title="Editar Cartão de Crédito"
         description="Atualize os dados do seu cartão de crédito"
+        icon={EditIcon}
+        iconBgColor="bg-orange-500/10"
+        iconColor="text-orange-500"
+        title="Editar Cartão de Crédito"
       />
 
       <FormModalPreview>
@@ -132,26 +133,26 @@ export function EditCardModal({
 
       <FormModalFormWithHook form={form} onSubmit={handleSubmit}>
         <FormModalField
-          form={form}
-          name="name"
-          label="Nome do Cartão"
           description="Escolha um nome que facilite a identificação do cartão"
+          form={form}
+          label="Nome do Cartão"
+          name="name"
           required
         >
           <Input
-            type="text"
-            placeholder="Ex: Cartão Principal"
-            className="h-11"
             autoFocus
+            className="h-11"
+            placeholder="Ex: Cartão Principal"
+            type="text"
             {...form.register("name")}
           />
         </FormModalField>
 
         <FormModalField
-          form={form}
-          name="limit"
-          label="Limite do Cartão"
           description="Atualize o limite disponível do seu cartão"
+          form={form}
+          label="Limite do Cartão"
+          name="limit"
           required
         >
           <div className="relative">
@@ -159,21 +160,21 @@ export function EditCardModal({
               R$
             </span>
             <Input
-              type="number"
-              placeholder="0,00"
               className="h-11 pl-10"
-              step="0.01"
               min="0"
+              placeholder="0,00"
+              step="0.01"
+              type="number"
               {...form.register("limit")}
             />
           </div>
         </FormModalField>
 
         <FormModalField
-          form={form}
-          name="currentBill"
-          label="Fatura Atual"
           description="Informe o valor atual da fatura do cartão"
+          form={form}
+          label="Fatura Atual"
+          name="currentBill"
           required
         >
           <div className="relative">
@@ -181,11 +182,11 @@ export function EditCardModal({
               R$
             </span>
             <Input
-              type="number"
-              placeholder="0,00"
               className="h-11 pl-10"
-              step="0.01"
               min="0"
+              placeholder="0,00"
+              step="0.01"
+              type="number"
               {...form.register("currentBill")}
             />
           </div>
@@ -193,10 +194,10 @@ export function EditCardModal({
 
         <FormModalActions
           form={form}
-          onCancel={handleClose}
-          submitText="Salvar Alterações"
-          submitIcon={SaveIcon}
           isLoading={isLoading}
+          submitIcon={SaveIcon}
+          submitText="Salvar Alterações"
+          onCancel={handleClose}
         />
       </FormModalFormWithHook>
     </FormModal>

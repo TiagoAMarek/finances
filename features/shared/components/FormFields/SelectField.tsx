@@ -1,4 +1,6 @@
 import { Controller, FieldValues } from "react-hook-form";
+
+import { FormModalField } from "@/features/shared/components/FormModal";
 import {
   Select,
   SelectContent,
@@ -6,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/features/shared/components/ui";
-import { FormModalField } from "@/features/shared/components/FormModal";
+
 import type { BaseFieldProps, SelectOption } from "./types";
 
 /**
@@ -29,10 +31,10 @@ export function SelectField<T extends FieldValues>({
 }) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <Controller
@@ -40,13 +42,13 @@ export function SelectField<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <Select
+            disabled={disabled}
             value={field.value?.toString() || ""}
             onValueChange={(value) => {
               // Try to convert to number if the original value was a number
               const originalValue = options.find(opt => opt.value.toString() === value)?.value;
               field.onChange(originalValue);
             }}
-            disabled={disabled}
           >
             <SelectTrigger
               className={`h-11 ${className || ""}`}
@@ -58,8 +60,8 @@ export function SelectField<T extends FieldValues>({
               {options.map((option) => (
                 <SelectItem
                   key={option.value.toString()}
-                  value={option.value.toString()}
                   disabled={option.disabled}
+                  value={option.value.toString()}
                 >
                   <div className="flex items-center gap-2">
                     {option.icon && <span>{option.icon}</span>}

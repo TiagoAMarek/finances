@@ -1,6 +1,7 @@
-import { AccordionTrigger, Badge } from "@/features/shared/components/ui";
 import { LucideIcon } from "lucide-react";
 import { memo, ReactNode } from "react";
+
+import { AccordionTrigger, Badge } from "@/features/shared/components/ui";
 
 /**
  * Badge configuration for accordion headers
@@ -60,8 +61,8 @@ export const DashboardAccordionTrigger = memo<DashboardAccordionTriggerProps>(
               return (
                 <Badge
                   key={index}
-                  variant={badge.variant || "secondary"}
                   className={`text-xs ${badge.hideOnMobile ? "hidden sm:inline-flex" : ""} ${badge.className || ""}`}
+                  variant={badge.variant || "secondary"}
                 >
                   {IconComponent && <IconComponent className="h-3 w-3 mr-1" />}
                   {badge.label}

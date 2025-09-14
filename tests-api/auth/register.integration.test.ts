@@ -1,6 +1,8 @@
-import { POST } from "@/app/api/auth/register/route";
 import Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { POST } from "@/app/api/auth/register/route";
+
 import { createNextRequest } from "../helpers/auth-helpers";
 import {
   cleanupTestDb,

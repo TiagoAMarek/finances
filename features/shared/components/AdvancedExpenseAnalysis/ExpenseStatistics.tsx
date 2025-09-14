@@ -1,4 +1,5 @@
 import { memo } from "react";
+
 import { ExpenseStatistics as ExpenseStatsType } from "@/lib/expense-utils";
 import { formatCurrency } from "@/lib/expense-utils";
 
@@ -50,24 +51,24 @@ export const ExpenseStatistics = memo<ExpenseStatisticsProps>(
         className={`grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 px-2 ${className}`}
       >
         <StatisticCard
+          colorClass="bg-red-500/10 text-red-600 dark:text-red-400"
           label="Maior"
           value={max}
-          colorClass="bg-red-500/10 text-red-600 dark:text-red-400"
         />
         <StatisticCard
+          colorClass="bg-green-500/10 text-green-600 dark:text-green-400"
           label="Menor"
           value={min}
-          colorClass="bg-green-500/10 text-green-600 dark:text-green-400"
         />
         <StatisticCard
+          colorClass="bg-blue-500/10 text-blue-600 dark:text-blue-400"
           label="Média"
           value={average}
-          colorClass="bg-blue-500/10 text-blue-600 dark:text-blue-400"
         />
         <StatisticCard
+          colorClass="bg-orange-500/10 text-orange-600 dark:text-orange-400"
           label="Total"
           value={total}
-          colorClass="bg-orange-500/10 text-orange-600 dark:text-orange-400"
         />
       </div>
     );

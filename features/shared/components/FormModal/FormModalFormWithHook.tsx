@@ -1,7 +1,9 @@
-import { FieldValues } from "react-hook-form";
-import { Card, CardContent } from "../ui/card";
-import { Alert, AlertDescription } from "../ui/alert";
 import { AlertTriangleIcon } from "lucide-react";
+import { FieldValues } from "react-hook-form";
+
+import { Alert, AlertDescription } from "../ui/alert";
+import { Card, CardContent } from "../ui/card";
+
 import type { FormModalFormWithHookProps } from "./types";
 
 /**
@@ -17,12 +19,12 @@ export function FormModalFormWithHook<T extends FieldValues = FieldValues>({
     <Card className="border-dashed">
       <CardContent className="pt-6">
         {nonFieldError && (
-          <Alert variant="destructive" className="mb-4">
+          <Alert className="mb-4" variant="destructive">
             <AlertTriangleIcon className="h-4 w-4" />
             <AlertDescription>{nonFieldError}</AlertDescription>
           </Alert>
         )}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" role="form">
+        <form className="space-y-6" role="form" onSubmit={form.handleSubmit(onSubmit)}>
           {children}
         </form>
       </CardContent>

@@ -1,7 +1,8 @@
-import React from "react";
-import { render, RenderOptions } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, RenderOptions } from "@testing-library/react";
+import React from "react";
 import { beforeAll, afterEach, afterAll, vi } from "vitest";
+
 import { server } from "../mocks/server";
 
 // MSW server setup for tests

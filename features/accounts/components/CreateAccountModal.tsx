@@ -1,20 +1,21 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreditCardIcon, PlusIcon } from "lucide-react";
 import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+
+import { QuickCreateButton } from "@/features/shared/components";
+import { TextField, CurrencyField } from "@/features/shared/components/FormFields";
 import {
   FormModal,
   FormModalHeader,
   FormModalActions,
   FormModalFormWithHook
 } from "@/features/shared/components/FormModal";
-import { QuickCreateButton } from "@/features/shared/components";
-import { TextField, CurrencyField } from "@/features/shared/components/FormFields";
 import {
   BankAccountCreateInput,
   BankAccountFormInput,
   BankAccountFormSchema,
 } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreditCardIcon, PlusIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
 
 interface CreateAccountModalProps {
   open: boolean;
@@ -65,55 +66,55 @@ export function CreateAccountModal({
 
   return (
     <FormModal
-      open={open}
-      onOpenChange={onOpenChange}
-      variant="create"
-      size="md"
       confirmOnDirtyClose={true}
+      open={open}
+      size="md"
       trigger={
         <QuickCreateButton onClick={() => onOpenChange(true)}>
           Nova Conta
         </QuickCreateButton>
       }
+      variant="create"
+      onOpenChange={onOpenChange}
     >
       <FormModalHeader
-        icon={CreditCardIcon}
-        iconColor="text-primary"
-        iconBgColor="bg-primary/10"
-        title="Nova Conta Bancária"
         description="Cadastre uma nova conta para controlar suas finanças pessoais"
+        icon={CreditCardIcon}
+        iconBgColor="bg-primary/10"
+        iconColor="text-primary"
+        title="Nova Conta Bancária"
       />
 
        <FormModalFormWithHook
          form={form}
-         onSubmit={handleSubmit}
          nonFieldError={errorMessage}
+         onSubmit={handleSubmit}
        >
          <TextField
-           form={form}
-           name="name"
-           label="Nome da Conta"
-           description="Escolha um nome que facilite a identificação da conta"
-           required
-           placeholder="Ex: Conta Corrente Santander"
            autoFocus
+           description="Escolha um nome que facilite a identificação da conta"
+           form={form}
+           label="Nome da Conta"
+           name="name"
+           placeholder="Ex: Conta Corrente Santander"
+           required
          />
 
          <CurrencyField
-           form={form}
-           name="balance"
-           label="Saldo Inicial"
            description="Informe o saldo atual da sua conta bancária"
-           required
+           form={form}
+           label="Saldo Inicial"
+           name="balance"
            placeholder="0,00"
+           required
          />
 
         <FormModalActions
           form={form}
-          onCancel={handleClose}
-          submitText="Criar Conta"
-          submitIcon={PlusIcon}
           isLoading={isLoading}
+          submitIcon={PlusIcon}
+          submitText="Criar Conta"
+          onCancel={handleClose}
         />
       </FormModalFormWithHook>
     </FormModal>

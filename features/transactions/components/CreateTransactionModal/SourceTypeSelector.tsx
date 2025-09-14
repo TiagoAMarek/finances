@@ -1,5 +1,6 @@
-import { RadioGroup, RadioGroupItem } from "@/features/shared/components/ui";
 import { UseFormReturn, Controller } from "react-hook-form";
+
+import { RadioGroup, RadioGroupItem } from "@/features/shared/components/ui";
 import { TransactionFormInput } from "@/lib/schemas";
 
 interface SourceTypeSelectorProps {
@@ -17,19 +18,19 @@ export function SourceTypeSelector({ form }: SourceTypeSelectorProps) {
         name="sourceType"
         render={({ field }) => (
           <RadioGroup
+            className="flex flex-col space-y-2"
             value={field.value}
             onValueChange={field.onChange}
-            className="flex flex-col space-y-2"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="account" id="account-radio" data-testid="account-radio" />
-              <label htmlFor="account-radio" className="cursor-pointer">
+              <RadioGroupItem data-testid="account-radio" id="account-radio" value="account" />
+              <label className="cursor-pointer" htmlFor="account-radio">
                 🏦 Conta Bancária
               </label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="creditCard" id="creditCard-radio" data-testid="credit-card-radio" />
-              <label htmlFor="creditCard-radio" className="cursor-pointer">
+              <RadioGroupItem data-testid="credit-card-radio" id="creditCard-radio" value="creditCard" />
+              <label className="cursor-pointer" htmlFor="creditCard-radio">
                 💳 Cartão de Crédito
               </label>
             </div>

@@ -1,8 +1,10 @@
 import * as React from "react";
 import { forwardRef } from "react";
 import { Controller, Control, FieldPath, FieldValues } from "react-hook-form";
-import { Input } from "./input";
+
 import { Formatter } from "@/lib/formatters";
+
+import { Input } from "./input";
 
 /**
  * Props for FormattedInput component

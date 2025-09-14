@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { UseFormReturn, useWatch } from "react-hook-form";
+
 import { TransactionFormInput } from "@/lib/schemas";
-import { useEffect, useRef } from "react";
-import { SourceTypeSelector } from "./SourceTypeSelector";
+
 import { AccountSelector } from "./AccountSelector";
 import { CreditCardSelector } from "./CreditCardSelector";
+import { SourceTypeSelector } from "./SourceTypeSelector";
 
 interface BankAccount {
   id: number;
@@ -23,32 +25,18 @@ interface SourceAccountFieldsProps {
 
 export function SourceAccountFields({ form, accounts, creditCards }: SourceAccountFieldsProps) {
   const { setValue } = form;
-  const prevSourceTypeRef = useRef<string | undefined>(undefined);
-  const isInitialRender = useRef(true);
-  
+
   const sourceType = useWatch({
     control: form.control,
     name: "sourceType",
   });
 
   // Handle clearing opposite field when source type changes
-  // Skip updates on initial render to avoid state update warnings
   useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      prevSourceTypeRef.current = sourceType;
-      return;
-    }
-
-    if (prevSourceTypeRef.current !== sourceType) {
-      prevSourceTypeRef.current = sourceType;
-      
-      // Clear opposite field based on current selection
-      if (sourceType === "account") {
-        setValue("creditCardId", undefined);
-      } else if (sourceType === "creditCard") {
-        setValue("accountId", undefined);
-      }
+    if (sourceType === "account") {
+      setValue("creditCardId", undefined);
+    } else if (sourceType === "creditCard") {
+      setValue("accountId", undefined);
     }
   }, [sourceType, setValue]);
 
@@ -57,11 +45,11 @@ export function SourceAccountFields({ form, accounts, creditCards }: SourceAccou
       <SourceTypeSelector form={form} />
 
       {sourceType === "account" && (
-        <AccountSelector form={form} accounts={accounts} />
+        <AccountSelector accounts={accounts} form={form} />
       )}
 
       {sourceType === "creditCard" && (
-        <CreditCardSelector form={form} creditCards={creditCards} />
+        <CreditCardSelector creditCards={creditCards} form={form} />
       )}
     </div>
   );

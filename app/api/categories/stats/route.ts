@@ -1,12 +1,13 @@
-import { NextRequest } from "next/server";
 import { eq, sql } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { categories, transactions } from "../../lib/schema";
+import { NextRequest } from "next/server";
+
 import {
   getUserFromRequest,
   createErrorResponse,
   createSuccessResponse,
 } from "../../lib/auth";
+import { db } from "../../lib/db";
+import { categories, transactions } from "../../lib/schema";
 
 // GET /api/categories/stats - List user's categories with usage statistics
 export async function GET(request: NextRequest) {

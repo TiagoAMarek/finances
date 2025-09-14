@@ -1,7 +1,9 @@
-import { formatDashboardCurrency } from "@/features/dashboard/utils/dashboard-calculations";
-import { BankAccount, CreditCard } from "@/lib/schemas";
 import { Wallet } from "lucide-react";
 import { memo } from "react";
+
+import { formatDashboardCurrency } from "@/features/dashboard/utils/dashboard-calculations";
+import { BankAccount, CreditCard } from "@/lib/schemas";
+
 import { AccountsOverview } from "./AccountsOverview";
 import { CreditCardsOverview } from "./CreditCardsOverview";
 import { DashboardAccordion } from "./DashboardAccordion";
@@ -51,11 +53,11 @@ export const ResourcesAccordion = memo<ResourcesAccordionProps>(
 
     return (
       <DashboardAccordion
-        title="Recursos"
-        icon={Wallet}
-        iconColor="text-blue-500"
         badges={badges}
         defaultValue="resources"
+        icon={Wallet}
+        iconColor="text-blue-500"
+        title="Recursos"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
           <AccountsOverview accounts={accounts} totalBalance={totalBalance} />

@@ -1,10 +1,12 @@
+import { Banknote, CreditCardIcon } from "lucide-react";
+
 import {
   Badge,
   RowList,
   RowListSkeleton,
 } from "@/features/shared/components/ui";
 import { BankAccount } from "@/lib/schemas";
-import { Banknote, CreditCardIcon } from "lucide-react";
+
 import { AccountItem } from "./AccountItem";
 
 interface AccountsListProps {
@@ -53,7 +55,7 @@ export function AccountsList({
             Suas Contas Bancárias
           </h2>
         </div>
-        <Badge variant="secondary" className="text-xs">
+        <Badge className="text-xs" variant="secondary">
           {accounts.length} {accounts.length === 1 ? "conta" : "contas"}
         </Badge>
       </div>
@@ -63,9 +65,9 @@ export function AccountsList({
           <AccountItem
             key={account.id}
             account={account}
-            onEdit={onEdit}
-            onDelete={onDelete}
             isDeleting={isDeleting}
+            onDelete={onDelete}
+            onEdit={onEdit}
           />
         ))}
       </RowList>

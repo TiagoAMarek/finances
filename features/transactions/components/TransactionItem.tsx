@@ -1,3 +1,14 @@
+import {
+  BanknoteIcon,
+  CreditCardIcon,
+  EditIcon,
+  Receipt,
+  TrashIcon,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import { useState } from "react";
+
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
 import {
@@ -14,16 +25,6 @@ import {
   DialogTrigger,
 } from "@/features/shared/components/ui";
 import { Transaction } from "@/lib/schemas";
-import {
-  BanknoteIcon,
-  CreditCardIcon,
-  EditIcon,
-  Receipt,
-  TrashIcon,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
-import { useState } from "react";
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -88,8 +89,8 @@ export function TransactionItem({
                   {transaction.description}
                 </h3>
                 <Badge
-                  variant={isIncome ? "default" : "destructive"}
                   className="text-xs flex-shrink-0"
+                  variant={isIncome ? "default" : "destructive"}
                 >
                   {isIncome ? "Receita" : "Despesa"}
                 </Badge>
@@ -140,10 +141,10 @@ export function TransactionItem({
 
             <div className="flex items-center gap-1 ml-4">
               <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onEdit(transaction)}
                 className="h-9 px-3 hover:bg-primary/10"
+                size="sm"
+                variant="ghost"
+                onClick={() => onEdit(transaction)}
               >
                 <EditIcon className="h-4 w-4 mr-1" />
                 Editar
@@ -155,9 +156,9 @@ export function TransactionItem({
               >
                 <DialogTrigger asChild>
                   <Button
-                    variant="ghost"
-                    size="sm"
                     className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    size="sm"
+                    variant="ghost"
                   >
                     <TrashIcon className="h-4 w-4 mr-1" />
                     Excluir
@@ -193,18 +194,18 @@ export function TransactionItem({
 
                   <DialogFooter className="flex gap-3 sm:gap-3">
                     <Button
-                      variant="outline"
-                      onClick={() => setDeleteDialogOpen(false)}
                       className="flex-1"
                       disabled={isDeleting}
+                      variant="outline"
+                      onClick={() => setDeleteDialogOpen(false)}
                     >
                       Cancelar
                     </Button>
                     <Button
+                      className="flex-1"
+                      disabled={isDeleting}
                       variant="destructive"
                       onClick={handleDelete}
-                      disabled={isDeleting}
-                      className="flex-1"
                     >
                       {isDeleting ? (
                         "Excluindo..."

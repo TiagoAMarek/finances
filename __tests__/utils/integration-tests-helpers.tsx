@@ -1,7 +1,9 @@
 import { http, HttpResponse } from "msw";
-import { server } from "../mocks/server";
-import { ENDPOINTS } from "./endpoints";
+
 import { TEST_DATA } from "../integration/fixtures/dashboard-api";
+import { server } from "../mocks/server";
+
+import { ENDPOINTS } from "./endpoints";
 /**
  * Sets up MSW handlers for empty data states
  */

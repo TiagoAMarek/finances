@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   integer,
@@ -8,7 +9,6 @@ import {
   boolean,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
 // Users table
 export const users = pgTable("users", {

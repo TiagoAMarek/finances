@@ -1,8 +1,10 @@
 import { memo, useMemo } from "react";
+
 import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+
 import { DEFAULT_MODAL_CONFIG } from "./constants";
-import { renderIcon } from "./utils";
 import type { FormModalHeaderProps } from "./types";
+import { renderIcon } from "./utils";
 
 /**
  * FormModal Header - standardized header with icon, title, and description

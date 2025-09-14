@@ -1,15 +1,16 @@
-import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { users } from "../../lib/schema";
-import { RegisterApiSchema } from "../../lib/validation";
+import { NextRequest } from "next/server";
+
 import {
   hashPassword,
   createErrorResponse,
   createSuccessResponse,
   handleZodError,
 } from "../../lib/auth";
+import { db } from "../../lib/db";
+import { users } from "../../lib/schema";
 import { seedDefaultCategoriesForUser } from "../../lib/seedCategories";
+import { RegisterApiSchema } from "../../lib/validation";
 
 export async function POST(request: NextRequest) {
   try {

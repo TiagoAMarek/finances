@@ -1,6 +1,8 @@
 import { FieldValues } from "react-hook-form";
-import { Input } from "@/features/shared/components/ui";
+
 import { FormModalField } from "@/features/shared/components/FormModal";
+import { Input } from "@/features/shared/components/ui";
+
 import type { BaseFieldProps } from "./types";
 
 /**
@@ -29,21 +31,21 @@ export function FileInput<T extends FieldValues>({
 }) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <Input
-        type="file"
-        placeholder={placeholder}
-        className={`h-11 ${className || ""}`}
-        disabled={disabled}
-        autoFocus={autoFocus}
         accept={accept}
-        multiple={multiple}
+        autoFocus={autoFocus}
+        className={`h-11 ${className || ""}`}
         data-testid={testId}
+        disabled={disabled}
+        multiple={multiple}
+        placeholder={placeholder}
+        type="file"
         {...form.register(name, {
           validate: (files: FileList | null) => {
             if (!files || files.length === 0) return true;

@@ -1,5 +1,6 @@
-import { Category } from "@/lib/schemas";
 import { http, HttpResponse } from "msw";
+
+import { Category } from "@/lib/schemas";
 
 /**
  * MSW handlers for categories endpoints

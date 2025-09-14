@@ -1,6 +1,7 @@
-import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/features/shared/components/ui";
-import { FormModalField } from "@/features/shared/components/FormModal";
 import { UseFormReturn, Controller } from "react-hook-form";
+
+import { FormModalField } from "@/features/shared/components/FormModal";
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/features/shared/components/ui";
 import { TransactionFormInput } from "@/lib/schemas";
 
 interface TransactionTypeAndDateFieldsProps {
@@ -10,7 +11,7 @@ interface TransactionTypeAndDateFieldsProps {
 export function TransactionTypeAndDateFields({ form }: TransactionTypeAndDateFieldsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-      <FormModalField form={form} name="type" label="Tipo" required>
+      <FormModalField form={form} label="Tipo" name="type" required>
         <Controller
           control={form.control}
           name="type"
@@ -38,8 +39,8 @@ export function TransactionTypeAndDateFields({ form }: TransactionTypeAndDateFie
         />
       </FormModalField>
 
-      <FormModalField form={form} name="date" label="Data" required>
-        <Input type="date" className="h-11 w-full min-w-0 block" data-testid="date-input" {...form.register("date")} />
+      <FormModalField form={form} label="Data" name="date" required>
+        <Input className="h-11 w-full min-w-0 block" data-testid="date-input" type="date" {...form.register("date")} />
       </FormModalField>
     </div>
   );

@@ -1,7 +1,8 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { LucideIcon } from "lucide-react";
 import { ReactNode, ComponentProps } from "react";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
-import { LucideIcon } from "lucide-react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+
 import { MODAL_SIZE_CLASSES } from "./constants";
 
 /** Modal size types */

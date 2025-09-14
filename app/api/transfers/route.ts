@@ -1,14 +1,15 @@
-import { NextRequest } from "next/server";
 import { eq, and, sql } from "drizzle-orm";
-import { db } from "../lib/db";
-import { transactions, bankAccounts } from "../lib/schema";
-import { TransferCreateSchema } from "../lib/validation";
+import { NextRequest } from "next/server";
+
 import {
   getUserFromRequest,
   createErrorResponse,
   createSuccessResponse,
   handleZodError,
 } from "../lib/auth";
+import { db } from "../lib/db";
+import { transactions, bankAccounts } from "../lib/schema";
+import { TransferCreateSchema } from "../lib/validation";
 
 // POST /api/transfers - Create transfer between accounts
 export async function POST(request: NextRequest) {

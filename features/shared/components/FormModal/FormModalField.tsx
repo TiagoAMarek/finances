@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { FieldValues, FieldError, get } from "react-hook-form";
+
 import { FormField } from "../ui/form-field";
+
 import type { FieldValidationState, FormModalFieldProps } from "./types";
 
 /**
@@ -36,11 +38,11 @@ export function FormModalField<T extends FieldValues = FieldValues>({
 
   return (
     <FormField
-      label={label}
+      description={description}
       error={fieldValidation.error}
       isValid={fieldValidation.isValid}
+      label={label}
       required={required}
-      description={description}
     >
       {children}
     </FormField>

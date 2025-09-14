@@ -1,6 +1,8 @@
 import { Controller, FieldValues } from "react-hook-form";
-import { Checkbox as UICheckbox } from "@/features/shared/components/ui/checkbox";
+
 import { FormModalField } from "@/features/shared/components/FormModal";
+import { Checkbox as UICheckbox } from "@/features/shared/components/ui/checkbox";
+
 import type { BaseFieldProps } from "./types";
 
 /**
@@ -19,10 +21,10 @@ export function Checkbox<T extends FieldValues>({
 }: BaseFieldProps<T>) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <Controller
@@ -31,12 +33,12 @@ export function Checkbox<T extends FieldValues>({
         render={({ field: { onChange, value, ...fieldProps } }) => (
           <UICheckbox
             {...fieldProps}
-            checked={value || false}
-            onCheckedChange={onChange}
-            disabled={disabled}
             autoFocus={autoFocus}
-            data-testid={testId}
+            checked={value || false}
             className={className}
+            data-testid={testId}
+            disabled={disabled}
+            onCheckedChange={onChange}
           />
         )}
       />

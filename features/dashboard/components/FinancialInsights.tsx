@@ -1,4 +1,13 @@
 import {
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  Lightbulb,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+
+import {
   Alert,
   AlertDescription,
   Card,
@@ -7,14 +16,6 @@ import {
   CardTitle,
 } from "@/features/shared/components/ui";
 import { Transaction } from "@/lib/schemas";
-import {
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  Lightbulb,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
 
 interface FinancialInsightsProps {
   transactions: Transaction[];

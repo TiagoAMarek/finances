@@ -1,7 +1,9 @@
 import { Controller, FieldValues } from "react-hook-form";
+
+import { FormModalField } from "@/features/shared/components/FormModal";
 import { FormattedInput } from "@/features/shared/components/ui";
 import { brazilianCurrencyFormatter } from "@/lib/formatters";
-import { FormModalField } from "@/features/shared/components/FormModal";
+
 import type { BaseFieldProps } from "./types";
 
 /**
@@ -26,10 +28,10 @@ export function CurrencyField<T extends FieldValues>({
 }) {
   return (
     <FormModalField
-      form={form}
-      name={name}
-      label={label}
       description={description}
+      form={form}
+      label={label}
+      name={name}
       required={required}
     >
       <div className="relative">
@@ -44,14 +46,14 @@ export function CurrencyField<T extends FieldValues>({
           render={({ field: { ...fieldProps } }) => (
             <FormattedInput
               {...fieldProps}
-              control={form.control}
-              name={name}
-              formatter={brazilianCurrencyFormatter}
-              placeholder={placeholder}
-              className={`h-11 ${showSymbol ? "pl-10" : ""} ${className || ""}`}
-              disabled={disabled}
               autoFocus={autoFocus}
+              className={`h-11 ${showSymbol ? "pl-10" : ""} ${className || ""}`}
+              control={form.control}
               data-testid={testId}
+              disabled={disabled}
+              formatter={brazilianCurrencyFormatter}
+              name={name}
+              placeholder={placeholder}
             />
           )}
         />

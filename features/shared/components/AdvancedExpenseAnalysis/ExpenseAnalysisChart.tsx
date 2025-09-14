@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
 import { formatCurrency } from "@/lib/expense-utils";
 
 /**
@@ -91,44 +92,44 @@ export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
   function ExpenseAnalysisChart({ data, height = 350 }) {
     return (
       <div className="p-2" style={{ height: `${height}px` }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer height="100%" width="100%">
           <LineChart
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <CartesianGrid className="opacity-30" strokeDasharray="3 3" />
             <XAxis
+              axisLine={false}
+              className="fill-muted-foreground"
               dataKey="month"
               tick={{ fontSize: 12 }}
               tickLine={{ stroke: "#374151" }}
-              axisLine={false}
-              className="fill-muted-foreground"
             />
             <YAxis
-              tickFormatter={formatCurrency}
-              tick={{ fontSize: 12 }}
-              tickLine={{ stroke: "#374151" }}
               axisLine={false}
               className="fill-muted-foreground"
+              tick={{ fontSize: 12 }}
+              tickFormatter={formatCurrency}
+              tickLine={{ stroke: "#374151" }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line
-              type="monotone"
-              dataKey="total"
-              stroke="#ef4444"
-              strokeWidth={3}
-              dot={{
-                fill: "#ef4444",
-                strokeWidth: 2,
-                r: 6,
-                className: "transition-all duration-200 hover:r-8",
-              }}
               activeDot={{
                 r: 8,
                 fill: "#dc2626",
                 stroke: "#ffffff",
                 strokeWidth: 2,
               }}
+              dataKey="total"
+              dot={{
+                fill: "#ef4444",
+                strokeWidth: 2,
+                r: 6,
+                className: "transition-all duration-200 hover:r-8",
+              }}
+              stroke="#ef4444"
+              strokeWidth={3}
+              type="monotone"
             />
           </LineChart>
         </ResponsiveContainer>

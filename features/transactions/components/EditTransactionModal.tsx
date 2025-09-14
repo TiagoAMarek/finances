@@ -1,3 +1,14 @@
+import {
+  CalendarIcon,
+  DollarSignIcon,
+  EditIcon,
+  Loader2Icon,
+  Receipt,
+  SaveIcon,
+  TagIcon,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useGetCategories } from "@/features/categories/hooks/data";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data";
@@ -22,16 +33,6 @@ import {
   SelectValue,
 } from "@/features/shared/components/ui";
 import { Transaction } from "@/lib/schemas";
-import {
-  CalendarIcon,
-  DollarSignIcon,
-  EditIcon,
-  Loader2Icon,
-  Receipt,
-  SaveIcon,
-  TagIcon,
-} from "lucide-react";
-import { useEffect, useState } from "react";
 
 interface EditTransactionModalProps {
   transaction: Transaction | null;
@@ -198,10 +199,10 @@ export function EditTransactionModal({
               </p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Badge
+                  className="text-xs"
                   variant={
                     transaction.type === "income" ? "default" : "destructive"
                   }
-                  className="text-xs"
                 >
                   {transaction.type === "income" ? "Receita" : "Despesa"}
                 </Badge>
@@ -216,32 +217,32 @@ export function EditTransactionModal({
 
         <Card className="border-dashed">
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label
-                    htmlFor="editDescription"
                     className="text-sm font-medium flex items-center gap-2"
+                    htmlFor="editDescription"
                   >
                     <Receipt className="h-4 w-4" />
                     Descrição
                   </Label>
                   <Input
-                    type="text"
+                    autoFocus
+                    className="h-11"
                     id="editDescription"
+                    placeholder="Ex: Compra no supermercado"
+                    required
+                    type="text"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Ex: Compra no supermercado"
-                    className="h-11"
-                    autoFocus
-                    required
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="editAmount"
                     className="text-sm font-medium flex items-center gap-2"
+                    htmlFor="editAmount"
                   >
                     <DollarSignIcon className="h-4 w-4" />
                     Valor
@@ -251,17 +252,17 @@ export function EditTransactionModal({
                       R$
                     </span>
                     <Input
-                      type="number"
+                      className="h-11 pl-10"
                       id="editAmount"
+                      min="0"
+                      placeholder="0,00"
+                      required
+                      step="0.01"
+                      type="number"
                       value={amount || ""}
                       onChange={(e) =>
                         setAmount(parseFloat(e.target.value) || 0)
                       }
-                      placeholder="0,00"
-                      className="h-11 pl-10"
-                      step="0.01"
-                      min="0"
-                      required
                     />
                   </div>
                 </div>
@@ -269,7 +270,7 @@ export function EditTransactionModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="editType" className="text-sm font-medium">
+                  <Label className="text-sm font-medium" htmlFor="editType">
                     Tipo
                   </Label>
                   <Select
@@ -300,37 +301,37 @@ export function EditTransactionModal({
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="editDate"
                     className="text-sm font-medium flex items-center gap-2"
+                    htmlFor="editDate"
                   >
                     <CalendarIcon className="h-4 w-4" />
                     Data
                   </Label>
                   <Input
-                    type="date"
+                    className="h-11"
                     id="editDate"
+                    required
+                    type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="h-11"
-                    required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="editCategory"
                   className="text-sm font-medium flex items-center gap-2"
+                  htmlFor="editCategory"
                 >
                   <TagIcon className="h-4 w-4" />
                   Categoria
                 </Label>
                 <Select
+                  required
                   value={categoryId?.toString() || ""}
                   onValueChange={(value) =>
                     setCategoryId(value ? parseInt(value) : undefined)
                   }
-                  required
                 >
                   <SelectTrigger className="h-11">
                     <SelectValue placeholder="Selecione uma categoria" />
@@ -368,6 +369,7 @@ export function EditTransactionModal({
                     Origem do Lançamento *
                   </Label>
                   <RadioGroup
+                    className="flex flex-col space-y-2"
                     value={sourceType}
                     onValueChange={(value: "account" | "creditCard") => {
                       setSourceType(value);
@@ -375,25 +377,24 @@ export function EditTransactionModal({
                       setSelectedAccount(null);
                       setSelectedCreditCard(null);
                     }}
-                    className="flex flex-col space-y-2"
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="account" id="edit-account-radio" />
+                      <RadioGroupItem id="edit-account-radio" value="account" />
                       <Label
-                        htmlFor="edit-account-radio"
                         className="cursor-pointer"
+                        htmlFor="edit-account-radio"
                       >
                         🏦 Conta Bancária
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem
-                        value="creditCard"
                         id="edit-creditCard-radio"
+                        value="creditCard"
                       />
                       <Label
-                        htmlFor="edit-creditCard-radio"
                         className="cursor-pointer"
+                        htmlFor="edit-creditCard-radio"
                       >
                         💳 Cartão de Crédito
                       </Label>
@@ -404,17 +405,17 @@ export function EditTransactionModal({
                 {sourceType === "account" && (
                   <div className="space-y-2">
                     <Label
-                      htmlFor="editAccount"
                       className="text-sm font-medium"
+                      htmlFor="editAccount"
                     >
                       Selecione a Conta Bancária *
                     </Label>
                     <Select
+                      required
                       value={selectedAccount?.toString() || ""}
                       onValueChange={(value) =>
                         setSelectedAccount(value ? parseInt(value) : null)
                       }
-                      required
                     >
                       <SelectTrigger className="h-11">
                         <SelectValue placeholder="Escolha uma conta bancária" />
@@ -436,17 +437,17 @@ export function EditTransactionModal({
                 {sourceType === "creditCard" && (
                   <div className="space-y-2">
                     <Label
-                      htmlFor="editCreditCard"
                       className="text-sm font-medium"
+                      htmlFor="editCreditCard"
                     >
                       Selecione o Cartão de Crédito *
                     </Label>
                     <Select
+                      required
                       value={selectedCreditCard?.toString() || ""}
                       onValueChange={(value) =>
                         setSelectedCreditCard(value ? parseInt(value) : null)
                       }
-                      required
                     >
                       <SelectTrigger className="h-11">
                         <SelectValue placeholder="Escolha um cartão de crédito" />
@@ -465,18 +466,18 @@ export function EditTransactionModal({
 
               <div className="flex gap-3 pt-4">
                 <Button
+                  className="flex-1"
+                  disabled={isLoading}
                   type="button"
                   variant="outline"
                   onClick={handleClose}
-                  className="flex-1"
-                  disabled={isLoading}
                 >
                   Cancelar
                 </Button>
                 <Button
-                  type="submit"
-                  disabled={isLoading || !description.trim() || !categoryId}
                   className="flex-1"
+                  disabled={isLoading || !description.trim() || !categoryId}
+                  type="submit"
                 >
                   {isLoading ? (
                     <>

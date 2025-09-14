@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { categories } from "./schema";
 import { DEFAULT_CATEGORIES } from "./defaultCategories";
+import { categories } from "./schema";
 
 export async function seedDefaultCategoriesForUser(
   userId: number,

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/utils/api";
+
 import { CategoryUpdateInput, Category } from "@/lib/schemas";
+import { fetchWithAuth } from "@/utils/api";
 
 /**
  * Hook for updating a category
