@@ -21,6 +21,11 @@ jobs:
     - name: Install pnpm
       run: npm install -g pnpm
 
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip build-essential
+
     - name: Cache pnpm store
       uses: actions/cache@v3
       with:
