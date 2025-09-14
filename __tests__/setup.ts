@@ -64,6 +64,21 @@ vi.mock("sonner", () => ({
   },
 }));
 
+// Mock window.matchMedia for useIsMobile hook
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
 // Recharts/jsdom: ensure non-zero layout sizes to avoid 0x0 warnings
 (() => {
   const original = global.HTMLElement.prototype.getBoundingClientRect;

@@ -1,15 +1,13 @@
 "use client";
 
-import { PieChart, ChevronLeft } from "lucide-react";
+import { PieChart } from "lucide-react";
 import type { NextPage } from "next";
-import Link from "next/link";
 import { useState } from "react";
 
 import { FilterState } from "@/features/accounts/hooks/ui";
 import { ExpenseAnalysisContent } from "@/features/reports/components";
 import { AccountCardFilter, PageHeader } from "@/features/shared/components";
 import {
-  Button,
   Tabs,
   TabsContent,
   TabsList,
@@ -43,23 +41,12 @@ const ExpenseAnalysisPage: NextPage = () => {
       {/* Mobile Header */}
       <div className="sticky top-0 z-10 bg-background border-b sm:hidden">
         <div className="flex items-center justify-between p-4">
-          <Button 
-            aria-label="Voltar para relatórios" 
-            asChild 
-            className="h-10 w-10 p-0"
-            size="sm"
-            variant="ghost"
-          >
-            <Link href="/reports">
-              <ChevronLeft className="h-5 w-5" />
-            </Link>
-          </Button>
           <h1 className="text-lg font-semibold truncate mx-3">
             Análise de Gastos
           </h1>
           <div className="w-10" />
         </div>
-        
+
         <div className="px-4 pb-4">
           <AccountCardFilter
             accounts={accounts}
@@ -80,12 +67,6 @@ const ExpenseAnalysisPage: NextPage = () => {
                 creditCards={creditCards}
                 onFiltersChange={setAccountCardFilters}
               />
-              <Button asChild size="sm" variant="outline">
-                <Link className="flex items-center gap-2" href="/reports">
-                  <ChevronLeft className="h-4 w-4" />
-                  Relatórios
-                </Link>
-              </Button>
             </div>
           }
           description="Insights avançados sobre seus padrões de consumo"
@@ -136,8 +117,8 @@ const ExpenseAnalysisPage: NextPage = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent 
-              aria-label="Dados dos últimos 3 meses" 
+            <TabsContent
+              aria-label="Dados dos últimos 3 meses"
               className="mt-4 sm:mt-6"
               role="tabpanel"
               value="3months"
@@ -154,8 +135,8 @@ const ExpenseAnalysisPage: NextPage = () => {
               </div>
             </TabsContent>
 
-            <TabsContent 
-              aria-label="Dados dos últimos 6 meses" 
+            <TabsContent
+              aria-label="Dados dos últimos 6 meses"
               className="mt-4 sm:mt-6"
               role="tabpanel"
               value="6months"
@@ -172,8 +153,8 @@ const ExpenseAnalysisPage: NextPage = () => {
               </div>
             </TabsContent>
 
-            <TabsContent 
-              aria-label="Dados dos últimos 12 meses" 
+            <TabsContent
+              aria-label="Dados dos últimos 12 meses"
               className="mt-4 sm:mt-6"
               role="tabpanel"
               value="12months"
