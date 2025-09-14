@@ -63,7 +63,7 @@ export const AdvancedExpenseAnalysis = memo<AdvancedExpenseAnalysisProps>(
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ExpenseAnalysisChart data={formattedChartData} height={350} />
+          <ExpenseAnalysisChart data={formattedChartData} />
           {formattedChartData.length > 0 && (
             <ExpenseStatistics statistics={statistics} />
           )}

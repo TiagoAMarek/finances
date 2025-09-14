@@ -19,9 +19,11 @@ interface ChartProps {
 /**
  * Chart visualization component for income vs expense data
  */
-export const Chart = memo<ChartProps>(({ data, height = 200 }) => {
+export const Chart = memo<ChartProps>(({ data, height }) => {
+  const containerClass = height ? 'w-full' : 'w-full h-40 sm:h-[200px]';
+
   return (
-    <div className="w-full" style={{ height }}>
+    <div className={containerClass} style={height ? { height } : undefined}>
       <ResponsiveContainer height="100%" width="100%">
         <BarChart
           data={data}

@@ -89,9 +89,13 @@ const CustomTooltip = memo<TooltipProps>(function CustomTooltip({
  * - Consistent styling with application theme
  */
 export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
-  function ExpenseAnalysisChart({ data, height = 350 }) {
+  function ExpenseAnalysisChart({ data, height }) {
+    const containerClass = height
+      ? 'p-2'
+      : 'p-2 h-64 sm:h-80 lg:h-[350px]';
+
     return (
-      <div className="p-2" style={{ height: `${height}px` }}>
+      <div className={containerClass} style={height ? { height: `${height}px` } : undefined}>
         <ResponsiveContainer height="100%" width="100%">
           <LineChart
             data={data}

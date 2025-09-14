@@ -91,7 +91,7 @@ export const IncomeVsExpenseChart = memo<IncomeVsExpenseChartProps>(
           <ChartSummary totals={totals} />
         </CardHeader>
         <CardContent>
-          <Chart data={chartData} height={200} />
+          <Chart data={chartData} />
         </CardContent>
       </Card>
     );

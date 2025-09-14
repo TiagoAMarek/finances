@@ -30,9 +30,9 @@ export function ExpenseAnalysisContent({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Visão Geral */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <IncomeVsExpenseChart
           periodType={getPeriodType(periodFilter)}
           transactions={transactions}
@@ -40,7 +40,7 @@ export function ExpenseAnalysisContent({
       </div>
 
       {/* Análise Detalhada */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <AdvancedExpenseAnalysis
           isLoading={isLoading}
           periodFilter={periodFilter}

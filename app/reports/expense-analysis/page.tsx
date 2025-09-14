@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, PieChart } from "lucide-react";
+import { PieChart, ChevronLeft } from "lucide-react";
 import type { NextPage } from "next";
 import Link from "next/link";
 import { useState } from "react";
@@ -40,32 +40,65 @@ const ExpenseAnalysisPage: NextPage = () => {
 
   return (
     <>
-      <PageHeader
-        action={
-          <div className="flex items-center gap-2">
-            <AccountCardFilter
-              accounts={accounts}
-              creditCards={creditCards}
-              onFiltersChange={setAccountCardFilters}
-            />
-            <Button asChild size="sm" variant="outline">
-              <Link className="flex items-center gap-2" href="/reports">
-                <ArrowLeft className="h-4 w-4" />
-                Relatórios
-              </Link>
-            </Button>
-          </div>
-        }
-        description="Insights avançados sobre seus padrões de consumo"
-        icon={PieChart}
-        title="Análise Detalhada de Gastos"
-      />
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-10 bg-background border-b sm:hidden">
+        <div className="flex items-center justify-between p-4">
+          <Button 
+            aria-label="Voltar para relatórios" 
+            asChild 
+            className="h-10 w-10 p-0"
+            size="sm"
+            variant="ghost"
+          >
+            <Link href="/reports">
+              <ChevronLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <h1 className="text-lg font-semibold truncate mx-3">
+            Análise de Gastos
+          </h1>
+          <div className="w-10" />
+        </div>
+        
+        <div className="px-4 pb-4">
+          <AccountCardFilter
+            accounts={accounts}
+            className="w-full"
+            creditCards={creditCards}
+            onFiltersChange={setAccountCardFilters}
+          />
+        </div>
+      </div>
 
-      <div className="space-y-8 px-4 lg:px-6 pb-8">
+      {/* Desktop Header */}
+      <div className="hidden sm:block">
+        <PageHeader
+          action={
+            <div className="flex items-center gap-3">
+              <AccountCardFilter
+                accounts={accounts}
+                creditCards={creditCards}
+                onFiltersChange={setAccountCardFilters}
+              />
+              <Button asChild size="sm" variant="outline">
+                <Link className="flex items-center gap-2" href="/reports">
+                  <ChevronLeft className="h-4 w-4" />
+                  Relatórios
+                </Link>
+              </Button>
+            </div>
+          }
+          description="Insights avançados sobre seus padrões de consumo"
+          icon={PieChart}
+          title="Análise Detalhada de Gastos"
+        />
+      </div>
+
+      <div className="space-y-4 sm:space-y-6 px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
         {/* Análise Detalhada de Gastos */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <Tabs
-            className="w-full space-y-6"
+            className="w-full space-y-4 sm:space-y-6"
             value={periodFilter}
             onValueChange={(value: string) => {
               const typedValue = value as "3months" | "6months" | "12months";
@@ -76,21 +109,42 @@ const ExpenseAnalysisPage: NextPage = () => {
               }, 300);
             }}
           >
-            <TabsList className="grid w-full grid-cols-3 h-auto">
-              <TabsTrigger className="text-sm py-3" value="3months">
-                Últimos 3 meses
+            <TabsList className="w-full h-12 p-1 grid grid-cols-3 gap-1">
+              <TabsTrigger
+                aria-label="Ver dados dos últimos 3 meses"
+                className="h-10 text-sm font-medium min-w-0 truncate transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2"
+                value="3months"
+              >
+                <span className="hidden sm:inline">Últimos 3 meses</span>
+                <span className="sm:hidden">3m</span>
               </TabsTrigger>
-              <TabsTrigger className="text-sm py-3" value="6months">
-                Últimos 6 meses
+              <TabsTrigger
+                aria-label="Ver dados dos últimos 6 meses"
+                className="h-10 text-sm font-medium min-w-0 truncate transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2"
+                value="6months"
+              >
+                <span className="hidden sm:inline">Últimos 6 meses</span>
+                <span className="sm:hidden">6m</span>
               </TabsTrigger>
-              <TabsTrigger className="text-sm py-3" value="12months">
-                Últimos 12 meses
+              <TabsTrigger
+                aria-label="Ver dados dos últimos 12 meses"
+                className="h-10 text-sm font-medium min-w-0 truncate transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2"
+                value="12months"
+              >
+                <span className="hidden sm:inline">Últimos 12 meses</span>
+                <span className="sm:hidden">12m</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="3months">
+            <TabsContent 
+              aria-label="Dados dos últimos 3 meses" 
+              className="mt-4 sm:mt-6"
+              role="tabpanel"
+              value="3months"
+            >
               <div
-                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+                aria-busy={isAnalysisLoading}
+                className={`transition-opacity duration-200 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
               >
                 <ExpenseAnalysisContent
                   isLoading={isAnalysisLoading}
@@ -100,9 +154,15 @@ const ExpenseAnalysisPage: NextPage = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="6months">
+            <TabsContent 
+              aria-label="Dados dos últimos 6 meses" 
+              className="mt-4 sm:mt-6"
+              role="tabpanel"
+              value="6months"
+            >
               <div
-                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+                aria-busy={isAnalysisLoading}
+                className={`transition-opacity duration-200 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
               >
                 <ExpenseAnalysisContent
                   isLoading={isAnalysisLoading}
@@ -112,9 +172,15 @@ const ExpenseAnalysisPage: NextPage = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="12months">
+            <TabsContent 
+              aria-label="Dados dos últimos 12 meses" 
+              className="mt-4 sm:mt-6"
+              role="tabpanel"
+              value="12months"
+            >
               <div
-                className={`transition-opacity duration-300 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
+                aria-busy={isAnalysisLoading}
+                className={`transition-opacity duration-200 ${isAnalysisLoading ? "opacity-50" : "opacity-100"}`}
               >
                 <ExpenseAnalysisContent
                   isLoading={isAnalysisLoading}

@@ -59,7 +59,7 @@ export function AccountCardFilter({
           variant="outline"
         >
           <Filter className="h-4 w-4" />
-          <span className="hidden sm:inline">Filtros</span>
+          <span className="hidden xs:inline sm:inline">Filtros</span>
           <Badge
             className="text-xs"
             variant={hasActiveFilters ? "default" : "secondary"}
@@ -69,7 +69,7 @@ export function AccountCardFilter({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent align="end" className="w-[480px] p-0">
+      <PopoverContent align="end" className="w-[min(480px,calc(100vw-2rem))] p-0">
         <div className="p-4 border-b">
           <h4 className="font-medium">Filtros de Contas e Cartões</h4>
           <p className="text-sm text-muted-foreground">
@@ -97,11 +97,11 @@ export function AccountCardFilter({
                   </Toggle>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {accounts.map((account) => (
                     <Toggle
                       key={account.id}
-                      className="justify-start h-auto p-2.5"
+                      className="justify-start h-auto p-3 min-h-[44px]"
                       pressed={filters.accounts.includes(account.id)}
                       variant="outline"
                       onPressedChange={() => toggleAccount(account.id)}
@@ -137,11 +137,11 @@ export function AccountCardFilter({
                   </Toggle>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {creditCards.map((card) => (
                     <Toggle
                       key={card.id}
-                      className="justify-start h-auto p-2.5"
+                      className="justify-start h-auto p-3 min-h-[44px]"
                       pressed={filters.creditCards.includes(card.id)}
                       variant="outline"
                       onPressedChange={() => toggleCreditCard(card.id)}
