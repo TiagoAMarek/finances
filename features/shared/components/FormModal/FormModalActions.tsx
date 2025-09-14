@@ -3,7 +3,7 @@ import { FieldValues } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
 import { DEFAULT_MODAL_CONFIG } from "./constants";
-import { getLoadingText, renderIcon, isFormValid } from "./utils";
+import { getLoadingText, renderIcon } from "./utils";
 import type { FormModalActionsProps } from "./types";
 
 /**
