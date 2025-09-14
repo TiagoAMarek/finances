@@ -69,7 +69,7 @@ export function AccountCardFilter({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent align="end" className="w-96 p-0">
+      <PopoverContent align="end" className="w-[480px] p-0">
         <div className="p-4 border-b">
           <h4 className="font-medium">Filtros de Contas e Cartões</h4>
           <p className="text-sm text-muted-foreground">
@@ -77,8 +77,8 @@ export function AccountCardFilter({
           </p>
         </div>
 
-        <ScrollArea className="max-h-80">
-          <div className="p-4 space-y-6">
+        <ScrollArea className="max-h-96">
+          <div className="px-4 pt-4 pb-6 space-y-4">
             {/* Seção de Contas */}
             {accounts.length > 0 && (
               <div className="space-y-3">
@@ -97,18 +97,18 @@ export function AccountCardFilter({
                   </Toggle>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {accounts.map((account) => (
                     <Toggle
                       key={account.id}
-                      className="justify-start h-auto p-3"
+                      className="justify-start h-auto p-2.5"
                       pressed={filters.accounts.includes(account.id)}
                       variant="outline"
                       onPressedChange={() => toggleAccount(account.id)}
                     >
-                      <div className="flex items-center gap-2">
-                        <Banknote className="h-4 w-4" />
-                        <span className="truncate">{account.name}</span>
+                      <div className="flex items-center gap-2 min-w-0 w-full">
+                        <Banknote className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate text-sm">{account.name}</span>
                       </div>
                     </Toggle>
                   ))}
@@ -137,18 +137,18 @@ export function AccountCardFilter({
                   </Toggle>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {creditCards.map((card) => (
                     <Toggle
                       key={card.id}
-                      className="justify-start h-auto p-3"
+                      className="justify-start h-auto p-2.5"
                       pressed={filters.creditCards.includes(card.id)}
                       variant="outline"
                       onPressedChange={() => toggleCreditCard(card.id)}
                     >
-                      <div className="flex items-center gap-2">
-                        <CreditCardIcon className="h-4 w-4" />
-                        <span className="truncate">{card.name}</span>
+                      <div className="flex items-center gap-2 min-w-0 w-full">
+                        <CreditCardIcon className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate text-sm">{card.name}</span>
                       </div>
                     </Toggle>
                   ))}
