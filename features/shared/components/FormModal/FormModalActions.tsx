@@ -28,14 +28,17 @@ function FormModalActionsImpl<T extends FieldValues = FieldValues>({
     [submitIcon]
   );
 
+  // Extract form validity state if form is provided
+  const { isValid } = form?.formState || {};
+
   // Memoized form validation state
   const formValidation = useMemo(() => {
     if (!form) return { isFormProvided: false, isFormValid: true };
     return {
       isFormProvided: true,
-      isFormValid: isFormValid(form.formState),
+      isFormValid: isValid,
     };
-  }, [form]);
+  }, [form, isValid]);
 
   // Memoized submit button disabled state
   const isSubmitDisabled = useMemo(() => {

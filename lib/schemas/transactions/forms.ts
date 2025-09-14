@@ -45,14 +45,14 @@ export const TransactionFormSchema = z.object({
    * Examples: "Compra no supermercado", "Pagamento de conta de luz"
    */
   description: z.string().min(1, requiredMessage("description")),
-  
+
   /** 
    * Transaction amount - required decimal string
    * Format: "1234.56" (no currency symbols, always positive)
    * Direction determined by transaction type
    */
   amount: z.string().min(1, requiredMessage("amount")),
-  
+
   /** 
    * Transaction type - determines validation rules and UI behavior
    * - "income": Requires categoryId + (accountId OR creditCardId)
@@ -60,13 +60,13 @@ export const TransactionFormSchema = z.object({
    * - "transfer": Requires accountId + toAccountId (different accounts)
    */
   type: z.enum(["income", "expense", "transfer"]),
-  
+
   /** 
    * Transaction date - required ISO date string
    * Format: "2024-01-15" (date inputs provide this format)
    */
   date: z.string().min(1, requiredMessage("date")),
-  
+
   /** 
    * Category ID - conditionally required
    * - Required for income/expense transactions
@@ -74,7 +74,7 @@ export const TransactionFormSchema = z.object({
    * - Validation enforced by business rules below
    */
   categoryId: z.number().optional(),
-  
+
   /** 
    * Bank account ID - conditionally required
    * - For income/expense: source/destination account
@@ -82,7 +82,7 @@ export const TransactionFormSchema = z.object({
    * - Mutually exclusive with creditCardId for income/expense
    */
   accountId: z.number().optional(),
-  
+
   /** 
    * Credit card ID - conditionally required
    * - Only for income/expense transactions
@@ -90,7 +90,7 @@ export const TransactionFormSchema = z.object({
    * - Not used for transfers
    */
   creditCardId: z.number().optional(),
-  
+
   /** 
    * Destination account ID - only for transfers
    * - Required for transfer transactions
@@ -98,7 +98,7 @@ export const TransactionFormSchema = z.object({
    * - Not used for income/expense
    */
   toAccountId: z.number().optional(),
-  
+
   /** 
    * UI helper field - not persisted to database
    * Helps form components determine which source type is selected

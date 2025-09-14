@@ -1,7 +1,7 @@
 import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TransactionFormInput, TransactionFormSchema } from "@/lib/schemas";
 import { useMemo, useCallback } from "react";
+import { TransactionFormInput, TransactionFormSchema } from "@/lib/schemas/transactions";
 
 interface UseTransactionFormProps {
   onSubmit: (data: TransactionFormInput) => void;
@@ -14,9 +14,9 @@ interface UseTransactionFormReturn {
   handleClose: () => void;
 }
 
-export function useTransactionForm({ 
-  onSubmit, 
-  onClose 
+export function useTransactionForm({
+  onSubmit,
+  onClose
 }: UseTransactionFormProps): UseTransactionFormReturn {
   // Memoize resolver to prevent recreation on every render
   const resolver = useMemo(() => zodResolver(TransactionFormSchema), []);
@@ -35,7 +35,7 @@ export function useTransactionForm({
 
   const form = useForm<TransactionFormInput>({
     resolver,
-    mode: "onTouched", // Less aggressive validation for better performance
+    mode: "onChange", // More responsive validation to fix button enabling
     defaultValues,
   });
 

@@ -1,4 +1,3 @@
-import { UseFormReturn, FieldValues } from "react-hook-form";
 import { LucideIcon } from "lucide-react";
 import { LOADING_TEXT_MAP } from "./constants";
 
@@ -22,16 +21,5 @@ export const getLoadingText = (submitText: string): string => {
  */
 export const renderIcon = (IconComponent: LucideIcon, className: string) => {
   return <IconComponent className={className} />;
-};
-
-/**
- * Checks if a form is valid based on form state
- * @param formState - React Hook Form's form state
- * @returns Whether the form is valid
- */
-export const isFormValid = <T extends FieldValues>(
-  formState: UseFormReturn<T>["formState"],
-): boolean => {
-  return formState.isValid && !Object.keys(formState.errors).length;
 };
 

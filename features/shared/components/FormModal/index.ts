@@ -32,7 +32,7 @@ export type {
 } from "./types";
 
 // Re-export utilities for advanced usage
-export { getLoadingText, renderIcon, isFormValid } from "./utils";
+export { getLoadingText, renderIcon } from "./utils";
 export {
   MODAL_SIZE_CLASSES,
   LOADING_TEXT_MAP,

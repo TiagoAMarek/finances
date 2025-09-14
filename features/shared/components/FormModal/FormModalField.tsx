@@ -17,7 +17,6 @@ export function FormModalField<T extends FieldValues = FieldValues>({
 }: FormModalFieldProps<T>) {
   const {
     formState: { errors, touchedFields },
-    watch,
   } = form;
 
   // Memoized field validation state with proper type safety using react-hook-form's get utility
@@ -25,15 +24,15 @@ export function FormModalField<T extends FieldValues = FieldValues>({
     // Type-safe error access using react-hook-form's get utility
     const fieldError = get(errors, name) as FieldError | undefined;
     const isTouched = Boolean(get(touchedFields, name));
-    const watchedValue = watch(name);
-    const isValid = isTouched && !fieldError && !!watchedValue;
+    // Don't use watch() during render - just check if field has error and is touched
+    const isValid = isTouched && !fieldError;
 
     return {
       error: fieldError?.message,
       isValid,
       isTouched,
     };
-  }, [errors, name, touchedFields, watch]);
+  }, [errors, name, touchedFields]);
 
   return (
     <FormField
