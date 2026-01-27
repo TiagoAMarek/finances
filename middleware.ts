@@ -20,11 +20,18 @@ export function middleware(request: NextRequest) {
     request.method === "OPTIONS" &&
     request.nextUrl.pathname.startsWith("/api/")
   ) {
+    // Security: Only allow preflight from allowed origins, reject others
+    if (!isOriginAllowed) {
+      return new Response(null, {
+        status: 403,
+        statusText: "Forbidden",
+      });
+    }
+
     return new Response(null, {
       status: 200,
       headers: {
-        // Security fix: Only allow origin if it's in allowedOrigins
-        "Access-Control-Allow-Origin": isOriginAllowed ? origin : allowedOrigins[0] || "http://localhost:3000",
+        "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Authorization, X-Requested-With",
