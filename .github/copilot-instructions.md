@@ -48,10 +48,11 @@ This is a personal finance management application built with Next.js, React, and
 
 ## Tooling & Configuration
 
-### Next.js 16+ Updates
-- **Turbopack**: Default dev bundler - configure via top-level `turbopack` field in `next.config.*`
-- **Typed Routes**: Stable via `typedRoutes` (requires TypeScript)
-- **ESLint**: Run via ESLint CLI rather than `next lint`
+### Next.js 15 Configuration
+- **Version**: Currently using Next.js 15.4.11
+- **Turbopack**: Available in experimental mode (stable in Next.js 16+)
+- **Typed Routes**: Enable via `typedRoutes` in `next.config.*` (requires TypeScript)
+- **ESLint**: Use `next lint` or ESLint CLI directly
 
 ### Environment Variables
 - Store secrets in `.env.local` - never commit to version control
@@ -215,22 +216,39 @@ export default async function DashboardPage() {
 }
 ```
 
-## Next.js 16+ Async Request APIs
+## Next.js 15 Async Request APIs
 
-- **Request-bound data is async**: APIs like `cookies()`, `headers()`, and `draftMode()` are async in App Router
-- **Route props may be Promises**: `params` and `searchParams` may be Promises in Server Components - prefer `await`ing them
+- **Request-bound data is async**: In Next.js 15, `cookies()`, `headers()`, and `draftMode()` return Promises and must be awaited
+- **Route props are Promises**: `params` and `searchParams` are Promises in Server Components - always `await` them
+- **Breaking change from Next.js 14**: These APIs were synchronous in v14, now async in v15
 - **Avoid accidental dynamic rendering**: Accessing request data opts the route into dynamic behavior - read them intentionally and isolate behind `Suspense` boundaries when appropriate
+
+### Migration Pattern
+```tsx
+// Next.js 14 (old - synchronous)
+export default function Page({ params }) {
+  const { id } = params; // ❌ No longer works in v15
+}
+
+// Next.js 15 (current - asynchronous)
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // ✅ Correct
+}
+```
 
 ## Caching & Revalidation
 
-### Modern Approach (Next.js 16+)
-- **Prefer Cache Components** for memoization/caching in App Router
-- **Use `use cache` directive** to opt components/functions into caching
-- **Cache tagging**: Use `cacheTag(...)` to associate cached results with tags
-- **Cache lifetime**: Use `cacheLife(...)` to control cache lifetime
-- **Revalidation**: Prefer `revalidateTag(tag, 'max')` (stale-while-revalidate) for most cases
-- **Server Actions**: Use `updateTag(...)` inside Server Actions for "read-your-writes" consistency
-- **Avoid `unstable_cache`** for new code - migrate toward Cache Components
+### Next.js 15 Approach
+- Use `fetch()` with caching options for data fetching
+- Use `revalidatePath()` and `revalidateTag()` for cache invalidation
+- Server Actions for mutations with automatic revalidation
+- `unstable_cache` for function-level caching (use sparingly)
+
+### Future: Next.js 16 Cache Components (Not Yet Available)
+- Next.js 16 introduces **Cache Components** with `use cache` directive
+- Opt-in, explicit caching model replacing complex heuristics
+- When upgrading to v16, consider migration to Cache Components pattern
+- Features: `cacheTag()`, `cacheLife()`, `updateTag()` for granular control
 
 ## Performance Best Practices
 
