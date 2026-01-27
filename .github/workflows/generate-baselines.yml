@@ -1,0 +1,219 @@
+name: Generate Visual Regression Baselines
+
+# This workflow generates baseline screenshots for visual regression tests
+# and creates a PR with the results. Use this when:
+# - Setting up visual tests for the first time
+# - After intentional UI changes that affect all pages
+# - When baselines need to be regenerated from CI environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to generate baselines for'
+        required: true
+        default: 'main'
+      update_mode:
+        description: 'Update mode'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - chromium-only
+          - missing-only
+
+jobs:
+  generate-baselines:
+    name: Generate Baseline Screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers (All)
+        if: github.event.inputs.update_mode == 'all'
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Install Playwright Browsers (Chromium Only)
+        if: github.event.inputs.update_mode == 'chromium-only'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Generate All Baselines
+        if: github.event.inputs.update_mode == 'all'
+        run: pnpm test:visual:update
+        env:
+          NEXT_PUBLIC_USE_MOCKS: 'true'
+        continue-on-error: true
+
+      - name: Generate Chromium Baselines Only
+        if: github.event.inputs.update_mode == 'chromium-only'
+        run: pnpm exec playwright test --project=chromium-desktop --update-snapshots
+        env:
+          NEXT_PUBLIC_USE_MOCKS: 'true'
+        continue-on-error: true
+
+      - name: Generate Missing Baselines Only
+        if: github.event.inputs.update_mode == 'missing-only'
+        run: |
+          pnpm exec playwright install --with-deps chromium firefox webkit
+          pnpm test:visual --update-snapshots
+        env:
+          NEXT_PUBLIC_USE_MOCKS: 'true'
+        continue-on-error: true
+
+      - name: Count Generated Screenshots
+        id: count
+        run: |
+          SCREENSHOT_COUNT=$(find e2e/__snapshots__ -name "*.png" 2>/dev/null | wc -l)
+          echo "count=$SCREENSHOT_COUNT" >> $GITHUB_OUTPUT
+          echo "📸 Generated $SCREENSHOT_COUNT baseline screenshots"
+
+      - name: Generate Summary Report
+        run: |
+          echo "## 📸 Visual Regression Baseline Generation Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Mode:** ${{ github.event.inputs.update_mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.event.inputs.branch }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Screenshots Generated:** ${{ steps.count.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Screenshot Breakdown by Browser" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for dir in e2e/__snapshots__/*/; do
+            if [ -d "$dir" ]; then
+              browser=$(basename "$dir")
+              count=$(find "$dir" -name "*.png" 2>/dev/null | wc -l)
+              echo "- **$browser:** $count screenshots" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Create PR with Baselines
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore: Generate baseline screenshots for visual regression tests'
+          branch: visual-baselines-${{ github.run_number }}
+          delete-branch: true
+          title: '📸 Visual Regression Baselines (${{ github.event.inputs.update_mode }})'
+          body: |
+            ## 📸 Baseline Screenshots Generated
+            
+            This PR contains automatically generated baseline screenshots for visual regression testing.
+            
+            ### Generation Details
+            - **Mode:** ${{ github.event.inputs.update_mode }}
+            - **Source Branch:** ${{ github.event.inputs.branch }}
+            - **Screenshots:** ${{ steps.count.outputs.count }} total
+            - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            ### What's Included
+            
+            Baseline screenshots for:
+            - 📱 **Mobile viewports:** 375×667 (Pixel 5, iPhone 13)
+            - 📱 **Tablet viewports:** 768×1024, 1024×1366 (iPad Pro)
+            - 💻 **Desktop viewports:** 1920×1080
+            - 🌐 **Browsers:** Chrome, Firefox, Safari
+            - 🌙 **Theme modes:** Light and dark
+            - 🎨 **Component states:** Default, errors, filled, modals, accordions
+            
+            ### Review Checklist
+            
+            Before merging, please verify:
+            
+            - [ ] Screenshot count is correct (~252 for 'all' mode, ~42 for 'chromium-only')
+            - [ ] Screenshots are clear and readable
+            - [ ] Pages are fully loaded (no loading spinners)
+            - [ ] Fonts are properly rendered
+            - [ ] No unexpected scrollbars
+            - [ ] Dark mode screenshots look correct
+            - [ ] Mobile screenshots show mobile layout
+            - [ ] Responsive breakpoints are correct
+            
+            ### Testing
+            
+            To verify these baselines work:
+            
+            ```bash
+            # Checkout this PR branch
+            gh pr checkout ${{ github.event.number }}
+            
+            # Run visual tests
+            pnpm test:visual:chromium
+            
+            # All tests should pass
+            ```
+            
+            ### Next Steps
+            
+            1. ✅ Review sample screenshots (see Files Changed)
+            2. ✅ Verify quality meets standards
+            3. ✅ Merge this PR
+            4. ✅ Visual regression tests are now active in CI
+            
+            ---
+            
+            **Generated by:** [Generate Visual Baselines Workflow](${{ github.server_url }}/${{ github.repository }}/actions/workflows/generate-baselines.yml)
+            **Triggered by:** @${{ github.actor }}
+          labels: |
+            visual-testing
+            automated
+            baselines
+          reviewers: ${{ github.actor }}
+
+      - name: Upload Baseline Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: baseline-screenshots-${{ github.event.inputs.update_mode }}
+          path: e2e/__snapshots__/
+          retention-days: 30
+
+      - name: Comment on Trigger Issue (if applicable)
+        if: github.event.issue.number
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ✅ Baseline Generation Complete
+              
+              **Screenshots generated:** ${{ steps.count.outputs.count }}
+              **Mode:** ${{ github.event.inputs.update_mode }}
+              
+              A pull request has been created with the baseline screenshots.
+              Please review and merge: #PR_NUMBER
+              
+              [View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+            });

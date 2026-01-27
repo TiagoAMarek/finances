@@ -25,7 +25,27 @@ pnpm install
 pnpm exec playwright install chromium
 ```
 
-### 3. Run Visual Tests
+### 3. Generate Baseline Screenshots (First Time Only)
+
+**Option A: Using the automated script (Recommended)**
+```bash
+./scripts/generate-visual-baselines.sh
+```
+
+**Option B: Manual generation**
+```bash
+pnpm test:visual:update
+```
+
+**Option C: Using GitHub Actions**
+- Go to Actions → "Generate Visual Regression Baselines"
+- Click "Run workflow"
+- Select your branch and update mode
+- A PR will be created with the baselines
+
+📚 **Detailed guide:** See [`GENERATING_BASELINES.md`](./GENERATING_BASELINES.md)
+
+### 4. Run Visual Tests
 
 ```bash
 # Run all visual regression tests
@@ -37,16 +57,6 @@ pnpm test:visual:chromium
 # Open interactive UI
 pnpm test:visual:ui
 ```
-
-### 4. First Time Setup (Generate Baselines)
-
-The first time you run tests, Playwright will create baseline screenshots:
-
-```bash
-pnpm test:visual:update
-```
-
-Review the generated screenshots in `e2e/__snapshots__/` to ensure they look correct.
 
 ## Common Commands
 
