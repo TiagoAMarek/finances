@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
  * 
  * Note: Uses localStorage for token storage. This is vulnerable to XSS attacks.
  * For production applications, consider using httpOnly cookies instead.
+ * 
+ * Limitation: Only checks for token presence, not validity. Expired/invalid tokens
+ * will still grant access until the first API call returns 401.
  */
 export function useAuthGuard() {
   const router = useRouter();
@@ -16,6 +19,9 @@ export function useAuthGuard() {
     // Only check once to prevent unnecessary redirects during hydration
     if (hasChecked.current) return;
     hasChecked.current = true;
+
+    // Check if we're in browser context
+    if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -30,6 +36,9 @@ export function useAuthGuard() {
  * 
  * Note: Uses localStorage for token storage. This is vulnerable to XSS attacks.
  * For production applications, consider using httpOnly cookies instead.
+ * 
+ * Limitation: Only checks for token presence, not validity. Expired tokens
+ * will still redirect users to dashboard until the first API call returns 401.
  */
 export function useGuestGuard() {
   const router = useRouter();
@@ -39,6 +48,9 @@ export function useGuestGuard() {
     // Only check once to prevent unnecessary redirects during hydration
     if (hasChecked.current) return;
     hasChecked.current = true;
+
+    // Check if we're in browser context
+    if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("access_token");
     if (token) {
