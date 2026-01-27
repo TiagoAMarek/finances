@@ -10,6 +10,7 @@ import {
 import { db } from "../lib/db";
 import { transactions, bankAccounts } from "../lib/schema";
 import { TransferCreateSchema } from "../lib/validation";
+import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
 
 // POST /api/transfers - Create transfer between accounts
 export async function POST(request: NextRequest) {
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
       if (account) {
         const currentBalance = parseFloat(account.balance);
         if (currentBalance < parseFloat(validatedData.amount)) {
-          throw new Error("Insufficient balance in source account");
+          throw new Error(VALIDATION_MESSAGES.business.insufficientFunds);
         }
       }
 
@@ -111,8 +112,8 @@ export async function POST(request: NextRequest) {
     if (zodErrorResponse) return zodErrorResponse;
 
     // Handle insufficient balance error
-    if (error instanceof Error && error.message === "Insufficient balance in source account") {
-      return createErrorResponse("Insufficient balance in source account", 400);
+    if (error instanceof Error && error.message === VALIDATION_MESSAGES.business.insufficientFunds) {
+      return createErrorResponse(VALIDATION_MESSAGES.business.insufficientFunds, 400);
     }
 
     console.error("Create transfer error:", error);

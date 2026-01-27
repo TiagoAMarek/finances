@@ -15,6 +15,7 @@ import {
   categories,
 } from "../lib/schema";
 import { TransactionCreateSchema } from "../lib/validation";
+import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
 
 // GET /api/transactions - List user's transactions
 export async function GET(request: NextRequest) {
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
           const currentBalance = parseFloat(account.balance);
           const amount = parseFloat(validatedData.amount);
           if (currentBalance < amount) {
-            throw new Error("Saldo insuficiente");
+            throw new Error(VALIDATION_MESSAGES.business.insufficientFunds);
           }
         }
       }
@@ -245,8 +246,8 @@ export async function POST(request: NextRequest) {
     if (zodErrorResponse) return zodErrorResponse;
 
     // Handle insufficient balance error
-    if (error instanceof Error && error.message === "Saldo insuficiente") {
-      return createErrorResponse("Saldo insuficiente", 400);
+    if (error instanceof Error && error.message === VALIDATION_MESSAGES.business.insufficientFunds) {
+      return createErrorResponse(VALIDATION_MESSAGES.business.insufficientFunds, 400);
     }
 
     console.error("Create transaction error:", error);
