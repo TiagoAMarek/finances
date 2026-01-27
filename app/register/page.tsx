@@ -5,7 +5,7 @@ import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
-import { useRegister } from "@/features/auth/hooks/data";
+import { useRegister } from "@/features/auth/hooks";
 import {
   Button,
   FormField,
