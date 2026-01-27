@@ -1,5 +1,4 @@
-"use client";
-
+// Server Component - pure styling wrapper for Radix UI Separator
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import * as React from "react";
 

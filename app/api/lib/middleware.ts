@@ -28,10 +28,18 @@ export function corsMiddleware(request: NextRequest, response: NextResponse) {
 }
 
 export function handleOptionsRequest() {
+  // Use consistent CORS policy with corsMiddleware (no wildcard for security)
+  // In production, configure allowed origins via environment variables
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "https://your-domain.vercel.app", // Replace with your actual domain
+    process.env.FRONTEND_URL || "http://localhost:3000",
+  ];
+
   return new Response(null, {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": allowedOrigins[0], // Default to localhost, or check request origin
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers":
         "Content-Type, Authorization, X-Requested-With",

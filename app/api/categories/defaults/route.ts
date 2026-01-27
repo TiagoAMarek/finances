@@ -3,6 +3,9 @@ import { db } from "../../lib/db";
 import { defaultCategories } from "../../lib/schema";
 
 // GET /api/categories/defaults - Get default categories for seeding
+// NOTE: This endpoint is intentionally public (no authentication required)
+// Default categories are system-wide templates used for new user onboarding
+// They contain no sensitive data and are read-only
 export async function GET() {
   try {
     const defaults = await db

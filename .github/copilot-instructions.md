@@ -46,6 +46,19 @@ This is a personal finance management application built with Next.js, React, and
 - `pnpm drizzle-kit push` - Push schema changes to database
 - Database schema: `app/api/lib/schema.ts`
 
+## Tooling & Configuration
+
+### Next.js 15 Configuration
+- **Version**: Currently using Next.js 15.4.11
+- **Turbopack**: Available in experimental mode (stable in Next.js 16+)
+- **Typed Routes**: Enable via `typedRoutes` in `next.config.*` (requires TypeScript)
+- **ESLint**: Use `next lint` or ESLint CLI directly
+
+### Environment Variables
+- Store secrets in `.env.local` - never commit to version control
+- `NEXT_PUBLIC_` variables are inlined at build time (changing after build won't affect deployed build)
+- For runtime evaluation, follow Next.js guidance (e.g., call `connection()` before reading `process.env`)
+
 ## Code Style & Conventions
 
 ### Imports
@@ -96,6 +109,15 @@ This is a personal finance management application built with Next.js, React, and
 - 401 responses automatically clear tokens and redirect to login
 - Error format: `{ detail: "error message" }` (Portuguese)
 - RESTful patterns: `/api/[resource]/` and `/api/[resource]/[id]/`
+
+### Route Handlers (API Routes)
+- Location: `app/api/` directory
+- HTTP Methods: Export async functions named after HTTP verbs (`GET`, `POST`, etc.)
+- Use Web `Request` and `Response` APIs, or `NextRequest`/`NextResponse` for advanced features
+- **Performance**: Don't call your own Route Handlers from Server Components - extract shared logic into `lib/` modules and call directly to avoid extra server hops
+- Dynamic segments: Use `[param]` for dynamic routes (e.g., `app/api/users/[id]/route.ts`)
+- Always validate input with Zod schemas
+- Return appropriate HTTP status codes and error messages
 
 ### Authentication Flow
 1. Login/Register via `/api/auth/[action]/route.ts`
@@ -170,6 +192,92 @@ This is a personal finance management application built with Next.js, React, and
 - **Form State**: React Hook Form with Zod resolvers
 - **Global State**: Minimal - prefer server state and prop drilling
 
+## Server & Client Component Integration
+
+### Critical Rules
+- **Never use `next/dynamic` with `{ ssr: false }` inside a Server Component** - This is not supported and will cause errors
+- **Correct approach**: Move all client-only logic into a dedicated Client Component (with `'use client'` at top) and import it directly
+- **Server Components cannot use client-only features** or dynamic imports with SSR disabled
+- **Client Components can be rendered inside Server Components**, but not the other way around
+
+### Example
+```tsx
+// Server Component
+import DashboardNavbar from "@/components/DashboardNavbar";
+
+export default async function DashboardPage() {
+  // ...server logic...
+  return (
+    <>
+      <DashboardNavbar /> {/* This is a Client Component */}
+      {/* ...rest of server-rendered page... */}
+    </>
+  );
+}
+```
+
+## Next.js 15 Async Request APIs
+
+- **Request-bound data is async**: In Next.js 15, `cookies()`, `headers()`, and `draftMode()` return Promises and must be awaited
+- **Route props are Promises**: `params` and `searchParams` are Promises in Server Components - always `await` them
+- **Breaking change from Next.js 14**: These APIs were synchronous in v14, now async in v15
+- **Avoid accidental dynamic rendering**: Accessing request data opts the route into dynamic behavior - read them intentionally and isolate behind `Suspense` boundaries when appropriate
+
+### Migration Pattern
+```tsx
+// Next.js 14 (old - synchronous)
+export default function Page({ params }) {
+  const { id } = params; // ❌ No longer works in v15
+}
+
+// Next.js 15 (current - asynchronous)
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // ✅ Correct
+}
+```
+
+## Caching & Revalidation
+
+### Next.js 15 Approach
+- Use `fetch()` with caching options for data fetching
+- Use `revalidatePath()` and `revalidateTag()` for cache invalidation
+- Server Actions for mutations with automatic revalidation
+- `unstable_cache` for function-level caching (use sparingly)
+
+### Future: Next.js 16 Cache Components (Not Yet Available)
+- Next.js 16 introduces **Cache Components** with `use cache` directive
+- Opt-in, explicit caching model replacing complex heuristics
+- When upgrading to v16, consider migration to Cache Components pattern
+- Features: `cacheTag()`, `cacheLife()`, `updateTag()` for granular control
+
+## Performance Best Practices
+
+- **Images**: Use `next/image` for automatic optimization
+- **Fonts**: Use `next/font` for font optimization
+- **Route prefetching**: Leverage automatic prefetching
+- **Code splitting**: Keep most logic in Server Components to reduce client bundle
+- **Suspense**: Use Suspense and loading states for async data
+- **Route Handlers**: Don't call your own Route Handlers from Server Components - extract shared logic into `lib/` and call directly
+
+## Security Best Practices
+
+- **Input validation**: Always validate and sanitize user input using Zod schemas
+- **Authentication**: Protect sensitive routes using middleware or server-side session checks
+- **Authorization**: Always perform server-side authorization for Server Actions and Route Handlers - never trust client input
+- **HTTPS**: Use HTTPS in production
+- **HTTP Headers**: Set secure HTTP headers
+- **Secrets**: Store in `.env.local` and never commit to version control
+- **CSRF Protection**: Implement CSRF protection for forms
+- **Rate Limiting**: Implement rate limiting for API routes
+
+## Accessibility Best Practices
+
+- **Semantic HTML**: Use proper HTML elements for their intended purpose
+- **ARIA Attributes**: Add ARIA attributes where needed for screen readers
+- **Keyboard Navigation**: Ensure all interactive elements are keyboard accessible
+- **Focus Management**: Handle focus states properly in modals and dynamic content
+- **Testing**: Test with screen readers and keyboard-only navigation
+
 ## Best Practices
 
 ### Do's
@@ -181,6 +289,11 @@ This is a personal finance management application built with Next.js, React, and
 - Use feature-specific hooks from `features/[feature]/hooks/`
 - Follow RESTful API patterns
 - Handle errors in Portuguese
+- Use Server Components by default - only add `'use client'` when needed
+- Implement proper error boundaries for client components
+- Use optimistic updates where appropriate for better UX
+- Write responsive designs with Tailwind CSS
+- Follow semantic HTML structure
 
 ### Don'ts
 - Never use `any` in TypeScript
@@ -191,7 +304,9 @@ This is a personal finance management application built with Next.js, React, and
 - Don't store sensitive data in localStorage except auth tokens
 - Don't introduce breaking changes to exported APIs
 - Don't create files unless absolutely necessary
-- Don't proactively create documentation files
+- Don't proactively create documentation files or example/demo files
+- Don't use `next/dynamic` with `{ ssr: false }` in Server Components
+- Don't call your own Route Handlers from Server Components
 
 ## FormModal System
 

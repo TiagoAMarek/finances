@@ -1,5 +1,4 @@
-"use client";
-
+// Server Component - pure styling wrappers for HTML table elements
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
