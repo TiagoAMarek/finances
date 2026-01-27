@@ -5,7 +5,7 @@ import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
-import { useRegister, useGuestGuard } from "@/features/auth/hooks";
+import { useRegister } from "@/features/auth/hooks";
 import {
   Button,
   FormField,
@@ -23,7 +23,6 @@ import {
 import { RegisterSchema, type RegisterInput } from "@/lib/schemas";
 
 const RegisterPage: NextPage = () => {
-  useGuestGuard();
   const router = useRouter();
   const registerMutation = useRegister();
 

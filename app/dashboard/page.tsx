@@ -4,7 +4,6 @@ import { BarChart3 } from "lucide-react";
 import type { NextPage } from "next";
 import { useCallback, useState } from "react";
 
-import { useAuthGuard } from "@/features/auth/hooks";
 import {
   DashboardMetricsGrid,
   DashboardSkeletonLoader,
@@ -18,7 +17,6 @@ import { useTransactionActions } from "@/features/transactions/hooks/ui/useTrans
 import { TransactionCreateInput } from "@/lib/schemas";
 
 const DashboardPage: NextPage = () => {
-  useAuthGuard();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { createTransaction, isCreating } = useTransactionActions();
 

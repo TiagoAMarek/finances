@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
+import { useAuthGuard, useGuestGuard } from "@/features/auth/hooks";
 import { AppSidebar } from "@/features/shared/components";
 import { Separator } from "@/features/shared/components/ui";
 import {
@@ -39,6 +40,16 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Routes that shouldn't show the sidebar
   const publicRoutes = ["/login", "/register"];
   const isPublicRoute = publicRoutes.includes(pathname);
+
+  // Centralized authentication logic
+  // Protected routes: redirect to /login if not authenticated
+  // Public routes: redirect to /dashboard if authenticated
+  if (isPublicRoute) {
+    useGuestGuard();
+  } else if (pathname !== "/") {
+    // Don't guard root path as it redirects to /login anyway
+    useAuthGuard();
+  }
 
   if (isPublicRoute) {
     return <div className="min-h-screen bg-background">{children}</div>;

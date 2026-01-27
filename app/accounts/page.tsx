@@ -12,12 +12,10 @@ import {
 } from "@/features/accounts/components";
 import { useGetAccounts } from "@/features/accounts/hooks/data";
 import { useAccountActions } from "@/features/accounts/hooks/ui";
-import { useAuthGuard } from "@/features/auth/hooks";
 import { PageHeader } from "@/features/shared/components";
 import { Skeleton } from "@/features/shared/components/ui";
 
 const AccountsPage: NextPage = () => {
-  useAuthGuard();
   const { data: accounts = [], isLoading, error } = useGetAccounts();
   const {
     handleCreate,

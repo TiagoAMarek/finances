@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useLogin, useGuestGuard } from "@/features/auth/hooks";
+import { useLogin } from "@/features/auth/hooks";
 import { Button, Input, Label } from "@/features/shared/components/ui";
 import { Alert, AlertDescription } from "@/features/shared/components/ui/alert";
 import {
@@ -19,7 +19,6 @@ import {
 import { LoginSchema, type LoginInput } from "@/lib/schemas";
 
 const LoginPage: NextPage = () => {
-  useGuestGuard();
   const router = useRouter();
   const loginMutation = useLogin();
   const [loadingState, setLoadingState] = useState<
