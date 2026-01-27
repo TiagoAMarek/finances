@@ -1,8 +1,8 @@
 import Database from "better-sqlite3";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-import { POST } from "@/app/api/users/change-password/route";
 import { signToken } from "@/app/api/lib/auth";
+import { POST } from "@/app/api/users/change-password/route";
 
 import { createNextRequest } from "../helpers/auth-helpers";
 import {

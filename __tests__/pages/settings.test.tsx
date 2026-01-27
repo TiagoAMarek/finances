@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import React from "react";
 import { afterEach, describe, expect, it } from "vitest";
@@ -10,7 +11,6 @@ import {
   screen,
   waitFor,
   testHelpers,
-  userEvent,
 } from "../utils/test-utils";
 
 // Ensure we reset auth mock state between tests

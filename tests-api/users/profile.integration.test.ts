@@ -1,8 +1,8 @@
 import Database from "better-sqlite3";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-import { GET, PATCH } from "@/app/api/users/profile/route";
 import { signToken } from "@/app/api/lib/auth";
+import { GET, PATCH } from "@/app/api/users/profile/route";
 
 import { createNextRequest } from "../helpers/auth-helpers";
 import {
