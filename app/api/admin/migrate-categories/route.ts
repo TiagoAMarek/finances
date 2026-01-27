@@ -34,6 +34,13 @@ export async function POST(request: NextRequest) {
     return createErrorResponse("Unauthorized", 401);
   }
 
+  // TODO: Security - Add role-based authorization
+  // Currently any authenticated user can trigger migrations
+  // Recommendation: Add isAdmin flag to JWT payload and check here
+  // if (!user.isAdmin) {
+  //   return createErrorResponse("Forbidden - Admin access required", 403);
+  // }
+
   try {
     console.log("Starting category migration via API endpoint");
     const migrationStats = await migrateCategoriesData();

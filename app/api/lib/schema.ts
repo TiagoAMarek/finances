@@ -8,6 +8,7 @@ import {
   serial,
   boolean,
   timestamp,
+  index,
 } from "drizzle-orm/pg-core";
 
 // Users table
@@ -30,7 +31,10 @@ export const categories = pgTable("categories", {
     .notNull()
     .references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  // Performance: Index for filtering categories by owner
+  ownerIdx: index("categories_owner_idx").on(table.ownerId),
+}));
 
 // Default categories table (for seeding new users)
 export const defaultCategories = pgTable("default_categories", {
@@ -52,7 +56,10 @@ export const bankAccounts = pgTable("bank_accounts", {
   ownerId: integer("owner_id")
     .notNull()
     .references(() => users.id),
-});
+}, (table) => ({
+  // Performance: Index for filtering bank accounts by owner
+  ownerIdx: index("bank_accounts_owner_idx").on(table.ownerId),
+}));
 
 // Credit cards table
 export const creditCards = pgTable("credit_cards", {
@@ -67,7 +74,10 @@ export const creditCards = pgTable("credit_cards", {
   ownerId: integer("owner_id")
     .notNull()
     .references(() => users.id),
-});
+}, (table) => ({
+  // Performance: Index for filtering credit cards by owner
+  ownerIdx: index("credit_cards_owner_idx").on(table.ownerId),
+}));
 
 // Transactions table
 export const transactions = pgTable("transactions", {
@@ -84,7 +94,12 @@ export const transactions = pgTable("transactions", {
   accountId: integer("account_id").references(() => bankAccounts.id),
   creditCardId: integer("credit_card_id").references(() => creditCards.id),
   toAccountId: integer("to_account_id").references(() => bankAccounts.id), // For transfers
-});
+}, (table) => ({
+  // Performance: Composite index for date-based queries filtered by owner
+  ownerDateIdx: index("transactions_owner_date_idx").on(table.ownerId, table.date),
+  // Performance: Index for category lookups
+  categoryIdx: index("transactions_category_idx").on(table.categoryId),
+}));
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
