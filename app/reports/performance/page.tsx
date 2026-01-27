@@ -5,6 +5,7 @@ import type { NextPage } from "next";
 import { useState } from "react";
 
 import { FilterState } from "@/features/accounts/hooks/ui";
+import { useAuthGuard } from "@/features/auth/hooks";
 import { PeriodSelector } from "@/features/reports/components";
 import {
   AccountCardFilter,
@@ -17,6 +18,7 @@ import { Skeleton } from "@/features/shared/components/ui";
 import { useFilteredTransactions } from "@/features/transactions";
 
 const PerformancePage: NextPage = () => {
+  useAuthGuard();
   // Estados dos filtros
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());

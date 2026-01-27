@@ -3,6 +3,7 @@
 import { AlertCircle, Filter, Tag } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { useAuthGuard } from "@/features/auth/hooks";
 import {
   useCategoryActions,
   useGetCategoriesWithStats,
@@ -29,6 +30,7 @@ import {
 } from "@/features/shared/components/ui";
 
 export default function CategoriesPage() {
+  useAuthGuard();
   const {
     data: categories,
     isLoading,

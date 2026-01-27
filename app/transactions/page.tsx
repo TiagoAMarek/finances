@@ -4,6 +4,7 @@ import { ArrowLeftRight } from "lucide-react";
 import type { NextPage } from "next";
 
 import { useGetAccounts } from "@/features/accounts/hooks/data/useGetAccounts";
+import { useAuthGuard } from "@/features/auth/hooks";
 import { useGetCreditCards } from "@/features/credit-cards/hooks/data/useGetCreditCards";
 import { PageHeader, QuickCreateButton } from "@/features/shared/components";
 import {
@@ -24,6 +25,7 @@ import {
 } from "@/features/transactions/hooks/ui";
 
 const TransactionsPage: NextPage = () => {
+  useAuthGuard();
   const {
     data: transactions = [],
     isLoading: isLoadingTransactions,

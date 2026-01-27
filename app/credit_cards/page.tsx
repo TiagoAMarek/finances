@@ -3,6 +3,7 @@
 import { CreditCard } from "lucide-react";
 import type { NextPage } from "next";
 
+import { useAuthGuard } from "@/features/auth/hooks";
 import {
   CreateCardModal,
   CreditCardsList,
@@ -15,6 +16,7 @@ import { PageHeader } from "@/features/shared/components";
 import { Skeleton } from "@/features/shared/components/ui";
 
 const CreditCardsPage: NextPage = () => {
+  useAuthGuard();
   const { data: creditCards = [], isLoading, error } = useGetCreditCards();
   const {
     handleCreate,

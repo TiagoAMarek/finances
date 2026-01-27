@@ -5,6 +5,7 @@ import type { NextPage } from "next";
 import { useState } from "react";
 
 import { FilterState } from "@/features/accounts/hooks/ui";
+import { useAuthGuard } from "@/features/auth/hooks";
 import { ExpenseAnalysisContent } from "@/features/reports/components";
 import { AccountCardFilter, PageHeader } from "@/features/shared/components";
 import {
@@ -18,6 +19,7 @@ import { useFilteredTransactions } from "@/features/transactions/hooks/ui";
 import { ExpenseAnalysisPageSkeleton } from "./_skeleton";
 
 const ExpenseAnalysisPage: NextPage = () => {
+  useAuthGuard();
   // Estados dos filtros
   const [periodFilter, setPeriodFilter] = useState<
     "3months" | "6months" | "12months"
