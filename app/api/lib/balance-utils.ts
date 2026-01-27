@@ -1,19 +1,16 @@
 import { eq, sql } from "drizzle-orm";
 
 import { TRANSACTION_TYPES, TransactionType } from "./constants";
+import { db } from "./db";
 import { bankAccounts, creditCards } from "./schema";
 
 /**
  * Transaction context type from Drizzle ORM
  * 
- * Note: We use a simplified type here because Drizzle's full transaction type
- * is complex with multiple generics. The transaction context provides all the
- * standard query builder methods (select, insert, update, delete, etc.) and
- * works with any table from our schema. TypeScript will catch incorrect usage
- * at the call site.
+ * Inferred from the actual database transaction type to ensure type safety
+ * while avoiding complex generic type definitions.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type TransactionContext = any;
+type TransactionContext = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 interface BalanceUpdateParams {
   type: TransactionType;
