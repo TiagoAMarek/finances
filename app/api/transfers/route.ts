@@ -60,31 +60,36 @@ export async function POST(request: NextRequest) {
       return createErrorResponse("Insufficient balance in source account", 400);
     }
 
-    // Create transfer transaction
-    const [newTransfer] = await db
-      .insert(transactions)
-      .values({
-        description: validatedData.description,
-        amount: validatedData.amount.toString(),
-        type: "transfer",
-        date: validatedData.date, // Already a string in ISO format
-        category: "Transfer",
-        ownerId: user.userId,
-        accountId: validatedData.fromAccountId,
-        toAccountId: validatedData.toAccountId,
-      })
-      .returning();
+    // Create transfer transaction and update balances in a database transaction
+    const newTransfer = await db.transaction(async (tx) => {
+      // Create transfer transaction
+      const [transfer] = await tx
+        .insert(transactions)
+        .values({
+          description: validatedData.description,
+          amount: validatedData.amount.toString(),
+          type: "transfer",
+          date: validatedData.date, // Already a string in ISO format
+          category: "Transfer",
+          ownerId: user.userId,
+          accountId: validatedData.fromAccountId,
+          toAccountId: validatedData.toAccountId,
+        })
+        .returning();
 
-    // Update account balances
-    await db
-      .update(bankAccounts)
-      .set({ balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}` })
-      .where(eq(bankAccounts.id, validatedData.fromAccountId));
+      // Update account balances
+      await tx
+        .update(bankAccounts)
+        .set({ balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}` })
+        .where(eq(bankAccounts.id, validatedData.fromAccountId));
 
-    await db
-      .update(bankAccounts)
-      .set({ balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}` })
-      .where(eq(bankAccounts.id, validatedData.toAccountId));
+      await tx
+        .update(bankAccounts)
+        .set({ balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}` })
+        .where(eq(bankAccounts.id, validatedData.toAccountId));
+
+      return transfer;
+    });
 
     return createSuccessResponse(
       {

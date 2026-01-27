@@ -162,64 +162,69 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create transaction
-    const [newTransaction] = await db
-      .insert(transactions)
-      .values({
-        description: validatedData.description,
-        amount: validatedData.amount.toString(),
-        type: validatedData.type,
-        date: validatedData.date, // Already a string in ISO format
-        categoryId: validatedData.categoryId,
-        ownerId: user.userId,
-        accountId: validatedData.accountId || null,
-        creditCardId: validatedData.creditCardId || null,
-        toAccountId: validatedData.toAccountId || null,
-      })
-      .returning();
+    // Create transaction and update balances in a database transaction
+    const newTransaction = await db.transaction(async (tx) => {
+      // Create transaction
+      const [transaction] = await tx
+        .insert(transactions)
+        .values({
+          description: validatedData.description,
+          amount: validatedData.amount.toString(),
+          type: validatedData.type,
+          date: validatedData.date, // Already a string in ISO format
+          categoryId: validatedData.categoryId,
+          ownerId: user.userId,
+          accountId: validatedData.accountId || null,
+          creditCardId: validatedData.creditCardId || null,
+          toAccountId: validatedData.toAccountId || null,
+        })
+        .returning();
 
-    // Update account balances for non-transfer transactions
-    if (validatedData.type !== "transfer") {
-      if (validatedData.accountId) {
-        const balanceChange =
-          validatedData.type === "income"
-            ? validatedData.amount
-            : -validatedData.amount;
-        await db
-          .update(bankAccounts)
-          .set({ balance: sql`CAST(balance AS DECIMAL) + ${balanceChange}` })
-          .where(eq(bankAccounts.id, validatedData.accountId));
-      }
+      // Update account balances for non-transfer transactions
+      if (validatedData.type !== "transfer") {
+        if (validatedData.accountId) {
+          const balanceChange =
+            validatedData.type === "income"
+              ? validatedData.amount
+              : -validatedData.amount;
+          await tx
+            .update(bankAccounts)
+            .set({ balance: sql`CAST(balance AS DECIMAL) + ${balanceChange}` })
+            .where(eq(bankAccounts.id, validatedData.accountId));
+        }
 
-      if (validatedData.creditCardId) {
-        // For credit card, only expenses increase the bill
-        if (validatedData.type === "expense") {
-          await db
-            .update(creditCards)
+        if (validatedData.creditCardId) {
+          // For credit card, only expenses increase the bill
+          if (validatedData.type === "expense") {
+            await tx
+              .update(creditCards)
+              .set({
+                currentBill: sql`CAST(current_bill AS DECIMAL) + ${validatedData.amount}`,
+              })
+              .where(eq(creditCards.id, validatedData.creditCardId));
+          }
+        }
+      } else {
+        // Handle transfer: decrease from account, increase to account
+        if (validatedData.accountId && validatedData.toAccountId) {
+          await tx
+            .update(bankAccounts)
             .set({
-              currentBill: sql`CAST(current_bill AS DECIMAL) + ${validatedData.amount}`,
+              balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}`,
             })
-            .where(eq(creditCards.id, validatedData.creditCardId));
+            .where(eq(bankAccounts.id, validatedData.accountId));
+
+          await tx
+            .update(bankAccounts)
+            .set({
+              balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}`,
+            })
+            .where(eq(bankAccounts.id, validatedData.toAccountId));
         }
       }
-    } else {
-      // Handle transfer: decrease from account, increase to account
-      if (validatedData.accountId && validatedData.toAccountId) {
-        await db
-          .update(bankAccounts)
-          .set({
-            balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}`,
-          })
-          .where(eq(bankAccounts.id, validatedData.accountId));
 
-        await db
-          .update(bankAccounts)
-          .set({
-            balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}`,
-          })
-          .where(eq(bankAccounts.id, validatedData.toAccountId));
-      }
-    }
+      return transaction;
+    });
 
     return createSuccessResponse(
       {
