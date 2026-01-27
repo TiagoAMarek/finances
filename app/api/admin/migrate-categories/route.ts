@@ -1,11 +1,18 @@
-import { createErrorResponse, createSuccessResponse } from "../../lib/auth";
+import { createErrorResponse, createSuccessResponse, getUserFromRequest } from "../../lib/auth";
 import {
   migrateCategoriesData,
   checkMigrationStatus,
 } from "../../lib/migrateCategoriesData";
+import { NextRequest } from "next/server";
 
 // GET /api/admin/migrate-categories - Check migration status
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const user = await getUserFromRequest(request);
+  
+  if (!user) {
+    return createErrorResponse("Unauthorized", 401);
+  }
+
   try {
     const status = await checkMigrationStatus();
     return createSuccessResponse({
@@ -19,7 +26,13 @@ export async function GET() {
 }
 
 // POST /api/admin/migrate-categories - Run migration
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const user = await getUserFromRequest(request);
+  
+  if (!user) {
+    return createErrorResponse("Unauthorized", 401);
+  }
+
   try {
     console.log("Starting category migration via API endpoint");
     const migrationStats = await migrateCategoriesData();

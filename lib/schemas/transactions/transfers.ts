@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { VALIDATION_MESSAGES, requiredMessage } from "../base/validation-helpers";
+import { VALIDATION_MESSAGES, requiredMessage, validAmount } from "../base/validation-helpers";
 
 /**
  * Transfer Create Schema - Specialized Transfer Transaction Type
@@ -59,7 +59,7 @@ export const TransferCreateSchema = z
      * Represents the amount being moved from source to destination
      * Format: "1234.56" (no currency symbols)
      */
-    amount: z.string().min(1, requiredMessage("amount")),
+    amount: validAmount("amount"),
     
     /** 
      * Transfer date - ISO 8601 format

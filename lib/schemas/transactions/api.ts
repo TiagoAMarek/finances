@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { VALIDATION_MESSAGES, requiredMessage } from "../base/validation-helpers";
+import { VALIDATION_MESSAGES, requiredMessage, validAmount } from "../base/validation-helpers";
 
 /**
  * Transaction Create API Schema - Server-Side Validation
@@ -56,7 +56,7 @@ export const TransactionCreateSchema = z
      * Format: "1234.56" (no currency symbols)
      * Precision handled by decimal type in database
      */
-    amount: z.string().min(1, requiredMessage("amount")),
+    amount: validAmount("amount"),
     
     /** Transaction type - determines validation and processing logic */
     type: z.enum(["income", "expense", "transfer"]),
@@ -178,7 +178,7 @@ export const TransactionUpdateSchema = z.object({
   description: z.string().min(1, requiredMessage("description")).optional(),
   
   /** Optional amount update - must be valid decimal string */
-  amount: z.string().optional(),
+  amount: validAmount("amount").optional(),
   
   /** Optional type change - requires service-layer validation */
   type: z.enum(["income", "expense", "transfer"]).optional(),

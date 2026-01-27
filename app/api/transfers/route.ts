@@ -10,6 +10,7 @@ import {
 import { db } from "../lib/db";
 import { transactions, bankAccounts } from "../lib/schema";
 import { TransferCreateSchema } from "../lib/validation";
+import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
 
 // POST /api/transfers - Create transfer between accounts
 export async function POST(request: NextRequest) {
@@ -54,37 +55,50 @@ export async function POST(request: NextRequest) {
       return createErrorResponse("Destination account not found", 404);
     }
 
-    // Check if source account has sufficient balance
-    const currentBalance = parseFloat(fromAccount.balance);
-    if (currentBalance < parseFloat(validatedData.amount)) {
-      return createErrorResponse("Insufficient balance in source account", 400);
-    }
+    // Create transfer transaction and update balances in a database transaction
+    const newTransfer = await db.transaction(async (tx) => {
+      // Check if source account has sufficient balance inside transaction
+      const [account] = await tx
+        .select()
+        .from(bankAccounts)
+        .where(eq(bankAccounts.id, validatedData.fromAccountId))
+        .limit(1);
+      
+      if (account) {
+        const currentBalance = parseFloat(account.balance);
+        if (currentBalance < parseFloat(validatedData.amount)) {
+          throw new Error(VALIDATION_MESSAGES.business.insufficientFunds);
+        }
+      }
 
-    // Create transfer transaction
-    const [newTransfer] = await db
-      .insert(transactions)
-      .values({
-        description: validatedData.description,
-        amount: validatedData.amount.toString(),
-        type: "transfer",
-        date: validatedData.date, // Already a string in ISO format
-        category: "Transfer",
-        ownerId: user.userId,
-        accountId: validatedData.fromAccountId,
-        toAccountId: validatedData.toAccountId,
-      })
-      .returning();
+      // Create transfer transaction
+      const [transfer] = await tx
+        .insert(transactions)
+        .values({
+          description: validatedData.description,
+          amount: validatedData.amount.toString(),
+          type: "transfer",
+          date: validatedData.date, // Already a string in ISO format
+          category: "Transfer",
+          ownerId: user.userId,
+          accountId: validatedData.fromAccountId,
+          toAccountId: validatedData.toAccountId,
+        })
+        .returning();
 
-    // Update account balances
-    await db
-      .update(bankAccounts)
-      .set({ balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}` })
-      .where(eq(bankAccounts.id, validatedData.fromAccountId));
+      // Update account balances
+      await tx
+        .update(bankAccounts)
+        .set({ balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}` })
+        .where(eq(bankAccounts.id, validatedData.fromAccountId));
 
-    await db
-      .update(bankAccounts)
-      .set({ balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}` })
-      .where(eq(bankAccounts.id, validatedData.toAccountId));
+      await tx
+        .update(bankAccounts)
+        .set({ balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}` })
+        .where(eq(bankAccounts.id, validatedData.toAccountId));
+
+      return transfer;
+    });
 
     return createSuccessResponse(
       {
@@ -96,6 +110,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const zodErrorResponse = handleZodError(error);
     if (zodErrorResponse) return zodErrorResponse;
+
+    // Handle insufficient balance error
+    if (error instanceof Error && error.message === VALIDATION_MESSAGES.business.insufficientFunds) {
+      return createErrorResponse(VALIDATION_MESSAGES.business.insufficientFunds, 400);
+    }
 
     console.error("Create transfer error:", error);
     return createErrorResponse("Internal server error", 500);

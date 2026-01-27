@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, or, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 import {
@@ -8,7 +8,7 @@ import {
   handleZodError,
 } from "../../lib/auth";
 import { db } from "../../lib/db";
-import { bankAccounts } from "../../lib/schema";
+import { bankAccounts, transactions } from "../../lib/schema";
 import { BankAccountUpdateSchema } from "../../lib/validation";
 
 // PUT /api/accounts/[id] - Update bank account
@@ -107,6 +107,24 @@ export async function DELETE(
 
     if (!existingAccount) {
       return createErrorResponse("Account not found", 404);
+    }
+
+    // Check for existing transactions before deletion
+    const [transactionCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(transactions)
+      .where(
+        or(
+          eq(transactions.accountId, accountId),
+          eq(transactions.toAccountId, accountId)
+        )
+      );
+
+    if (transactionCount && transactionCount.count > 0) {
+      return createErrorResponse(
+        "Não é possível excluir uma conta com transações existentes",
+        400
+      );
     }
 
     // Delete account

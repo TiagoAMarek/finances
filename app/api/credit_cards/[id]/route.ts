@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 import {
@@ -8,7 +8,7 @@ import {
   handleZodError,
 } from "../../lib/auth";
 import { db } from "../../lib/db";
-import { creditCards } from "../../lib/schema";
+import { creditCards, transactions } from "../../lib/schema";
 import { CreditCardUpdateSchema } from "../../lib/validation";
 
 // PUT /api/credit_cards/[id] - Update credit card
@@ -101,6 +101,19 @@ export async function DELETE(
 
     if (!existingCard) {
       return createErrorResponse("Credit card not found", 404);
+    }
+
+    // Check for existing transactions before deletion
+    const [transactionCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(transactions)
+      .where(eq(transactions.creditCardId, cardId));
+
+    if (transactionCount && transactionCount.count > 0) {
+      return createErrorResponse(
+        "Não é possível excluir um cartão com transações existentes",
+        400
+      );
     }
 
     // Delete card

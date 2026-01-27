@@ -33,6 +33,8 @@ export const VALIDATION_MESSAGES = {
     hexColor: "Cor deve estar no formato hexadecimal (#RRGGBB)",
     positiveNumber: "Valor deve ser um número positivo",
     currency: "Formato de moeda inválido",
+    amount: "Valor deve ser um número válido com até 2 casas decimais",
+    amountPositive: "Valor deve ser maior que zero",
   },
 
   // Length validation messages
