@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import { useAuthGuard, useGuestGuard } from "@/features/auth/hooks";
+import { ProtectedRoute, PublicRoute } from "@/features/auth";
 import { AppSidebar } from "@/features/shared/components";
 import { Separator } from "@/features/shared/components/ui";
 import {
@@ -40,50 +40,55 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Routes that shouldn't show the sidebar
   const publicRoutes = ["/login", "/register"];
   const isPublicRoute = publicRoutes.includes(pathname);
+  const isRootPath = pathname === "/";
 
-  // Centralized authentication logic
-  // Protected routes: redirect to /login if not authenticated
-  // Public routes: redirect to /dashboard if authenticated
+  // Centralized authentication logic using wrapper components
+  // This approach respects Rules of Hooks by using components instead of conditional hook calls
   if (isPublicRoute) {
-    useGuestGuard();
-  } else if (pathname !== "/") {
-    // Don't guard root path as it redirects to /login anyway
-    useAuthGuard();
+    return (
+      <PublicRoute>
+        <div className="min-h-screen bg-background">{children}</div>
+      </PublicRoute>
+    );
   }
 
-  if (isPublicRoute) {
+  // Don't guard root path as it already redirects to /login
+  if (isRootPath) {
     return <div className="min-h-screen bg-background">{children}</div>;
   }
 
+  // All other routes are protected
   const currentPageTitle = routeMapping[pathname] || "Página";
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator className="mr-2 h-4" orientation="vertical" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                {pathname !== "/dashboard" && (
-                  <>
-                    <BreadcrumbSeparator className="hidden md:block" />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{currentPageTitle}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <main className="flex-1 overflow-auto">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator className="mr-2 h-4" orientation="vertical" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  {pathname !== "/dashboard" && (
+                    <>
+                      <BreadcrumbSeparator className="hidden md:block" />
+                      <BreadcrumbItem>
+                        <BreadcrumbPage>{currentPageTitle}</BreadcrumbPage>
+                      </BreadcrumbItem>
+                    </>
+                  )}
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+          </header>
+          <main className="flex-1 overflow-auto">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
