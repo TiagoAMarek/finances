@@ -100,8 +100,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate account/credit card ownership
+    let account;
     if (validatedData.accountId) {
-      const [account] = await db
+      [account] = await db
         .select()
         .from(bankAccounts)
         .where(
@@ -114,6 +115,15 @@ export async function POST(request: NextRequest) {
 
       if (!account) {
         return createErrorResponse("Account not found", 404);
+      }
+
+      // Check for insufficient balance on expense transactions
+      if (validatedData.type === "expense") {
+        const currentBalance = parseFloat(account.balance);
+        const amount = parseFloat(validatedData.amount);
+        if (currentBalance < amount) {
+          return createErrorResponse("Saldo insuficiente", 400);
+        }
       }
     }
 
