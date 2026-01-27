@@ -2,7 +2,8 @@ import { vi, beforeAll, beforeEach, afterEach, afterAll } from "vitest";
 import "@testing-library/jest-dom";
 
 // Mock environment variables for testing
-vi.stubEnv("JWT_SECRET", "test-jwt-secret-key");
+// Security: JWT secret must be at least 32 characters for HS256
+vi.stubEnv("JWT_SECRET", "test-jwt-secret-key-32-chars-minimum!");
 vi.stubEnv("DATABASE_URL", ":memory:");
 
 // Global test setup - runs once before all tests

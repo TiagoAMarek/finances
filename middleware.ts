@@ -1,21 +1,44 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Define allowed origins in one place for consistency
+const getAllowedOrigins = () => {
+  return [
+    "http://localhost:3000",
+    process.env.FRONTEND_URL,
+    process.env.NEXT_PUBLIC_APP_URL,
+  ].filter((origin): origin is string => Boolean(origin));
+};
+
 export function middleware(request: NextRequest) {
+  const allowedOrigins = getAllowedOrigins();
+  const origin = request.headers.get("origin") || "";
+  const isOriginAllowed = allowedOrigins.includes(origin);
+
   // Handle CORS preflight requests for API routes
   if (
     request.method === "OPTIONS" &&
     request.nextUrl.pathname.startsWith("/api/")
   ) {
+    // Security: Allow same-origin requests (no Origin header) and allowed origins
+    if (!origin || isOriginAllowed) {
+      return new Response(null, {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": origin || allowedOrigins[0] || "http://localhost:3000",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers":
+            "Content-Type, Authorization, X-Requested-With",
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Max-Age": "86400",
+        },
+      });
+    }
+
+    // Reject unauthorized cross-origin requests
     return new Response(null, {
-      status: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, X-Requested-With",
-        "Access-Control-Max-Age": "86400",
-      },
+      status: 403,
+      statusText: "Forbidden",
     });
   }
 
@@ -23,15 +46,7 @@ export function middleware(request: NextRequest) {
 
   // Add CORS headers to all API responses
   if (request.nextUrl.pathname.startsWith("/api/")) {
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "https://your-domain.vercel.app", // Replace with your actual domain
-      process.env.FRONTEND_URL || "http://localhost:3000",
-    ];
-
-    const origin = request.headers.get("origin") || "";
-
-    if (allowedOrigins.includes(origin)) {
+    if (isOriginAllowed) {
       response.headers.set("Access-Control-Allow-Origin", origin);
     }
 
@@ -43,6 +58,27 @@ export function middleware(request: NextRequest) {
     response.headers.set(
       "Access-Control-Allow-Headers",
       "Content-Type, Authorization, X-Requested-With",
+    );
+    
+    // Security headers
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("X-XSS-Protection", "1; mode=block");
+    
+    // Only set HSTS for HTTPS connections in production
+    if (
+      process.env.NODE_ENV === "production" &&
+      request.nextUrl.protocol === "https:"
+    ) {
+      response.headers.set(
+        "Strict-Transport-Security",
+        "max-age=31536000; includeSubDomains"
+      );
+    }
+    
+    response.headers.set(
+      "Referrer-Policy",
+      "strict-origin-when-cross-origin"
     );
   }
 

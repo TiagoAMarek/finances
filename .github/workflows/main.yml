@@ -64,7 +64,9 @@ jobs:
       run: pnpm install
 
     - name: Rebuild native dependencies
-      run: pnpm rebuild
+      run: |
+        npm rebuild better-sqlite3
+        pnpm rebuild
 
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps

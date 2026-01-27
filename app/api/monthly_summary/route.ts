@@ -1,4 +1,4 @@
-import { eq, and, gte, lte } from "drizzle-orm";
+import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 import {
@@ -7,6 +7,7 @@ import {
   createSuccessResponse,
   handleZodError,
 } from "../lib/auth";
+import { TRANSACTION_TYPES } from "../lib/constants";
 import { db } from "../lib/db";
 import { transactions } from "../lib/schema";
 import { MonthlySummarySchema } from "../lib/validation";
@@ -32,9 +33,12 @@ export async function GET(request: NextRequest) {
       .toISOString()
       .split("T")[0]; // Last day of month
 
-    // Get all transactions for the month
-    const monthlyTransactions = await db
-      .select()
+    // Performance optimization: Use SQL aggregation instead of fetching all rows
+    const result = await db
+      .select({
+        totalIncome: sql<string>`COALESCE(SUM(CASE WHEN ${transactions.type} = ${TRANSACTION_TYPES.INCOME} THEN CAST(${transactions.amount} AS DECIMAL) ELSE 0 END), 0)`,
+        totalExpense: sql<string>`COALESCE(SUM(CASE WHEN ${transactions.type} = ${TRANSACTION_TYPES.EXPENSE} THEN CAST(${transactions.amount} AS DECIMAL) ELSE 0 END), 0)`,
+      })
       .from(transactions)
       .where(
         and(
@@ -44,21 +48,12 @@ export async function GET(request: NextRequest) {
         ),
       );
 
-    // Calculate totals
-    let totalIncome = 0;
-    let totalExpense = 0;
+    // Drizzle + PostgreSQL aggregation returns a single row, but we add an explicit
+    // fallback row to handle any unexpected empty result set safely.
+    const row = result[0] ?? { totalIncome: "0", totalExpense: "0" };
 
-    monthlyTransactions.forEach((transaction) => {
-      const amount = parseFloat(transaction.amount);
-
-      if (transaction.type === "income") {
-        totalIncome += amount;
-      } else if (transaction.type === "expense") {
-        totalExpense += amount;
-      }
-      // Skip 'transfer' as they don't affect net worth
-    });
-
+    const totalIncome = parseFloat(row.totalIncome.toString());
+    const totalExpense = parseFloat(row.totalExpense.toString());
     const balance = totalIncome - totalExpense;
 
     return createSuccessResponse({
