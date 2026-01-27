@@ -1,5 +1,4 @@
-"use client";
-
+// Note: Radix UI Label can work as Server Component when not using events
 import * as LabelPrimitive from "@radix-ui/react-label";
 import * as React from "react";
 
