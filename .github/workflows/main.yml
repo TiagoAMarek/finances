@@ -65,7 +65,7 @@ jobs:
 
     - name: Rebuild native dependencies
       run: |
-        pnpm rebuild better-sqlite3 --build-from-source
+        npm rebuild better-sqlite3
         pnpm rebuild
 
     - name: Install Playwright Browsers
