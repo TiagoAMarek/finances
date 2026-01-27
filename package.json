@@ -26,7 +26,13 @@
     "test:browser:watch": "vitest --project browser",
     "test:browser:coverage": "vitest run --coverage --project browser",
     "test:browser:ui": "vitest --ui --project browser",
-    "test:browser:ci": "playwright install chromium && vitest run --project browser"
+    "test:browser:ci": "playwright install chromium && vitest run --project browser",
+    "test:visual": "playwright test",
+    "test:visual:chromium": "playwright test --project=chromium-desktop",
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:visual:ui": "playwright test --ui",
+    "test:visual:report": "playwright show-report playwright-report",
+    "test:visual:debug": "playwright test --debug"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

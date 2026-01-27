@@ -1,0 +1,209 @@
+name: Visual Regression Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'app/**'
+      - 'features/**'
+      - 'components/**'
+      - 'styles/**'
+      - 'e2e/**'
+      - 'playwright.config.ts'
+      - 'package.json'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  visual-tests:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-desktop, firefox-desktop, webkit-desktop]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps ${{ matrix.project == 'chromium-desktop' && 'chromium' || matrix.project == 'firefox-desktop' && 'firefox' || 'webkit' }}
+
+      - name: Run visual regression tests
+        run: pnpm test:visual --project=${{ matrix.project }}
+        env:
+          NEXT_PUBLIC_USE_MOCKS: 'true'
+          CI: 'true'
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-${{ matrix.project }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30
+
+      - name: Upload failed screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-screenshots-${{ matrix.project }}
+          path: |
+            test-results/**/*-actual.png
+            test-results/**/*-diff.png
+          retention-days: 7
+
+  visual-tests-mobile:
+    name: Visual Regression Tests (Mobile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [mobile-chrome, mobile-safari]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps ${{ matrix.project == 'mobile-chrome' && 'chromium' || 'webkit' }}
+
+      - name: Run mobile visual regression tests
+        run: pnpm test:visual --project=${{ matrix.project }}
+        env:
+          NEXT_PUBLIC_USE_MOCKS: 'true'
+          CI: 'true'
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-${{ matrix.project }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30
+
+  publish-report:
+    name: Publish Test Report
+    runs-on: ubuntu-latest
+    needs: [visual-tests, visual-tests-mobile]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-results
+
+      - name: Merge Playwright reports
+        run: |
+          # Combine all reports into a single directory
+          mkdir -p merged-report
+          find all-results -name "playwright-report" -type d -exec cp -r {}/* merged-report/ \;
+
+      - name: Upload merged report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-merged
+          path: merged-report/
+          retention-days: 30
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Check if there are any failures
+            const resultsPath = 'all-results';
+            let hasFailures = false;
+            
+            try {
+              const dirs = fs.readdirSync(resultsPath);
+              for (const dir of dirs) {
+                const failedPath = path.join(resultsPath, dir, 'failed-screenshots-*');
+                if (fs.existsSync(failedPath)) {
+                  hasFailures = true;
+                  break;
+                }
+              }
+            } catch (error) {
+              console.log('Could not check for failures:', error.message);
+            }
+            
+            const status = hasFailures ? '❌' : '✅';
+            const message = hasFailures 
+              ? 'Some visual regression tests failed. Please review the screenshots in the artifacts.'
+              : 'All visual regression tests passed!';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ${status} Visual Regression Test Results\n\n${message}\n\n[View detailed report in artifacts](${context.payload.pull_request.html_url}/checks)`
+            });
