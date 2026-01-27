@@ -1,6 +1,8 @@
 import { eq, and, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
+import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
+
 import {
   getUserFromRequest,
   createErrorResponse,
@@ -10,7 +12,6 @@ import {
 import { db } from "../lib/db";
 import { transactions, bankAccounts } from "../lib/schema";
 import { TransferCreateSchema } from "../lib/validation";
-import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
 
 // POST /api/transfers - Create transfer between accounts
 export async function POST(request: NextRequest) {
