@@ -100,9 +100,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate account/credit card ownership
-    let account;
     if (validatedData.accountId) {
-      [account] = await db
+      const [account] = await db
         .select()
         .from(bankAccounts)
         .where(
@@ -115,15 +114,6 @@ export async function POST(request: NextRequest) {
 
       if (!account) {
         return createErrorResponse("Account not found", 404);
-      }
-
-      // Check for insufficient balance on expense transactions
-      if (validatedData.type === "expense") {
-        const currentBalance = parseFloat(account.balance);
-        const amount = parseFloat(validatedData.amount);
-        if (currentBalance < amount) {
-          return createErrorResponse("Saldo insuficiente", 400);
-        }
       }
     }
 
@@ -164,6 +154,23 @@ export async function POST(request: NextRequest) {
 
     // Create transaction and update balances in a database transaction
     const newTransaction = await db.transaction(async (tx) => {
+      // Check for insufficient balance on expense transactions inside transaction
+      if (validatedData.type === "expense" && validatedData.accountId) {
+        const [account] = await tx
+          .select()
+          .from(bankAccounts)
+          .where(eq(bankAccounts.id, validatedData.accountId))
+          .limit(1);
+        
+        if (account) {
+          const currentBalance = parseFloat(account.balance);
+          const amount = parseFloat(validatedData.amount);
+          if (currentBalance < amount) {
+            throw new Error("Saldo insuficiente");
+          }
+        }
+      }
+
       // Create transaction
       const [transaction] = await tx
         .insert(transactions)
@@ -236,6 +243,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const zodErrorResponse = handleZodError(error);
     if (zodErrorResponse) return zodErrorResponse;
+
+    // Handle insufficient balance error
+    if (error instanceof Error && error.message === "Saldo insuficiente") {
+      return createErrorResponse("Saldo insuficiente", 400);
+    }
 
     console.error("Create transaction error:", error);
     return createErrorResponse("Internal server error", 500);

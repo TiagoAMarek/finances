@@ -54,14 +54,22 @@ export async function POST(request: NextRequest) {
       return createErrorResponse("Destination account not found", 404);
     }
 
-    // Check if source account has sufficient balance
-    const currentBalance = parseFloat(fromAccount.balance);
-    if (currentBalance < parseFloat(validatedData.amount)) {
-      return createErrorResponse("Insufficient balance in source account", 400);
-    }
-
     // Create transfer transaction and update balances in a database transaction
     const newTransfer = await db.transaction(async (tx) => {
+      // Check if source account has sufficient balance inside transaction
+      const [account] = await tx
+        .select()
+        .from(bankAccounts)
+        .where(eq(bankAccounts.id, validatedData.fromAccountId))
+        .limit(1);
+      
+      if (account) {
+        const currentBalance = parseFloat(account.balance);
+        if (currentBalance < parseFloat(validatedData.amount)) {
+          throw new Error("Insufficient balance in source account");
+        }
+      }
+
       // Create transfer transaction
       const [transfer] = await tx
         .insert(transactions)
@@ -101,6 +109,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const zodErrorResponse = handleZodError(error);
     if (zodErrorResponse) return zodErrorResponse;
+
+    // Handle insufficient balance error
+    if (error instanceof Error && error.message === "Insufficient balance in source account") {
+      return createErrorResponse("Insufficient balance in source account", 400);
+    }
 
     console.error("Create transfer error:", error);
     return createErrorResponse("Internal server error", 500);
