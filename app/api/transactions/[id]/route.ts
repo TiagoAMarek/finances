@@ -11,6 +11,7 @@ import {
   applyBalanceChanges,
   reverseBalanceChanges,
 } from "../../lib/balance-utils";
+import { TransactionType } from "../../lib/constants";
 import { db } from "../../lib/db";
 import { transactions, categories } from "../../lib/schema";
 import { TransactionUpdateSchema } from "../../lib/validation";
@@ -91,7 +92,7 @@ export async function PUT(
     const updatedTransaction = await db.transaction(async (tx) => {
       // First, reverse the old transaction's effect on balances
       await reverseBalanceChanges(tx, {
-        type: existingTransaction.type,
+        type: existingTransaction.type as TransactionType,
         amount: existingTransaction.amount,
         accountId: existingTransaction.accountId,
         creditCardId: existingTransaction.creditCardId,
@@ -113,7 +114,7 @@ export async function PUT(
       const newToAccountId = validatedData.toAccountId !== undefined ? validatedData.toAccountId : existingTransaction.toAccountId;
 
       await applyBalanceChanges(tx, {
-        type: newType,
+        type: newType as TransactionType,
         amount: newAmount,
         accountId: newAccountId,
         creditCardId: newCreditCardId,
@@ -174,7 +175,7 @@ export async function DELETE(
     await db.transaction(async (tx) => {
       // Reverse the transaction's effect on balances using utility
       await reverseBalanceChanges(tx, {
-        type: existingTransaction.type,
+        type: existingTransaction.type as TransactionType,
         amount: existingTransaction.amount,
         accountId: existingTransaction.accountId,
         creditCardId: existingTransaction.creditCardId,

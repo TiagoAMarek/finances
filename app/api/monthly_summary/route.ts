@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
     // Performance optimization: Use SQL aggregation instead of fetching all rows
     const result = await db
       .select({
-        totalIncome: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = ${TRANSACTION_TYPES.INCOME} THEN CAST(${transactions.amount} AS DECIMAL) ELSE 0 END), 0)`,
-        totalExpense: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = ${TRANSACTION_TYPES.EXPENSE} THEN CAST(${transactions.amount} AS DECIMAL) ELSE 0 END), 0)`,
+        totalIncome: sql<string>`COALESCE(SUM(CASE WHEN ${transactions.type} = ${TRANSACTION_TYPES.INCOME} THEN CAST(${transactions.amount} AS DECIMAL) ELSE 0 END), 0)`,
+        totalExpense: sql<string>`COALESCE(SUM(CASE WHEN ${transactions.type} = ${TRANSACTION_TYPES.EXPENSE} THEN CAST(${transactions.amount} AS DECIMAL) ELSE 0 END), 0)`,
       })
       .from(transactions)
       .where(
@@ -48,8 +48,12 @@ export async function GET(request: NextRequest) {
         ),
       );
 
-    const totalIncome = parseFloat(result[0]?.totalIncome?.toString() || "0");
-    const totalExpense = parseFloat(result[0]?.totalExpense?.toString() || "0");
+    // Drizzle + PostgreSQL aggregation returns a single row, but we add an explicit
+    // fallback row to handle any unexpected empty result set safely.
+    const row = result[0] ?? { totalIncome: "0", totalExpense: "0" };
+
+    const totalIncome = parseFloat(row.totalIncome.toString());
+    const totalExpense = parseFloat(row.totalExpense.toString());
     const balance = totalIncome - totalExpense;
 
     return createSuccessResponse({

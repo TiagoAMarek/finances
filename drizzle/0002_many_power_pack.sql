@@ -1,4 +1,4 @@
-ALTER TABLE "users" ADD COLUMN "name" varchar(255) NOT NULL;--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN "name" varchar(255) NOT NULL DEFAULT 'User';--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "bank_accounts_owner_idx" ON "bank_accounts" ("owner_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "categories_owner_idx" ON "categories" ("owner_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "credit_cards_owner_idx" ON "credit_cards" ("owner_id");--> statement-breakpoint

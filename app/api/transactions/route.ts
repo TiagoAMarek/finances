@@ -10,6 +10,7 @@ import {
   handleZodError,
 } from "../lib/auth";
 import { applyBalanceChanges } from "../lib/balance-utils";
+import { TRANSACTION_TYPES } from "../lib/constants";
 import { db } from "../lib/db";
 import {
   transactions,
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
     const validatedData = TransactionCreateSchema.parse(body);
 
     // Validate category ownership and type compatibility for non-transfer transactions
-    if (validatedData.type !== "transfer" && validatedData.categoryId) {
+    if (validatedData.type !== TRANSACTION_TYPES.TRANSFER && validatedData.categoryId) {
       const [category] = await db
         .select()
         .from(categories)
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate transfer accounts
-    if (validatedData.type === "transfer" && validatedData.toAccountId) {
+    if (validatedData.type === TRANSACTION_TYPES.TRANSFER && validatedData.toAccountId) {
       const [toAccount] = await db
         .select()
         .from(bankAccounts)
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
     // Create transaction and update balances in a database transaction
     const newTransaction = await db.transaction(async (tx) => {
       // Check for insufficient balance on expense transactions inside transaction
-      if (validatedData.type === "expense" && validatedData.accountId) {
+      if (validatedData.type === TRANSACTION_TYPES.EXPENSE && validatedData.accountId) {
         const [account] = await tx
           .select()
           .from(bankAccounts)

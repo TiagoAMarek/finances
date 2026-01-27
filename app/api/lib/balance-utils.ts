@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 
-import { TRANSACTION_TYPES } from "./constants";
+import { TRANSACTION_TYPES, TransactionType } from "./constants";
 import { bankAccounts, creditCards } from "./schema";
 
 /**
@@ -16,7 +16,7 @@ import { bankAccounts, creditCards } from "./schema";
 type TransactionContext = any;
 
 interface BalanceUpdateParams {
-  type: string;
+  type: TransactionType;
   amount: number | string;
   accountId: number | null;
   creditCardId: number | null;
@@ -32,6 +32,11 @@ export async function applyBalanceChanges(
   params: BalanceUpdateParams,
 ): Promise<void> {
   const amount = typeof params.amount === "string" ? parseFloat(params.amount) : params.amount;
+
+  // Validate amount is a valid number
+  if (isNaN(amount)) {
+    throw new Error("Invalid amount value");
+  }
 
   if (params.type !== TRANSACTION_TYPES.TRANSFER) {
     // Handle non-transfer transactions
@@ -81,6 +86,11 @@ export async function reverseBalanceChanges(
   params: BalanceUpdateParams,
 ): Promise<void> {
   const amount = typeof params.amount === "string" ? parseFloat(params.amount) : params.amount;
+
+  // Validate amount is a valid number
+  if (isNaN(amount)) {
+    throw new Error("Invalid amount value");
+  }
 
   if (params.type !== TRANSACTION_TYPES.TRANSFER) {
     // Reverse non-transfer transactions
