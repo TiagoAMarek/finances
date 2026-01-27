@@ -9,6 +9,7 @@ import {
   createSuccessResponse,
   handleZodError,
 } from "../lib/auth";
+import { applyBalanceChanges } from "../lib/balance-utils";
 import { db } from "../lib/db";
 import {
   transactions,
@@ -189,48 +190,14 @@ export async function POST(request: NextRequest) {
         })
         .returning();
 
-      // Update account balances for non-transfer transactions
-      if (validatedData.type !== "transfer") {
-        if (validatedData.accountId) {
-          const balanceChange =
-            validatedData.type === "income"
-              ? validatedData.amount
-              : -validatedData.amount;
-          await tx
-            .update(bankAccounts)
-            .set({ balance: sql`CAST(balance AS DECIMAL) + ${balanceChange}` })
-            .where(eq(bankAccounts.id, validatedData.accountId));
-        }
-
-        if (validatedData.creditCardId) {
-          // For credit card, only expenses increase the bill
-          if (validatedData.type === "expense") {
-            await tx
-              .update(creditCards)
-              .set({
-                currentBill: sql`CAST(current_bill AS DECIMAL) + ${validatedData.amount}`,
-              })
-              .where(eq(creditCards.id, validatedData.creditCardId));
-          }
-        }
-      } else {
-        // Handle transfer: decrease from account, increase to account
-        if (validatedData.accountId && validatedData.toAccountId) {
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) - ${validatedData.amount}`,
-            })
-            .where(eq(bankAccounts.id, validatedData.accountId));
-
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) + ${validatedData.amount}`,
-            })
-            .where(eq(bankAccounts.id, validatedData.toAccountId));
-        }
-      }
+      // Update balances using consolidated utility function
+      await applyBalanceChanges(tx, {
+        type: validatedData.type,
+        amount: validatedData.amount,
+        accountId: validatedData.accountId || null,
+        creditCardId: validatedData.creditCardId || null,
+        toAccountId: validatedData.toAccountId || null,
+      });
 
       return transaction;
     });

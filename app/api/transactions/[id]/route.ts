@@ -1,4 +1,4 @@
-import { eq, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 import {
@@ -7,8 +7,12 @@ import {
   createSuccessResponse,
   handleZodError,
 } from "../../lib/auth";
+import {
+  applyBalanceChanges,
+  reverseBalanceChanges,
+} from "../../lib/balance-utils";
 import { db } from "../../lib/db";
-import { transactions, categories, bankAccounts, creditCards } from "../../lib/schema";
+import { transactions, categories } from "../../lib/schema";
 import { TransactionUpdateSchema } from "../../lib/validation";
 
 // PUT /api/transactions/[id] - Update transaction
@@ -86,44 +90,13 @@ export async function PUT(
     // Update transaction and adjust balances in a database transaction
     const updatedTransaction = await db.transaction(async (tx) => {
       // First, reverse the old transaction's effect on balances
-      if (existingTransaction.type !== "transfer") {
-        if (existingTransaction.accountId) {
-          const oldBalanceChange =
-            existingTransaction.type === "income"
-              ? -parseFloat(existingTransaction.amount)
-              : parseFloat(existingTransaction.amount);
-          await tx
-            .update(bankAccounts)
-            .set({ balance: sql`CAST(balance AS DECIMAL) + ${oldBalanceChange}` })
-            .where(eq(bankAccounts.id, existingTransaction.accountId));
-        }
-
-        if (existingTransaction.creditCardId && existingTransaction.type === "expense") {
-          await tx
-            .update(creditCards)
-            .set({
-              currentBill: sql`CAST(current_bill AS DECIMAL) - ${parseFloat(existingTransaction.amount)}`,
-            })
-            .where(eq(creditCards.id, existingTransaction.creditCardId));
-        }
-      } else {
-        // Reverse transfer
-        if (existingTransaction.accountId && existingTransaction.toAccountId) {
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) + ${parseFloat(existingTransaction.amount)}`,
-            })
-            .where(eq(bankAccounts.id, existingTransaction.accountId));
-
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) - ${parseFloat(existingTransaction.amount)}`,
-            })
-            .where(eq(bankAccounts.id, existingTransaction.toAccountId));
-        }
-      }
+      await reverseBalanceChanges(tx, {
+        type: existingTransaction.type,
+        amount: existingTransaction.amount,
+        accountId: existingTransaction.accountId,
+        creditCardId: existingTransaction.creditCardId,
+        toAccountId: existingTransaction.toAccountId,
+      });
 
       // Update transaction record
       const [updated] = await tx
@@ -139,44 +112,13 @@ export async function PUT(
       const newCreditCardId = validatedData.creditCardId !== undefined ? validatedData.creditCardId : existingTransaction.creditCardId;
       const newToAccountId = validatedData.toAccountId !== undefined ? validatedData.toAccountId : existingTransaction.toAccountId;
 
-      if (newType !== "transfer") {
-        if (newAccountId) {
-          const newBalanceChange =
-            newType === "income"
-              ? parseFloat(newAmount)
-              : -parseFloat(newAmount);
-          await tx
-            .update(bankAccounts)
-            .set({ balance: sql`CAST(balance AS DECIMAL) + ${newBalanceChange}` })
-            .where(eq(bankAccounts.id, newAccountId));
-        }
-
-        if (newCreditCardId && newType === "expense") {
-          await tx
-            .update(creditCards)
-            .set({
-              currentBill: sql`CAST(current_bill AS DECIMAL) + ${parseFloat(newAmount)}`,
-            })
-            .where(eq(creditCards.id, newCreditCardId));
-        }
-      } else {
-        // Apply transfer
-        if (newAccountId && newToAccountId) {
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) - ${parseFloat(newAmount)}`,
-            })
-            .where(eq(bankAccounts.id, newAccountId));
-
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) + ${parseFloat(newAmount)}`,
-            })
-            .where(eq(bankAccounts.id, newToAccountId));
-        }
-      }
+      await applyBalanceChanges(tx, {
+        type: newType,
+        amount: newAmount,
+        accountId: newAccountId,
+        creditCardId: newCreditCardId,
+        toAccountId: newToAccountId,
+      });
 
       return updated;
     });
@@ -230,45 +172,14 @@ export async function DELETE(
 
     // Delete transaction and adjust balances in a database transaction
     await db.transaction(async (tx) => {
-      // Reverse the transaction's effect on balances
-      if (existingTransaction.type !== "transfer") {
-        if (existingTransaction.accountId) {
-          const balanceChange =
-            existingTransaction.type === "income"
-              ? -parseFloat(existingTransaction.amount)
-              : parseFloat(existingTransaction.amount);
-          await tx
-            .update(bankAccounts)
-            .set({ balance: sql`CAST(balance AS DECIMAL) + ${balanceChange}` })
-            .where(eq(bankAccounts.id, existingTransaction.accountId));
-        }
-
-        if (existingTransaction.creditCardId && existingTransaction.type === "expense") {
-          await tx
-            .update(creditCards)
-            .set({
-              currentBill: sql`CAST(current_bill AS DECIMAL) - ${parseFloat(existingTransaction.amount)}`,
-            })
-            .where(eq(creditCards.id, existingTransaction.creditCardId));
-        }
-      } else {
-        // Reverse transfer
-        if (existingTransaction.accountId && existingTransaction.toAccountId) {
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) + ${parseFloat(existingTransaction.amount)}`,
-            })
-            .where(eq(bankAccounts.id, existingTransaction.accountId));
-
-          await tx
-            .update(bankAccounts)
-            .set({
-              balance: sql`CAST(balance AS DECIMAL) - ${parseFloat(existingTransaction.amount)}`,
-            })
-            .where(eq(bankAccounts.id, existingTransaction.toAccountId));
-        }
-      }
+      // Reverse the transaction's effect on balances using utility
+      await reverseBalanceChanges(tx, {
+        type: existingTransaction.type,
+        amount: existingTransaction.amount,
+        accountId: existingTransaction.accountId,
+        creditCardId: existingTransaction.creditCardId,
+        toAccountId: existingTransaction.toAccountId,
+      });
 
       // Delete transaction
       await tx.delete(transactions).where(eq(transactions.id, transactionId));
