@@ -16,12 +16,12 @@ export function useAuthGuard() {
   const hasChecked = useRef(false);
 
   useEffect(() => {
+    // Check if we're in browser context (defensive check, though useEffect only runs client-side)
+    if (typeof window === "undefined") return;
+
     // Only check once to prevent unnecessary redirects during hydration
     if (hasChecked.current) return;
     hasChecked.current = true;
-
-    // Check if we're in browser context
-    if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -45,12 +45,12 @@ export function useGuestGuard() {
   const hasChecked = useRef(false);
 
   useEffect(() => {
+    // Check if we're in browser context (defensive check, though useEffect only runs client-side)
+    if (typeof window === "undefined") return;
+
     // Only check once to prevent unnecessary redirects during hydration
     if (hasChecked.current) return;
     hasChecked.current = true;
-
-    // Check if we're in browser context
-    if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("access_token");
     if (token) {
