@@ -35,7 +35,6 @@
 
 ## Repo Assistant Rules
 
-- No .cursor/rules or .cursorrules found
-- No .github/copilot-instructions.md found
-
-Keep this file short and actionable for autonomous agents. Update when new CLI scripts or tooling are added.
+- GitHub Copilot instructions: `.github/copilot-instructions.md` (comprehensive project guide)
+- Keep AGENTS.md short and actionable for autonomous agents
+- Update when new CLI scripts or tooling are added
