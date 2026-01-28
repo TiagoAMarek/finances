@@ -1,12 +1,7 @@
 import { Transaction } from "@/lib/schemas";
 
-// Create realistic transactions spanning the last 6 months
-const generateDateString = (daysAgo: number): string => {
-  const date = new Date();
-  date.setDate(date.getDate() - daysAgo);
-  return date.toISOString().split("T")[0];
-};
-
+// Fixed mock transactions for consistent visual testing
+// Using fixed dates to ensure screenshot stability
 export const mockTransactions: Transaction[] = [
   // Recent transactions (last 30 days)
   {
@@ -14,7 +9,7 @@ export const mockTransactions: Transaction[] = [
     description: "Salário - Janeiro",
     amount: "5500.00",
     type: "income",
-    date: generateDateString(5),
+    date: "2024-01-25", // Fixed date
     categoryId: 1,
     category: "Salário",
     ownerId: 1,
@@ -26,7 +21,7 @@ export const mockTransactions: Transaction[] = [
     description: "Supermercado Extra",
     amount: "234.50",
     type: "expense",
-    date: generateDateString(3),
+    date: "2024-01-22", // Fixed date
     categoryId: 1,
     category: "Alimentação",
     ownerId: 1,
@@ -38,7 +33,7 @@ export const mockTransactions: Transaction[] = [
     description: "Combustível",
     amount: "120.00",
     type: "expense",
-    date: generateDateString(2),
+    date: "2024-01-20", // Fixed date
     categoryId: 1,
     category: "Transporte",
     ownerId: 1,
@@ -47,25 +42,10 @@ export const mockTransactions: Transaction[] = [
   },
   {
     id: 4,
-    description: "Transferência para Poupança",
-    amount: "1000.00",
-    type: "transfer",
-    date: generateDateString(1),
-    categoryId: 1,
-    category: "Transferência",
-    ownerId: 1,
-    accountId: 1,
-    creditCardId: null,
-    toAccountId: 2,
-  },
-
-  // Last month transactions
-  {
-    id: 5,
     description: "Freelance - Projeto Web",
     amount: "2500.00",
     type: "income",
-    date: generateDateString(35),
+    date: "2024-01-18", // Fixed date
     categoryId: 1,
     category: "Freelance",
     ownerId: 1,
@@ -73,11 +53,11 @@ export const mockTransactions: Transaction[] = [
     creditCardId: null,
   },
   {
-    id: 6,
+    id: 5,
     description: "Conta de Luz",
     amount: "180.75",
     type: "expense",
-    date: generateDateString(32),
+    date: "2024-01-15", // Fixed date
     categoryId: 1,
     category: "Utilidades",
     ownerId: 1,
@@ -85,37 +65,23 @@ export const mockTransactions: Transaction[] = [
     creditCardId: null,
   },
   {
-    id: 7,
+    id: 6,
     description: "Streaming Netflix",
     amount: "39.90",
     type: "expense",
-    date: generateDateString(30),
+    date: "2024-01-12", // Fixed date
     categoryId: 1,
     category: "Entretenimento",
     ownerId: 1,
     accountId: null,
     creditCardId: 2,
   },
-
-  // 2 months ago
   {
-    id: 8,
-    description: "Salário - Dezembro",
-    amount: "5500.00",
-    type: "income",
-    date: generateDateString(65),
-    categoryId: 1,
-    category: "Salário",
-    ownerId: 1,
-    accountId: 1,
-    creditCardId: null,
-  },
-  {
-    id: 9,
+    id: 7,
     description: "Restaurante - Jantar",
     amount: "185.00",
     type: "expense",
-    date: generateDateString(60),
+    date: "2024-01-10", // Fixed date
     categoryId: 1,
     category: "Alimentação",
     ownerId: 1,
@@ -123,131 +89,55 @@ export const mockTransactions: Transaction[] = [
     creditCardId: 1,
   },
   {
-    id: 10,
+    id: 8,
+    description: "Transferência para Poupança",
+    amount: "1000.00",
+    type: "transfer",
+    date: "2024-01-08", // Fixed date
+    categoryId: 1,
+    category: "Transferência",
+    ownerId: 1,
+    accountId: 1,
+    creditCardId: null,
+    toAccountId: 2,
+  },
+  {
+    id: 9,
     description: "Pagamento Cartão",
     amount: "850.00",
     type: "expense",
-    date: generateDateString(58),
+    date: "2024-01-05", // Fixed date
     categoryId: 1,
     category: "Pagamento Cartão",
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
   },
-
-  // 3 months ago
   {
-    id: 11,
-    description: "Bonus Fim de Ano",
-    amount: "3000.00",
-    type: "income",
-    date: generateDateString(95),
-    categoryId: 1,
-    category: "Bonus",
-    ownerId: 1,
-    accountId: 2,
-    creditCardId: null,
-  },
-  {
-    id: 12,
-    description: "Compras de Natal",
-    amount: "750.00",
-    type: "expense",
-    date: generateDateString(90),
-    categoryId: 1,
-    category: "Presentes",
-    ownerId: 1,
-    accountId: null,
-    creditCardId: 3,
-  },
-
-  // 4 months ago
-  {
-    id: 13,
-    description: "Consultoria TI",
-    amount: "1800.00",
-    type: "income",
-    date: generateDateString(125),
-    categoryId: 1,
-    category: "Consultoria",
-    ownerId: 1,
-    accountId: 3,
-    creditCardId: null,
-  },
-  {
-    id: 14,
+    id: 10,
     description: "Curso Online",
     amount: "299.00",
     type: "expense",
-    date: generateDateString(120),
+    date: "2024-01-03", // Fixed date
     categoryId: 1,
     category: "Educação",
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
   },
-
-  // 5 months ago
-  {
-    id: 15,
-    description: "Venda Equipamento",
-    amount: "1200.00",
-    type: "income",
-    date: generateDateString(155),
-    categoryId: 1,
-    category: "Vendas",
-    ownerId: 1,
-    accountId: 1,
-    creditCardId: null,
-  },
-  {
-    id: 16,
-    description: "Manutenção Carro",
-    amount: "650.00",
-    type: "expense",
-    date: generateDateString(150),
-    categoryId: 1,
-    category: "Transporte",
-    ownerId: 1,
-    accountId: 1,
-    creditCardId: null,
-  },
-
-  // 6 months ago
-  {
-    id: 17,
-    description: "Salário - Agosto",
-    amount: "5500.00",
-    type: "income",
-    date: generateDateString(185),
-    categoryId: 1,
-    category: "Salário",
-    ownerId: 1,
-    accountId: 1,
-    creditCardId: null,
-  },
-  {
-    id: 18,
-    description: "Viagem - Hotel",
-    amount: "450.00",
-    type: "expense",
-    date: generateDateString(180),
-    categoryId: 1,
-    category: "Viagem",
-    ownerId: 1,
-    accountId: null,
-    creditCardId: 2,
-  },
 ];
+
+// Fixed ID counter for createMockTransaction
+let mockTransactionIdCounter = 1000;
 
 export const createMockTransaction = (
   overrides: Partial<Transaction> = {},
 ): Transaction => ({
-  id: Math.floor(Math.random() * 10000) + 1000,
+  id: ++mockTransactionIdCounter, // Sequential ID, not random
   description: "Transação Teste",
   amount: "100.00",
   type: "expense",
-  date: new Date().toISOString().split("T")[0],
+  date: "2024-01-15", // Fixed date
   categoryId: 1,
   category: "Teste",
   ownerId: 1,

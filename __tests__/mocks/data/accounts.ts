@@ -31,10 +31,13 @@ export const mockAccounts: BankAccount[] = [
   },
 ];
 
+// Fixed ID counter for createMockAccount
+let mockAccountIdCounter = 100;
+
 export const createMockAccount = (
   overrides: Partial<BankAccount> = {},
 ): BankAccount => ({
-  id: Math.floor(Math.random() * 1000) + 100,
+  id: ++mockAccountIdCounter, // Sequential ID, not random
   name: "Conta Teste",
   balance: "1000.00",
   currency: "BRL",
