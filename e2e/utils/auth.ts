@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { smartWait } from './smart-wait';
 
 /**
  * Authentication helpers for visual regression tests
@@ -69,14 +70,41 @@ export async function logout(page: Page): Promise<void> {
 }
 
 /**
- * Wait for page to be fully loaded including API calls
+ * Wait for MSW to be fully initialized
  * @param page - Playwright page instance
- * @param additionalWaitMs - Additional wait time in milliseconds
  */
-export async function waitForPageLoad(page: Page, additionalWaitMs = 500): Promise<void> {
+async function waitForMSW(page: Page): Promise<void> {
+  try {
+    // Wait for the MSW initialization message to disappear
+    await page.waitForSelector('text=Initializing Mock Service Worker', { 
+      state: 'hidden',
+      timeout: 10000 
+    });
+  } catch (error) {
+    // If the message never appeared, MSW might already be ready or not enabled
+    // Continue anyway
+  }
+}
+
+/**
+ * Wait for page to be fully loaded including API calls
+ * Uses smart waiting instead of fixed timeouts
+ * @param page - Playwright page instance
+ * @param options - Wait options
+ */
+export async function waitForPageLoad(page: Page, options?: {
+  charts?: boolean;
+}): Promise<void> {
+  // Wait for MSW to be fully initialized (if enabled)
+  await waitForMSW(page);
+  
   // Wait for network to be idle
   await page.waitForLoadState('networkidle');
   
-  // Wait for any pending animations to complete
-  await page.waitForTimeout(additionalWaitMs);
+  // Use smart wait
+  await smartWait(page, {
+    images: true,
+    fonts: true,
+    charts: options?.charts || false,
+  });
 }
