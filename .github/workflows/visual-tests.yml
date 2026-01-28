@@ -98,6 +98,24 @@ jobs:
           NEXT_PUBLIC_USE_MOCKS: 'true'
           NEXT_TELEMETRY_DISABLED: '1'
 
+      # TEMPORARY: Generate Linux baselines if tests fail due to missing snapshots
+      - name: Generate Linux baselines (if missing)
+        if: failure()
+        run: pnpm test:visual:update --project=chromium-desktop
+        env:
+          CI: true
+          NEXT_PUBLIC_USE_MOCKS: 'true'
+          NEXT_TELEMETRY_DISABLED: '1'
+
+      - name: Upload generated Linux baselines
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-baselines
+          path: e2e/__snapshots__/**/*-linux.png
+          retention-days: 7
+          compression-level: 9
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
