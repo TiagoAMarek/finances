@@ -319,16 +319,20 @@ Screenshots may vary slightly between:
 - Operating systems (Linux, macOS, Windows)
 - CI environment vs local
 
-**Solution**: Generate baselines in CI or use Docker for consistency
+**Solution**: 
+- **Platform-agnostic configuration** (already set up): `snapshotPathTemplate` removes OS-specific suffixes
+- Snapshots generated on any OS will work on all platforms
+- Minor rendering differences are handled by threshold settings
 
 ### Font Rendering
 
 Font rendering can differ across platforms.
 
 **Solution**: 
+- **Platform-agnostic snapshots** (configured): Snapshots work across macOS, Linux, and Windows
 - Use web fonts (not system fonts)
 - `preparePageForVisualTest()` already waits for fonts
-- Consider using `--project=chromium-desktop` for consistency
+- Visual comparison thresholds handle minor rendering differences
 
 ## 📊 CI Integration
 

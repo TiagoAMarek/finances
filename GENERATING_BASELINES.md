@@ -218,9 +218,10 @@ Error: page.goto: Timeout 30000ms exceeded
 - Fonts look different
 
 **Solutions:**
-1. Use Docker for consistent environment
-2. Generate baselines in CI environment
-3. Adjust visual comparison thresholds in `playwright.config.ts`
+1. **Platform-agnostic snapshots** (already configured): This project uses platform-independent snapshot paths
+2. Snapshots generated on macOS, Linux, or Windows will work on all platforms
+3. Font rendering differences are handled by Playwright's threshold settings
+4. If tests still fail due to minor differences, adjust `maxDiffPixelRatio` in `playwright.config.ts`
 
 ### Problem: Too many screenshots to review
 

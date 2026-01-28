@@ -191,8 +191,9 @@ test.describe('My Page - Visual Regression', () => {
 - Mask dynamic content (dates, IDs, etc.)
 
 ### Screenshots look different locally vs CI
-- Generate baselines in CI or use Docker for consistency
-- Font rendering may vary between platforms
+- **Platform-agnostic snapshots**: This project is configured to use platform-independent snapshot paths (no `-darwin`, `-linux`, `-win32` suffix)
+- Snapshots generated on any OS will work on all platforms
+- Font rendering may still vary slightly between platforms (adjust thresholds if needed)
 
 ### Tests are slow
 - Use `--project=chromium-desktop` for faster local development
