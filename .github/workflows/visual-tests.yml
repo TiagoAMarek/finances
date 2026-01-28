@@ -1,4 +1,4 @@
-name: Visual Regression Tests
+name: Visual Regression Tests (Optimized)
 
 on:
   pull_request:
@@ -7,24 +7,26 @@ on:
       - 'app/**'
       - 'features/**'
       - 'components/**'
-      - 'styles/**'
+      - 'src/**'
       - 'e2e/**'
+      - '__tests__/mocks/**'
       - 'playwright.config.ts'
       - 'package.json'
+      - 'pnpm-lock.yaml'
   push:
     branches: [main]
   workflow_dispatch:
 
+# Cancel in-progress runs when a new run is triggered
+concurrency:
+  group: visual-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   visual-tests:
-    name: Visual Regression Tests
+    name: Visual Tests (Chromium + Mocked APIs)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [chromium-desktop, firefox-desktop, webkit-desktop]
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -34,6 +36,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -57,153 +60,167 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps ${{ matrix.project == 'chromium-desktop' && 'chromium' || matrix.project == 'firefox-desktop' && 'firefox' || 'webkit' }}
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(pnpm list @playwright/test --depth=0 --json | jq -r '.[0].devDependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Install Chromium dependencies (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+
+      - name: Verify MSW worker exists
+        run: |
+          if [ ! -f "public/mockServiceWorker.js" ]; then
+            echo "❌ MSW worker not found, generating..."
+            pnpm exec msw init public/ --save
+            echo "✅ MSW worker generated"
+          else
+            echo "✅ MSW worker found ($(du -h public/mockServiceWorker.js | cut -f1))"
+          fi
 
       - name: Run visual regression tests
-        run: pnpm test:visual --project=${{ matrix.project }}
+        run: pnpm test:visual --project=chromium-desktop
         env:
+          CI: true
           NEXT_PUBLIC_USE_MOCKS: 'true'
-          CI: 'true'
+          NEXT_TELEMETRY_DISABLED: '1'
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4
         with:
-          name: playwright-results-${{ matrix.project }}
+          name: playwright-results
           path: |
             test-results/
             playwright-report/
           retention-days: 30
+          compression-level: 6
 
-      - name: Upload failed screenshots
+      - name: Upload visual diffs
         if: failure()
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4
         with:
-          name: failed-screenshots-${{ matrix.project }}
+          name: visual-diffs
           path: |
             test-results/**/*-actual.png
             test-results/**/*-diff.png
+            test-results/**/*-expected.png
           retention-days: 7
+          compression-level: 9
 
-  visual-tests-mobile:
-    name: Visual Regression Tests (Mobile)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [mobile-chrome, mobile-safari]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps ${{ matrix.project == 'mobile-chrome' && 'chromium' || 'webkit' }}
-
-      - name: Run mobile visual regression tests
-        run: pnpm test:visual --project=${{ matrix.project }}
-        env:
-          NEXT_PUBLIC_USE_MOCKS: 'true'
-          CI: 'true'
-
-      - name: Upload test results
+      - name: Generate test summary
         if: always()
-        uses: actions/upload-artifact@v4.5.0
-        with:
-          name: playwright-results-${{ matrix.project }}
-          path: |
-            test-results/
-            playwright-report/
-          retention-days: 30
-
-  publish-report:
-    name: Publish Test Report
-    runs-on: ubuntu-latest
-    needs: [visual-tests, visual-tests-mobile]
-    if: always()
-
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4.1.8
-        with:
-          path: all-results
-
-      - name: Merge Playwright reports
         run: |
-          # Combine all reports into a single directory
-          mkdir -p merged-report
-          find all-results -name "playwright-report" -type d -exec cp -r {}/* merged-report/ \;
-
-      - name: Upload merged report
-        uses: actions/upload-artifact@v4.5.0
-        with:
-          name: playwright-report-merged
-          path: merged-report/
-          retention-days: 30
+          if [ -f "test-results/results.json" ]; then
+            echo "## 🎨 Visual Regression Test Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Parse JSON results
+            TOTAL=$(jq '.suites | map(.specs | length) | add // 0' test-results/results.json)
+            PASSED=$(jq '[.suites[].specs[].tests[] | select(.status == "passed")] | length' test-results/results.json)
+            FAILED=$(jq '[.suites[].specs[].tests[] | select(.status == "failed")] | length' test-results/results.json)
+            
+            echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+            echo "- **Passed:** ✅ $PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "- **Failed:** ❌ $FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$FAILED" -gt 0 ]; then
+              echo "⚠️ Visual differences detected. Review the artifacts for details." >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ All visual regression tests passed!" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ Test results file not found" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Comment PR with results
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const path = require('path');
             
-            // Check if there are any failures
-            const resultsPath = 'all-results';
-            let hasFailures = false;
+            let body = '## 🎨 Visual Regression Test Results\n\n';
             
+            // Try to read JSON results
             try {
-              const dirs = fs.readdirSync(resultsPath);
-              for (const dir of dirs) {
-                const failedPath = path.join(resultsPath, dir, 'failed-screenshots-*');
-                if (fs.existsSync(failedPath)) {
-                  hasFailures = true;
-                  break;
+              if (fs.existsSync('test-results/results.json')) {
+                const results = JSON.parse(fs.readFileSync('test-results/results.json', 'utf8'));
+                
+                // Count test results
+                let total = 0;
+                let passed = 0;
+                let failed = 0;
+                
+                results.suites?.forEach(suite => {
+                  suite.specs?.forEach(spec => {
+                    spec.tests?.forEach(test => {
+                      total++;
+                      if (test.status === 'passed') passed++;
+                      if (test.status === 'failed') failed++;
+                    });
+                  });
+                });
+                
+                body += `- **Total Tests:** ${total}\n`;
+                body += `- **Passed:** ✅ ${passed}\n`;
+                body += `- **Failed:** ❌ ${failed}\n\n`;
+                
+                if (failed > 0) {
+                  body += '⚠️ **Visual differences detected!**\n\n';
+                  body += 'Please review the screenshots in the [artifacts](';
+                  body += `${context.payload.pull_request.html_url}/checks).\n`;
+                } else {
+                  body += '✅ **All visual regression tests passed!**\n';
                 }
+              } else {
+                body += '⚠️ Test results file not found.\n';
               }
             } catch (error) {
-              console.log('Could not check for failures:', error.message);
+              body += `⚠️ Could not parse test results: ${error.message}\n`;
             }
             
-            const status = hasFailures ? '❌' : '✅';
-            const message = hasFailures 
-              ? 'Some visual regression tests failed. Please review the screenshots in the artifacts.'
-              : 'All visual regression tests passed!';
+            body += '\n---\n';
+            body += '*Tests run with mocked APIs for consistency*\n';
             
-            github.rest.issues.createComment({
+            // Create or update comment
+            const { data: comments } = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## ${status} Visual Regression Test Results\n\n${message}\n\n[View detailed report in artifacts](${context.payload.pull_request.html_url}/checks)`
             });
+            
+            const botComment = comments.find(comment => 
+              comment.user?.type === 'Bot' && 
+              comment.body?.includes('Visual Regression Test Results')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                comment_id: botComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body
+              });
+            }

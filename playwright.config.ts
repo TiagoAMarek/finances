@@ -134,7 +134,17 @@ export default defineConfig({
     env: {
       // Use mocked APIs for consistent visual testing
       NEXT_PUBLIC_USE_MOCKS: 'true',
+      
+      // Disable Next.js telemetry in CI
+      NEXT_TELEMETRY_DISABLED: '1',
+      
+      // Use in-memory SQLite for tests (if using database)
+      // DATABASE_URL: process.env.CI ? 'file:./test.db' : process.env.DATABASE_URL,
     },
+    
+    // Enable stdout/stderr logging in CI for debugging
+    stdout: process.env.CI ? 'pipe' : 'ignore',
+    stderr: process.env.CI ? 'pipe' : 'ignore',
   },
   
   // Visual comparison settings
