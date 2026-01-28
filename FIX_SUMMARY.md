@@ -34,14 +34,15 @@ Added `snapshotPathTemplate` to `playwright.config.ts`:
 ```typescript
 // Use platform-agnostic snapshot paths (remove OS-specific suffix)
 // This allows snapshots generated on any OS to work on all platforms
-snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
+snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
 ```
 
 **What this does:**
 - Removes the platform-specific suffix from snapshot paths
 - Default: `{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}-{platform}{ext}`
-- Custom: `{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}`
+- Custom: `{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}`
 - Notice the removal of `-{platform}` from the template
+- Keeps `-{projectName}` to match existing file structure
 
 ### 2. Rename Existing Snapshots
 
@@ -132,6 +133,8 @@ After merging this fix:
   - Example: `dashboard-desktop-chromium-desktop-darwin.png`
 - **After:** `{name}-{project}.png`
   - Example: `dashboard-desktop-chromium-desktop.png`
+
+The change removes only the platform suffix while preserving the project name for clarity.
 
 ### Test Coverage
 The fix applies to all visual regression tests:

@@ -32,7 +32,7 @@ export default defineConfig({
   
   // Use platform-agnostic snapshot paths (remove OS-specific suffix)
   // This allows snapshots generated on any OS to work on all platforms
-  snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
+  snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
   
   // Maximum time one test can run for (increased for chart rendering)
   timeout: 60 * 1000,

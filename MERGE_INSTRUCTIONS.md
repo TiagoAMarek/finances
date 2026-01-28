@@ -43,9 +43,9 @@ git push origin copilot/add-visual-regression-tests
 ### 1. Configuration Change
 **File**: `playwright.config.ts`
 ```typescript
-snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}'
+snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}'
 ```
-This removes the platform-specific `{platform}` suffix from snapshot paths.
+This removes the platform-specific `{platform}` suffix from snapshot paths while keeping the `{projectName}` for clarity.
 
 ### 2. Snapshot Renames (34 files)
 All snapshots renamed from `*-darwin.png` to `*.png`:
