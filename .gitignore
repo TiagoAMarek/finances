@@ -6,3 +6,9 @@ __pycache__/
 **/*.db
 **/coverage
 package-lock.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+.pnpm-store/

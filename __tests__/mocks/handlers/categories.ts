@@ -113,7 +113,7 @@ export const categoryHandlers = [
         icon: "",
         isDefault: false,
         ownerId: 1,
-        createdAt: new Date().toISOString(),
+        createdAt: "2024-01-01T00:00:00Z", // Fixed date for consistent testing
       },
       // only copy known fields from safeRequestBody
       {

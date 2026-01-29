@@ -24,10 +24,13 @@ export const mockCreditCards: CreditCard[] = [
   },
 ];
 
+// Fixed ID counter for createMockCreditCard
+let mockCreditCardIdCounter = 100;
+
 export const createMockCreditCard = (
   overrides: Partial<CreditCard> = {},
 ): CreditCard => ({
-  id: Math.floor(Math.random() * 1000) + 100,
+  id: ++mockCreditCardIdCounter, // Sequential ID, not random
   name: "Cartão Teste",
   limit: "2000.00",
   currentBill: "500.00",

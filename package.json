@@ -26,7 +26,13 @@
     "test:browser:watch": "vitest --project browser",
     "test:browser:coverage": "vitest run --coverage --project browser",
     "test:browser:ui": "vitest --ui --project browser",
-    "test:browser:ci": "playwright install chromium && vitest run --project browser"
+    "test:browser:ci": "playwright install chromium && vitest run --project browser",
+    "test:visual": "playwright test",
+    "test:visual:chromium": "playwright test --project=chromium-desktop",
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:visual:ui": "playwright test --ui",
+    "test:visual:report": "playwright show-report playwright-report",
+    "test:visual:debug": "playwright test --debug"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -73,6 +79,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.58.0",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.7.0",
@@ -99,7 +106,7 @@
     "ignore-loader": "^0.1.2",
     "jsdom": "^26.1.0",
     "msw": "^2.10.5",
-    "playwright": "^1.55.0",
+    "playwright": "^1.58.0",
     "supertest": "^7.1.4",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.6",

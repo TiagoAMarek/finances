@@ -1,0 +1,26 @@
+# Dockerfile for visual regression testing
+# Ensures baselines are generated in the same environment as CI (ubuntu-latest)
+
+FROM mcr.microsoft.com/playwright:v1.58.0-noble
+
+# Set working directory
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm@latest
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the application
+COPY . .
+
+# Set environment variables for consistent rendering
+ENV NEXT_PUBLIC_USE_MOCKS=true
+ENV CI=true
+
+# Default command: update baselines
+CMD ["pnpm", "test:visual:update"]

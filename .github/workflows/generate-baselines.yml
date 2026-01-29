@@ -1,0 +1,173 @@
+name: Generate Visual Regression Baselines
+
+# This workflow generates baseline screenshots in a Docker container for visual regression tests
+# and creates a PR with the results. Use this when:
+# - Setting up visual tests for the first time
+# - After intentional UI changes that affect multiple pages
+# - When baselines need to be regenerated
+#
+# Note: Uses Docker to ensure baselines are generated in the exact same Linux environment as CI,
+# eliminating font rendering and platform differences.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to generate baselines for'
+        required: true
+        default: 'main'
+
+jobs:
+  generate-baselines:
+    name: Generate Baseline Screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    # Run the entire job in the Playwright Docker container (recommended by Playwright docs)
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.0-noble
+      options: --init --ipc=host
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup pnpm
+        run: npm install -g pnpm@latest
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify MSW worker exists
+        run: |
+          if [ ! -f "public/mockServiceWorker.js" ]; then
+            echo "❌ MSW worker not found. Please run 'pnpm exec msw init public/ --save' first."
+            exit 1
+          else
+            echo "✅ MSW worker found ($(du -h public/mockServiceWorker.js | cut -f1))"
+          fi
+
+      - name: Generate baselines
+        run: pnpm test:visual:update
+        env:
+          CI: true
+          NEXT_PUBLIC_USE_MOCKS: 'true'
+          NEXT_TELEMETRY_DISABLED: '1'
+
+      - name: Count Generated Screenshots
+        id: count
+        run: |
+          SCREENSHOT_COUNT=$(find e2e/__snapshots__ -name "*.png" 2>/dev/null | wc -l)
+          echo "count=$SCREENSHOT_COUNT" >> $GITHUB_OUTPUT
+          echo "📸 Generated $SCREENSHOT_COUNT baseline screenshots"
+
+      - name: Generate Summary Report
+        run: |
+          echo "## 📸 Visual Regression Baseline Generation Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.event.inputs.branch }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Screenshots Generated:** ${{ steps.count.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Docker-Based Generation" >> $GITHUB_STEP_SUMMARY
+          echo "Generated in Linux container matching CI environment exactly" >> $GITHUB_STEP_SUMMARY
+
+      - name: Create PR with Baselines
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore: update visual regression baseline screenshots'
+          branch: visual-baselines-${{ github.run_number }}
+          delete-branch: true
+          title: '📸 Update Visual Regression Baselines'
+          body: |
+            ## 📸 Baseline Screenshots Generated
+            
+            This PR contains automatically generated baseline screenshots for visual regression testing.
+            
+            ### Generation Details
+            - **Source Branch:** ${{ github.event.inputs.branch }}
+            - **Screenshots:** ${{ steps.count.outputs.count }} total
+            - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - **Generated in:** Docker container (Linux environment matching CI exactly)
+            
+            ### What's Included
+            
+            Docker-generated baseline screenshots for:
+            - 📱 **Mobile viewport:** 375×667 (dynamically set via test fixtures)
+            - 💻 **Desktop viewport:** 1920×1080 (dynamically set via test fixtures)
+            - 🌐 **Browser:** Chromium
+            - 🎭 **Mocked APIs:** All backend APIs mocked via MSW for consistency
+            - 🎨 **Component states:** Default, errors, filled forms, validation states
+            - 🐳 **Environment:** Generated in Docker to match CI (ubuntu-latest + Playwright image)
+            
+            ### Review Checklist
+            
+            Before merging, please verify:
+            
+            - [ ] Screenshot count is correct (~34 baselines expected)
+            - [ ] Screenshots are clear and readable
+            - [ ] Pages are fully loaded (no loading spinners)
+            - [ ] Fonts are properly rendered
+            - [ ] No unexpected scrollbars
+            - [ ] Mobile screenshots show mobile layout (375px width)
+            - [ ] Desktop screenshots show desktop layout (1920px width)
+            
+            ### Testing
+            
+            To verify these baselines work:
+            
+            ```bash
+            # Checkout this PR branch
+            gh pr checkout ${{ github.event.number }}
+            
+            # Run visual tests
+            pnpm test:visual
+            
+            # All tests should pass
+            ```
+            
+            ### Next Steps
+            
+            1. ✅ Review sample screenshots (see Files Changed)
+            2. ✅ Verify quality meets standards
+            3. ✅ Merge this PR
+            4. ✅ Baselines are now updated
+            
+            ---
+            
+            **Generated by:** [Generate Visual Baselines Workflow](${{ github.server_url }}/${{ github.repository }}/actions/workflows/generate-baselines.yml)
+            **Triggered by:** @${{ github.actor }}
+          labels: |
+            visual-testing
+            automated
+            baselines
+          reviewers: ${{ github.actor }}
+
+      - name: Upload Baseline Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: baseline-screenshots
+          path: e2e/__snapshots__/
+          retention-days: 30
+
+      - name: Comment on Trigger Issue (if applicable)
+        if: github.event.issue.number
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ✅ Baseline Generation Complete
+              
+              **Screenshots generated:** ${{ steps.count.outputs.count }}
+              **Branch:** ${{ github.event.inputs.branch }}
+              
+              A pull request has been created with the baseline screenshots.
+              Please review and merge: #PR_NUMBER
+              
+              [View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+            });

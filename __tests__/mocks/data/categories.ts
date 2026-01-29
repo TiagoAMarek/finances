@@ -73,16 +73,19 @@ export const mockCategories: Category[] = [
   },
 ];
 
+// Fixed ID counter for createMockCategory
+let mockCategoryIdCounter = 100;
+
 export const createMockCategory = (
   overrides: Partial<Category> = {},
 ): Category => ({
-  id: Math.floor(Math.random() * 1000) + 100,
+  id: ++mockCategoryIdCounter, // Sequential ID, not random
   name: "Categoria Teste",
   type: "expense",
   color: "#64748b",
   icon: "📝",
   isDefault: false,
   ownerId: 1,
-  createdAt: new Date().toISOString(),
+  createdAt: "2024-01-01T00:00:00Z", // Fixed date
   ...overrides,
 });
