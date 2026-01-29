@@ -64,20 +64,32 @@ export const test = base.extend<VisualTestFixtures>({
     await use(page);
   },
 
-  // Viewport fixtures
-  mobilePage: async ({ page }, use) => {
-    await page.setViewportSize(VIEWPORTS.MOBILE);
+  // Viewport fixtures - create context with viewport at creation time (Playwright recommended)
+  mobilePage: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      viewport: VIEWPORTS.MOBILE,
+    });
+    const page = await context.newPage();
     await use(page);
+    await context.close();
   },
 
-  tabletPage: async ({ page }, use) => {
-    await page.setViewportSize(VIEWPORTS.TABLET);
+  tabletPage: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      viewport: VIEWPORTS.TABLET,
+    });
+    const page = await context.newPage();
     await use(page);
+    await context.close();
   },
 
-  desktopPage: async ({ page }, use) => {
-    await page.setViewportSize(VIEWPORTS.DESKTOP);
+  desktopPage: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      viewport: VIEWPORTS.DESKTOP,
+    });
+    const page = await context.newPage();
     await use(page);
+    await context.close();
   },
 
   // Theme fixture
@@ -88,16 +100,24 @@ export const test = base.extend<VisualTestFixtures>({
   },
 
   // Combined fixtures: auth + viewport
-  authenticatedMobilePage: async ({ page }, use) => {
+  authenticatedMobilePage: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      viewport: VIEWPORTS.MOBILE,
+    });
+    const page = await context.newPage();
     await setupAuth(page);
-    await page.setViewportSize(VIEWPORTS.MOBILE);
     await use(page);
+    await context.close();
   },
 
-  authenticatedTabletPage: async ({ page }, use) => {
+  authenticatedTabletPage: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      viewport: VIEWPORTS.TABLET,
+    });
+    const page = await context.newPage();
     await setupAuth(page);
-    await page.setViewportSize(VIEWPORTS.TABLET);
     await use(page);
+    await context.close();
   },
 
   // Combined fixtures: auth + theme

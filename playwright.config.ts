@@ -30,6 +30,10 @@ export default defineConfig({
   // Folder for snapshots (baseline screenshots)
   snapshotDir: './e2e/__snapshots__',
   
+  // Platform-agnostic snapshot path (removes OS-specific suffixes)
+  // This allows the same baselines to work on macOS, Linux, and Windows
+  snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
+  
   // Maximum time one test can run for (increased for chart rendering)
   timeout: 60 * 1000,
   
@@ -85,9 +89,9 @@ export default defineConfig({
     {
       name: 'chromium-desktop',
       use: { 
-        ...devices['Desktop Chrome'],
-        // Viewport removed: tests use fixtures to set viewport dynamically
-        // mobile: 375×667, desktop: 1920×1080
+        // Don't use device presets - they include viewport
+        // Test fixtures set viewport dynamically: mobile 375×667, desktop 1920×1080
+        channel: 'chromium',
       },
     },
     // Uncomment to test on other browsers/devices
