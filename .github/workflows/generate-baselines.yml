@@ -62,6 +62,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify MSW worker exists
+        run: |
+          if [ ! -f "public/mockServiceWorker.js" ]; then
+            echo "❌ MSW worker not found, generating..."
+            pnpm exec msw init public/ --save
+            echo "✅ MSW worker generated"
+          else
+            echo "✅ MSW worker found ($(du -h public/mockServiceWorker.js | cut -f1))"
+          fi
+
       - name: Install Playwright Browsers (All)
         if: github.event.inputs.update_mode == 'all'
         run: pnpm exec playwright install --with-deps chromium firefox webkit
@@ -79,9 +89,11 @@ jobs:
 
       - name: Generate Chromium Baselines Only
         if: github.event.inputs.update_mode == 'chromium-only'
-        run: pnpm exec playwright test --project=chromium-desktop --update-snapshots
+        run: pnpm exec playwright test e2e/tests --update-snapshots
         env:
+          CI: true
           NEXT_PUBLIC_USE_MOCKS: 'true'
+          NEXT_TELEMETRY_DISABLED: '1'
         continue-on-error: true
 
       - name: Generate Missing Baselines Only
@@ -139,24 +151,23 @@ jobs:
             ### What's Included
             
             Baseline screenshots for:
-            - 📱 **Mobile viewports:** 375×667 (Pixel 5, iPhone 13)
-            - 📱 **Tablet viewports:** 768×1024, 1024×1366 (iPad Pro)
-            - 💻 **Desktop viewports:** 1920×1080
-            - 🌐 **Browsers:** Chrome, Firefox, Safari
-            - 🌙 **Theme modes:** Light and dark
-            - 🎨 **Component states:** Default, errors, filled, modals, accordions
+            - 📱 **Mobile viewport:** 375×667 (dynamically set via test fixtures)
+            - 💻 **Desktop viewport:** 1920×1080 (dynamically set via test fixtures)
+            - 🌐 **Browser:** Chromium only
+            - 🎭 **Mocked APIs:** All backend APIs mocked via MSW for consistency
+            - 🎨 **Component states:** Default, errors, filled forms, validation states
             
             ### Review Checklist
             
             Before merging, please verify:
             
-            - [ ] Screenshot count is correct (~252 for 'all' mode, ~42 for 'chromium-only')
+            - [ ] Screenshot count is correct (~34 for 'chromium-only' mode)
             - [ ] Screenshots are clear and readable
             - [ ] Pages are fully loaded (no loading spinners)
             - [ ] Fonts are properly rendered
             - [ ] No unexpected scrollbars
-            - [ ] Dark mode screenshots look correct
-            - [ ] Mobile screenshots show mobile layout
+            - [ ] Mobile screenshots show mobile layout (375×667)
+            - [ ] Desktop screenshots show desktop layout (1920×1080)
             - [ ] Responsive breakpoints are correct
             
             ### Testing
