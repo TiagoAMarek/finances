@@ -161,8 +161,8 @@ export default defineConfig({
       // Threshold for individual pixel comparison (0-1)
       threshold: 0.2,
       
-      // Number of different pixels allowed
-      maxDiffPixels: 100,
+      // Number of different pixels allowed (increased for font rendering differences across OS)
+      maxDiffPixels: 5000,
       
       // Animations: 'disabled' for consistent screenshots
       animations: 'disabled',
