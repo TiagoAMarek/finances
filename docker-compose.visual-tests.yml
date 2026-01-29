@@ -1,0 +1,20 @@
+services:
+  visual-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.visual-tests
+    volumes:
+      # Mount source code for live updates
+      - ./e2e:/app/e2e
+      - ./app:/app/app
+      - ./features:/app/features
+      - ./components:/app/components
+      - ./src:/app/src
+      - ./__tests__:/app/__tests__
+      - ./playwright.config.ts:/app/playwright.config.ts
+      # Mount snapshots directory to get updated baselines
+      - ./e2e/__snapshots__:/app/e2e/__snapshots__
+    environment:
+      - NEXT_PUBLIC_USE_MOCKS=true
+      - CI=true
+    command: pnpm test:visual:update

@@ -1,13 +1,13 @@
 name: Generate Visual Regression Baselines
 
-# This workflow generates platform-agnostic baseline screenshots for visual regression tests
+# This workflow generates baseline screenshots in a Docker container for visual regression tests
 # and creates a PR with the results. Use this when:
 # - Setting up visual tests for the first time
 # - After intentional UI changes that affect multiple pages
 # - When baselines need to be regenerated
 #
-# Note: Generates Chromium-only baselines that work on all platforms (macOS, Linux, Windows)
-# using pixel difference thresholds to handle font rendering variations.
+# Note: Uses Docker to ensure baselines are generated in the exact same Linux environment as CI,
+# eliminating font rendering and platform differences.
 
 on:
   workflow_dispatch:
@@ -29,53 +29,24 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Verify MSW worker exists
         run: |
           if [ ! -f "public/mockServiceWorker.js" ]; then
-            echo "❌ MSW worker not found, generating..."
-            pnpm exec msw init public/ --save
-            echo "✅ MSW worker generated"
+            echo "❌ MSW worker not found. Please run 'pnpm exec msw init public/ --save' first."
+            exit 1
           else
             echo "✅ MSW worker found ($(du -h public/mockServiceWorker.js | cut -f1))"
           fi
 
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Build Docker image for visual testing
+        run: docker compose -f docker-compose.visual-tests.yml build
 
-      - name: Generate Baselines
-        run: pnpm exec playwright test e2e/tests --update-snapshots
+      - name: Generate baselines in Docker
+        run: docker compose -f docker-compose.visual-tests.yml up --abort-on-container-exit
         env:
           CI: true
           NEXT_PUBLIC_USE_MOCKS: 'true'
           NEXT_TELEMETRY_DISABLED: '1'
-        continue-on-error: true
 
       - name: Count Generated Screenshots
         id: count
@@ -91,8 +62,8 @@ jobs:
           echo "**Branch:** ${{ github.event.inputs.branch }}" >> $GITHUB_STEP_SUMMARY
           echo "**Screenshots Generated:** ${{ steps.count.outputs.count }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Platform-Agnostic Baselines" >> $GITHUB_STEP_SUMMARY
-          echo "Generated baselines work on macOS, Linux, and Windows" >> $GITHUB_STEP_SUMMARY
+          echo "### Docker-Based Generation" >> $GITHUB_STEP_SUMMARY
+          echo "Generated in Linux container matching CI environment exactly" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR with Baselines
         uses: peter-evans/create-pull-request@v7
@@ -110,16 +81,17 @@ jobs:
             - **Source Branch:** ${{ github.event.inputs.branch }}
             - **Screenshots:** ${{ steps.count.outputs.count }} total
             - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - **Generated in:** Docker container (Linux environment matching CI exactly)
             
             ### What's Included
             
-            Platform-agnostic baseline screenshots for:
+            Docker-generated baseline screenshots for:
             - 📱 **Mobile viewport:** 375×667 (dynamically set via test fixtures)
             - 💻 **Desktop viewport:** 1920×1080 (dynamically set via test fixtures)
             - 🌐 **Browser:** Chromium
             - 🎭 **Mocked APIs:** All backend APIs mocked via MSW for consistency
             - 🎨 **Component states:** Default, errors, filled forms, validation states
-            - 🖥️ **Platform:** Works on macOS, Linux, and Windows (uses pixel diff thresholds)
+            - 🐳 **Environment:** Generated in Docker to match CI (ubuntu-latest + Playwright image)
             
             ### Review Checklist
             
