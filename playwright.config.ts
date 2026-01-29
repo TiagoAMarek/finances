@@ -86,7 +86,8 @@ export default defineConfig({
       name: 'chromium-desktop',
       use: { 
         ...devices['Desktop Chrome'],
-        viewport: { width: 1920, height: 1080 },
+        // Viewport removed: tests use fixtures to set viewport dynamically
+        // mobile: 375×667, desktop: 1920×1080
       },
     },
     // Uncomment to test on other browsers/devices
