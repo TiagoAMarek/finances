@@ -92,7 +92,7 @@ jobs:
           fi
 
       - name: Run visual regression tests
-        run: pnpm test:visual --project=chromium-desktop
+        run: pnpm test:visual
         env:
           CI: true
           NEXT_PUBLIC_USE_MOCKS: 'true'
