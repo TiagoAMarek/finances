@@ -1,7 +1,7 @@
 # Dockerfile for visual regression testing
 # Ensures baselines are generated in the same environment as CI (ubuntu-latest)
 
-FROM mcr.microsoft.com/playwright:v1.49.1-noble
+FROM mcr.microsoft.com/playwright:v1.58.0-noble
 
 # Set working directory
 WORKDIR /app

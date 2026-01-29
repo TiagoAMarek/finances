@@ -21,13 +21,24 @@ jobs:
   generate-baselines:
     name: Generate Baseline Screenshots
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
+    
+    # Run the entire job in the Playwright Docker container (recommended by Playwright docs)
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.0-noble
+      options: --init --ipc=host
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup pnpm
+        run: npm install -g pnpm@latest
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Verify MSW worker exists
         run: |
@@ -38,11 +49,8 @@ jobs:
             echo "✅ MSW worker found ($(du -h public/mockServiceWorker.js | cut -f1))"
           fi
 
-      - name: Build Docker image for visual testing
-        run: docker compose -f docker-compose.visual-tests.yml build
-
-      - name: Generate baselines in Docker
-        run: docker compose -f docker-compose.visual-tests.yml up --abort-on-container-exit
+      - name: Generate baselines
+        run: pnpm test:visual:update
         env:
           CI: true
           NEXT_PUBLIC_USE_MOCKS: 'true'
