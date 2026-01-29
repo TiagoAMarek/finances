@@ -1,10 +1,13 @@
 name: Generate Visual Regression Baselines
 
-# This workflow generates baseline screenshots for visual regression tests
+# This workflow generates platform-agnostic baseline screenshots for visual regression tests
 # and creates a PR with the results. Use this when:
 # - Setting up visual tests for the first time
-# - After intentional UI changes that affect all pages
-# - When baselines need to be regenerated from CI environment
+# - After intentional UI changes that affect multiple pages
+# - When baselines need to be regenerated
+#
+# Note: Generates Chromium-only baselines that work on all platforms (macOS, Linux, Windows)
+# using pixel difference thresholds to handle font rendering variations.
 
 on:
   workflow_dispatch:
@@ -13,15 +16,6 @@ on:
         description: 'Branch to generate baselines for'
         required: true
         default: 'main'
-      update_mode:
-        description: 'Update mode'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - chromium-only
-          - missing-only
 
 jobs:
   generate-baselines:
@@ -72,37 +66,15 @@ jobs:
             echo "✅ MSW worker found ($(du -h public/mockServiceWorker.js | cut -f1))"
           fi
 
-      - name: Install Playwright Browsers (All)
-        if: github.event.inputs.update_mode == 'all'
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
-
-      - name: Install Playwright Browsers (Chromium Only)
-        if: github.event.inputs.update_mode == 'chromium-only'
+      - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Generate All Baselines
-        if: github.event.inputs.update_mode == 'all'
-        run: pnpm test:visual:update
-        env:
-          NEXT_PUBLIC_USE_MOCKS: 'true'
-        continue-on-error: true
-
-      - name: Generate Chromium Baselines Only
-        if: github.event.inputs.update_mode == 'chromium-only'
+      - name: Generate Baselines
         run: pnpm exec playwright test e2e/tests --update-snapshots
         env:
           CI: true
           NEXT_PUBLIC_USE_MOCKS: 'true'
           NEXT_TELEMETRY_DISABLED: '1'
-        continue-on-error: true
-
-      - name: Generate Missing Baselines Only
-        if: github.event.inputs.update_mode == 'missing-only'
-        run: |
-          pnpm exec playwright install --with-deps chromium firefox webkit
-          pnpm test:visual --update-snapshots
-        env:
-          NEXT_PUBLIC_USE_MOCKS: 'true'
         continue-on-error: true
 
       - name: Count Generated Screenshots
@@ -116,59 +88,50 @@ jobs:
         run: |
           echo "## 📸 Visual Regression Baseline Generation Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Mode:** ${{ github.event.inputs.update_mode }}" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** ${{ github.event.inputs.branch }}" >> $GITHUB_STEP_SUMMARY
           echo "**Screenshots Generated:** ${{ steps.count.outputs.count }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Screenshot Breakdown by Browser" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          for dir in e2e/__snapshots__/*/; do
-            if [ -d "$dir" ]; then
-              browser=$(basename "$dir")
-              count=$(find "$dir" -name "*.png" 2>/dev/null | wc -l)
-              echo "- **$browser:** $count screenshots" >> $GITHUB_STEP_SUMMARY
-            fi
-          done
+          echo "### Platform-Agnostic Baselines" >> $GITHUB_STEP_SUMMARY
+          echo "Generated baselines work on macOS, Linux, and Windows" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR with Baselines
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: 'chore: Generate baseline screenshots for visual regression tests'
+          commit-message: 'chore: update visual regression baseline screenshots'
           branch: visual-baselines-${{ github.run_number }}
           delete-branch: true
-          title: '📸 Visual Regression Baselines (${{ github.event.inputs.update_mode }})'
+          title: '📸 Update Visual Regression Baselines'
           body: |
             ## 📸 Baseline Screenshots Generated
             
             This PR contains automatically generated baseline screenshots for visual regression testing.
             
             ### Generation Details
-            - **Mode:** ${{ github.event.inputs.update_mode }}
             - **Source Branch:** ${{ github.event.inputs.branch }}
             - **Screenshots:** ${{ steps.count.outputs.count }} total
             - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             
             ### What's Included
             
-            Baseline screenshots for:
+            Platform-agnostic baseline screenshots for:
             - 📱 **Mobile viewport:** 375×667 (dynamically set via test fixtures)
             - 💻 **Desktop viewport:** 1920×1080 (dynamically set via test fixtures)
-            - 🌐 **Browser:** Chromium only
+            - 🌐 **Browser:** Chromium
             - 🎭 **Mocked APIs:** All backend APIs mocked via MSW for consistency
             - 🎨 **Component states:** Default, errors, filled forms, validation states
+            - 🖥️ **Platform:** Works on macOS, Linux, and Windows (uses pixel diff thresholds)
             
             ### Review Checklist
             
             Before merging, please verify:
             
-            - [ ] Screenshot count is correct (~34 for 'chromium-only' mode)
+            - [ ] Screenshot count is correct (~34 baselines expected)
             - [ ] Screenshots are clear and readable
             - [ ] Pages are fully loaded (no loading spinners)
             - [ ] Fonts are properly rendered
             - [ ] No unexpected scrollbars
-            - [ ] Mobile screenshots show mobile layout (375×667)
-            - [ ] Desktop screenshots show desktop layout (1920×1080)
-            - [ ] Responsive breakpoints are correct
+            - [ ] Mobile screenshots show mobile layout (375px width)
+            - [ ] Desktop screenshots show desktop layout (1920px width)
             
             ### Testing
             
@@ -179,7 +142,7 @@ jobs:
             gh pr checkout ${{ github.event.number }}
             
             # Run visual tests
-            pnpm test:visual:chromium
+            pnpm test:visual
             
             # All tests should pass
             ```
@@ -189,7 +152,7 @@ jobs:
             1. ✅ Review sample screenshots (see Files Changed)
             2. ✅ Verify quality meets standards
             3. ✅ Merge this PR
-            4. ✅ Visual regression tests are now active in CI
+            4. ✅ Baselines are now updated
             
             ---
             
@@ -205,7 +168,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4.5.0
         with:
-          name: baseline-screenshots-${{ github.event.inputs.update_mode }}
+          name: baseline-screenshots
           path: e2e/__snapshots__/
           retention-days: 30
 
@@ -221,7 +184,7 @@ jobs:
               body: `## ✅ Baseline Generation Complete
               
               **Screenshots generated:** ${{ steps.count.outputs.count }}
-              **Mode:** ${{ github.event.inputs.update_mode }}
+              **Branch:** ${{ github.event.inputs.branch }}
               
               A pull request has been created with the baseline screenshots.
               Please review and merge: #PR_NUMBER

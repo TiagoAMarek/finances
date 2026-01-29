@@ -98,24 +98,6 @@ jobs:
           NEXT_PUBLIC_USE_MOCKS: 'true'
           NEXT_TELEMETRY_DISABLED: '1'
 
-      # TEMPORARY: Regenerate baselines WITHOUT --project flag to fix viewport issues
-      - name: Regenerate baselines with correct viewports
-        if: failure()
-        run: pnpm exec playwright test e2e/tests --update-snapshots
-        env:
-          CI: true
-          NEXT_PUBLIC_USE_MOCKS: 'true'
-          NEXT_TELEMETRY_DISABLED: '1'
-
-      - name: Upload regenerated baselines
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: corrected-linux-baselines
-          path: e2e/__snapshots__/**/*-linux.png
-          retention-days: 7
-          compression-level: 9
-
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
