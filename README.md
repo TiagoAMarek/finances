@@ -1,6 +1,12 @@
 # Personal Finance Manager
 
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.x-black.svg)](https://nextjs.org/)
+
 This is a [Next.js](https://nextjs.org) project for managing personal finances, built with TypeScript, PostgreSQL, and Drizzle ORM.
+
+> **Note**: This is a personal portfolio project built with modern web technologies. The code is open source under the Apache 2.0 License - you're free to use, modify, and distribute it, including for commercial purposes. See [LICENSE](LICENSE) for details.
 
 ## Tech Stack
 
@@ -264,3 +270,67 @@ The easiest way to deploy is using the [Vercel Platform](https://vercel.com/new)
 3. Deploy automatically on every push to main
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a pull request.
+
+### How to Contribute
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure your code:
+- Follows the project's coding standards
+- Includes appropriate tests
+- Passes all linting and type checks
+- Has been tested locally
+
+## Security
+
+Security is a top priority for a financial application. Please review:
+
+- [Security Policy](SECURITY.md) - How to report vulnerabilities
+- [Security Audit Report](SECURITY_AUDIT.md) - Latest security audit findings
+
+If you discover a security vulnerability, please follow our [Security Policy](SECURITY.md) for responsible disclosure.
+
+## License
+
+Copyright (c) 2026 Tiago A Marek
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the [LICENSE](LICENSE) file for the specific language governing permissions and limitations under the License.
+
+### What does this mean?
+
+This project is **open source** and you are free to:
+- Use it for personal or commercial purposes
+- Modify and adapt the code
+- Distribute original or modified versions
+- Include it in proprietary software
+
+You must:
+- Include the original copyright notice and license
+- State any significant changes you made
+- Include a copy of the Apache 2.0 License
+
+The software is provided "as-is" without warranties.
+
+## Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- Database ORM by [Drizzle](https://orm.drizzle.team/)
+- State management with [TanStack Query](https://tanstack.com/query)
+- Validation with [Zod](https://zod.dev/)
+
+---
+
+**Disclaimer**: This is a personal project for educational and portfolio purposes. While security best practices have been implemented, use at your own risk for managing actual financial data. Always ensure you have proper backups and security measures in place.
