@@ -1,53 +1,66 @@
-# About This Repository
+# Contributing to Personal Finance Manager
 
 Thank you for your interest in this personal finance management application!
 
-## Proprietary Notice
+## Open Source Project
 
-This is a proprietary project by Tiago A Marek. The source code is publicly viewable for educational, reference, and portfolio evaluation purposes only.
+This project is open source and licensed under the Apache License 2.0. We welcome contributions from the community!
 
 ## Copyright and License
 
-Copyright (c) 2026 Tiago A Marek. All rights reserved.
+Copyright (c) 2026 Tiago A Marek
 
-This project is **NOT open source**. All rights are reserved by the copyright holder. See the [LICENSE](LICENSE) file for complete terms and conditions.
+Licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for complete terms and conditions.
 
 ### What You Can Do
 
-- ✅ View the source code for learning and reference
-- ✅ Study the architecture and implementation patterns
-- ✅ Evaluate the code for portfolio or hiring purposes
+- ✅ View, use, and modify the source code
+- ✅ Use it for personal or commercial projects
+- ✅ Distribute original or modified versions
+- ✅ Contribute improvements back to the project
+- ✅ Fork the repository
 
-### What You Cannot Do
+### Contribution Requirements
 
-- ❌ Use the code in your own projects
-- ❌ Modify or create derivative works
-- ❌ Distribute, copy, or share the code
-- ❌ Use the code for commercial purposes
-- ❌ Fork the repository for use (forks for contributions only, see below)
+When contributing, you agree that:
+- Your contributions will be licensed under the Apache License 2.0
+- You have the right to submit the code you're contributing
+- You retain copyright to your contributions
 
-## Reporting Issues
+## How to Contribute
+
+### Reporting Issues
 
 If you find a bug or security vulnerability:
 
 1. **Security Issues**: Please follow the [Security Policy](SECURITY.md)
-2. **Bug Reports**: You may open an issue for informational purposes
-3. **Feature Suggestions**: You may suggest features via issues
+2. **Bug Reports**: Open an issue using the bug report template
+3. **Feature Suggestions**: Open an issue using the feature request template
 
-## Contributing
+### Contributing Code
 
-This project is not accepting external contributions at this time, as it is a personal portfolio project with proprietary licensing.
+We welcome pull requests! Here's how to contribute:
 
-### For Potential Employers/Collaborators
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Make your changes**
+4. **Run tests** (`pnpm test`)
+5. **Run linter** (`pnpm lint`)
+6. **Commit your changes** (`git commit -m 'feat: add amazing feature'`)
+7. **Push to your fork** (`git push origin feature/amazing-feature`)
+8. **Open a Pull Request**
 
-If you're interested in discussing potential collaboration or have questions about the project:
+### Pull Request Guidelines
 
-- Open an issue with the tag `discussion`
-- Contact the author through their GitHub profile
+Please ensure your PR:
+- Follows the project's coding standards
+- Includes appropriate tests for new features
+- Passes all linting and type checks (`pnpm lint && pnpm typecheck`)
+- Has been tested locally
+- Includes a clear description of the changes
+- References any related issues
 
-## Development Setup (For Reference)
-
-If you want to understand how the project is set up for reference purposes:
+## Development Setup
 
 ### Prerequisites
 
@@ -55,7 +68,7 @@ If you want to understand how the project is set up for reference purposes:
 - PostgreSQL database
 - Environment variables configured (see `.env.example`)
 
-### Installation (For Review Only)
+### Installation
 
 ```bash
 pnpm install
@@ -70,9 +83,20 @@ pnpm dev
 
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production
-- `pnpm lint` - Run ESLint
+- `pnpm lint` - Run ESLint with auto-fix
 - `pnpm typecheck` - Run TypeScript compiler check
 - `pnpm test` - Run all tests
+- `pnpm test:watch` - Run tests in watch mode
+- `pnpm test:coverage` - Run tests with coverage
+
+## Code Style
+
+- Follow the existing code style
+- Use TypeScript for all new code
+- Write tests for new features
+- Keep functions small and focused
+- Use meaningful variable and function names
+- Add comments for complex logic
 
 ## Questions?
 
@@ -80,7 +104,8 @@ For questions about:
 - **Licensing**: See the [LICENSE](LICENSE) file
 - **Security**: See the [Security Policy](SECURITY.md)
 - **Technical details**: Open an issue with the `question` tag
+- **Getting started**: Check the [README](README.md)
 
 ---
 
-**Note**: This project is maintained as a personal portfolio piece. While the code is public for viewing, it remains proprietary intellectual property.
+**Thank you for contributing!** Your improvements help make this project better for everyone.

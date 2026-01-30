@@ -1,12 +1,12 @@
 # Personal Finance Manager
 
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.x-black.svg)](https://nextjs.org/)
 
 This is a [Next.js](https://nextjs.org) project for managing personal finances, built with TypeScript, PostgreSQL, and Drizzle ORM.
 
-> **Note**: This is a personal project for educational and portfolio purposes. The code is publicly viewable for reference, but all rights are reserved. See [LICENSE](LICENSE) for details.
+> **Note**: This is a personal portfolio project built with modern web technologies. The code is open source under the Apache 2.0 License - you're free to use, modify, and distribute it, including for commercial purposes. See [LICENSE](LICENSE) for details.
 
 ## Tech Stack
 
@@ -300,9 +300,28 @@ If you discover a security vulnerability, please follow our [Security Policy](SE
 
 ## License
 
-Copyright (c) 2026 Tiago A Marek. All rights reserved.
+Copyright (c) 2026 Tiago A Marek
 
-This project is proprietary and confidential. You may view the source code for educational, reference, or evaluation purposes only. Any use, modification, distribution, or reproduction requires express written permission from the copyright holder. See the [LICENSE](LICENSE) file for complete terms and conditions.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the [LICENSE](LICENSE) file for the specific language governing permissions and limitations under the License.
+
+### What does this mean?
+
+This project is **open source** and you are free to:
+- Use it for personal or commercial purposes
+- Modify and adapt the code
+- Distribute original or modified versions
+- Include it in proprietary software
+
+You must:
+- Include the original copyright notice and license
+- State any significant changes you made
+- Include a copy of the Apache 2.0 License
+
+The software is provided "as-is" without warranties.
 
 ## Acknowledgments
 

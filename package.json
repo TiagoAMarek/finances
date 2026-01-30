@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "next dev",
     "dev:mocked": " NEXT_PUBLIC_USE_MOCKS=true next dev",
