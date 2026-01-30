@@ -96,28 +96,26 @@ jobs:
               if (fs.existsSync('test-results/results.json')) {
                 const results = JSON.parse(fs.readFileSync('test-results/results.json', 'utf8'));
                 
-                let total = 0;
-                let passed = 0;
-                let failed = 0;
-                
-                results.suites?.forEach(suite => {
-                  suite.specs?.forEach(spec => {
-                    spec.tests?.forEach(test => {
-                      total++;
-                      if (test.status === 'passed') passed++;
-                      if (test.status === 'failed') failed++;
-                    });
-                  });
-                });
-                
-                summary += `- **Total Tests:** ${total}\n`;
-                summary += `- **Passed:** ✅ ${passed}\n`;
-                summary += `- **Failed:** ❌ ${failed}\n\n`;
-                
-                if (failed > 0) {
-                  summary += '⚠️ Visual differences detected. Review the artifacts for details.\n';
+                // Use stats if available (most reliable)
+                if (results.stats) {
+                  const total = results.stats.expected + results.stats.unexpected + results.stats.skipped;
+                  const passed = results.stats.expected;
+                  const failed = results.stats.unexpected;
+                  const skipped = results.stats.skipped;
+                  
+                  summary += `- **Total Tests:** ${total}\n`;
+                  summary += `- **Passed:** ✅ ${passed}\n`;
+                  summary += `- **Failed:** ❌ ${failed}\n`;
+                  if (skipped > 0) summary += `- **Skipped:** ⏭️ ${skipped}\n`;
+                  summary += `\n`;
+                  
+                  if (failed > 0) {
+                    summary += '⚠️ Visual differences detected. Review the artifacts for details.\n';
+                  } else {
+                    summary += '✅ All visual regression tests passed!\n';
+                  }
                 } else {
-                  summary += '✅ All visual regression tests passed!\n';
+                  summary += '⚠️ No stats found in test results\n';
                 }
               } else {
                 summary += '⚠️ Test results file not found\n';
