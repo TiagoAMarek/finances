@@ -77,6 +77,14 @@ jobs:
           echo "### Docker-Based Generation" >> $GITHUB_STEP_SUMMARY
           echo "Generated in Linux container matching CI environment exactly" >> $GITHUB_STEP_SUMMARY
 
+      - name: Upload Baseline Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: baseline-screenshots
+          path: e2e/__snapshots__/
+          retention-days: 30
+
       - name: Create PR with Baselines
         uses: peter-evans/create-pull-request@v7
         with:
@@ -147,14 +155,6 @@ jobs:
             automated
             baselines
           reviewers: ${{ github.actor }}
-
-      - name: Upload Baseline Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4.5.0
-        with:
-          name: baseline-screenshots
-          path: e2e/__snapshots__/
-          retention-days: 30
 
       - name: Comment on Trigger Issue (if applicable)
         if: github.event.issue.number
