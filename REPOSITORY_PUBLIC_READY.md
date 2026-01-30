@@ -5,7 +5,9 @@
 
 ## Summary
 
-Your repository has been thoroughly audited and prepared for public release. All necessary documentation, licenses, and security policies have been added. **No sensitive data was found** in the codebase or git history.
+Your repository has been thoroughly audited and prepared for public release. All necessary documentation, licensing, and security policies have been added. **No sensitive data was found** in the codebase or git history.
+
+The repository is configured with **proprietary licensing** to protect your intellectual property while allowing the code to be viewed for portfolio and reference purposes.
 
 ## What Was Done
 
@@ -24,11 +26,11 @@ A comprehensive security audit was performed:
 ### 2. Documentation Added ✅
 
 #### Core Documentation Files
-- **LICENSE** - MIT License (permissive open-source license)
+- **LICENSE** - Proprietary License (protects intellectual property)
 - **SECURITY.md** - Security policy and vulnerability reporting guidelines
 - **SECURITY_AUDIT.md** - Detailed security audit findings
-- **CONTRIBUTING.md** - Comprehensive contribution guidelines
-- **README.md** - Enhanced with badges, disclaimer, and links to new docs
+- **CONTRIBUTING.md** - Repository information and usage restrictions
+- **README.md** - Enhanced with badges, disclaimer, and links to documentation
 
 #### GitHub Templates
 - **Pull Request Template** - Standardized PR format with checklist
@@ -37,16 +39,16 @@ A comprehensive security audit was performed:
 
 ### 3. Package Configuration ✅
 
-- Added `"license": "MIT"` to `package.json`
-- README now includes license badge and acknowledgments
+- Added `"license": "UNLICENSED"` to `package.json`
+- README now includes proprietary license badge and copyright notice
 
 ## Files Added
 
 ```
-LICENSE                              # MIT License
+LICENSE                              # Proprietary License
 SECURITY.md                          # Security policy
 SECURITY_AUDIT.md                    # Audit report
-CONTRIBUTING.md                      # Contribution guidelines
+CONTRIBUTING.md                      # Repository information
 .github/PULL_REQUEST_TEMPLATE.md     # PR template
 .github/ISSUE_TEMPLATE/bug_report.md # Bug report template
 .github/ISSUE_TEMPLATE/feature_request.md # Feature request template
@@ -55,8 +57,8 @@ CONTRIBUTING.md                      # Contribution guidelines
 ## Files Modified
 
 ```
-README.md        # Added badges, disclaimer, contributing section
-package.json     # Added license field
+README.md        # Added proprietary license badge, updated disclaimer
+package.json     # Added "UNLICENSED" license field
 ```
 
 ## Security Findings
@@ -104,9 +106,9 @@ The repository follows security best practices:
    - Set up alerts for accidentally committed secrets
 
 2. **Engage with Community**
-   - Respond to issues and pull requests
-   - Welcome new contributors
-   - Keep documentation up to date
+   - Review issues and feedback
+   - Maintain documentation
+   - Keep security practices up to date
 
 3. **Maintain Security**
    - Regularly update dependencies: `pnpm update`
@@ -123,23 +125,23 @@ Always use strong, unique values for:
 - Database credentials - Use strong passwords
 - Enable SSL for database connections (`?sslmode=require`)
 
-### For Contributors
+### About the License
 
-The repository now has clear guidelines:
-- **CONTRIBUTING.md** explains how to contribute
-- **SECURITY.md** explains how to report vulnerabilities
-- Issue templates make it easy to report bugs or request features
-- PR template ensures consistent pull requests
+The repository now has **proprietary licensing**:
+- ✅ Code is viewable for portfolio/reference purposes
+- ✅ Copyright and intellectual property are protected
+- ❌ Others cannot use, modify, or distribute the code without permission
+- ✅ Suitable for public portfolio projects
 
 ## Documentation Structure
 
 ```
 Repository Root
 ├── README.md                    # Main documentation
-├── LICENSE                      # MIT License
+├── LICENSE                      # Proprietary License
 ├── SECURITY.md                  # Security policy
 ├── SECURITY_AUDIT.md            # Security audit report
-├── CONTRIBUTING.md              # Contribution guidelines
+├── CONTRIBUTING.md              # Repository information
 ├── .env.example                 # Environment variables template
 └── .github/
     ├── PULL_REQUEST_TEMPLATE.md
@@ -150,33 +152,33 @@ Repository Root
 
 ## License Information
 
-**License**: MIT License  
-**Copyright**: 2026 Tiago A Marek
+**License**: Proprietary  
+**Copyright**: 2026 Tiago A Marek. All rights reserved.
 
-The MIT License is:
-- ✅ Permissive - allows commercial use
-- ✅ Simple - easy to understand
-- ✅ Popular - widely used in open source
-- ✅ Compatible - works with most other licenses
+The Proprietary License:
+- ✅ Protects your intellectual property
+- ✅ Allows code viewing for reference
+- ✅ Suitable for portfolio projects
+- ❌ Restricts unauthorized use, modification, or distribution
 
 ## Conclusion
 
 Your repository is **READY TO BE MADE PUBLIC** 🎉
 
-All security best practices have been implemented, no sensitive data exists in the codebase or history, and comprehensive documentation has been added to help contributors and users.
+All security best practices have been implemented, no sensitive data exists in the codebase or history, and comprehensive documentation with IP protection has been added.
 
 The repository now includes:
-- ✅ Proper license (MIT)
+- ✅ Proprietary license (IP protected)
 - ✅ Security documentation and policy
-- ✅ Contribution guidelines
+- ✅ Repository information and guidelines
 - ✅ Issue and PR templates
 - ✅ Enhanced README with badges
 - ✅ Security audit report
 
-You can safely make this repository public! 🚀
+You can safely make this repository public with full intellectual property protection! 🚀
 
 ---
 
 **Questions or Concerns?**
 
-If you have any questions about the changes or need modifications to the license or documentation, please let me know!
+If you have any questions about the licensing or need modifications to the documentation, please let me know!

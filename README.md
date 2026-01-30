@@ -1,12 +1,12 @@
 # Personal Finance Manager
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.x-black.svg)](https://nextjs.org/)
 
 This is a [Next.js](https://nextjs.org) project for managing personal finances, built with TypeScript, PostgreSQL, and Drizzle ORM.
 
-> **Note**: This is a personal project for learning and portfolio purposes. Feel free to use it, contribute, or fork it for your own needs!
+> **Note**: This is a personal project for educational and portfolio purposes. The code is publicly viewable for reference, but all rights are reserved. See [LICENSE](LICENSE) for details.
 
 ## Tech Stack
 
@@ -300,7 +300,9 @@ If you discover a security vulnerability, please follow our [Security Policy](SE
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Copyright (c) 2026 Tiago A Marek. All rights reserved.
+
+This project is proprietary and confidential. You may view the source code for educational, reference, or evaluation purposes only. Any use, modification, distribution, or reproduction requires express written permission from the copyright holder. See the [LICENSE](LICENSE) file for complete terms and conditions.
 
 ## Acknowledgments
 
