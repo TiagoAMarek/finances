@@ -64,15 +64,19 @@ jobs:
         id: count
         run: |
           SCREENSHOT_COUNT=$(find e2e/__snapshots__ -name "*.png" 2>/dev/null | wc -l)
-          echo "count=$SCREENSHOT_COUNT" >> $GITHUB_OUTPUT
-          echo "📸 Generated $SCREENSHOT_COUNT baseline screenshots"
+          CHANGED_COUNT=$(git status --porcelain e2e/__snapshots__/ | grep -E "^\s*[AM].*\.png$" | wc -l)
+          echo "total=$SCREENSHOT_COUNT" >> $GITHUB_OUTPUT
+          echo "changed=$CHANGED_COUNT" >> $GITHUB_OUTPUT
+          echo "📸 Found $SCREENSHOT_COUNT total screenshots"
+          echo "✏️  Changed: $CHANGED_COUNT files"
 
       - name: Generate Summary Report
         run: |
           echo "## 📸 Visual Regression Baseline Generation Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** ${{ github.event.inputs.branch }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Screenshots Generated:** ${{ steps.count.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Total Screenshots:** ${{ steps.count.outputs.total }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Changed Files:** ${{ steps.count.outputs.changed }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Docker-Based Generation" >> $GITHUB_STEP_SUMMARY
           echo "Generated in Linux container matching CI environment exactly" >> $GITHUB_STEP_SUMMARY
@@ -99,7 +103,8 @@ jobs:
             
             ### Generation Details
             - **Source Branch:** ${{ github.event.inputs.branch }}
-            - **Screenshots:** ${{ steps.count.outputs.count }} total
+            - **Total Screenshots:** ${{ steps.count.outputs.total }}
+            - **Changed Files:** ${{ steps.count.outputs.changed }}
             - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             - **Generated in:** Docker container (Linux environment matching CI exactly)
             
