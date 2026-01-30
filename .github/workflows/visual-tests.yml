@@ -85,29 +85,48 @@ jobs:
 
       - name: Generate test summary
         if: always()
-        run: |
-          if [ -f "test-results/results.json" ]; then
-            echo "## 🎨 Visual Regression Test Results" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
             
-            # Parse JSON results
-            TOTAL=$(jq '.suites | map(.specs | length) | add // 0' test-results/results.json)
-            PASSED=$(jq '[.suites[].specs[].tests[] | select(.status == "passed")] | length' test-results/results.json)
-            FAILED=$(jq '[.suites[].specs[].tests[] | select(.status == "failed")] | length' test-results/results.json)
+            let summary = '## 🎨 Visual Regression Test Results\n\n';
             
-            echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
-            echo "- **Passed:** ✅ $PASSED" >> $GITHUB_STEP_SUMMARY
-            echo "- **Failed:** ❌ $FAILED" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+            try {
+              if (fs.existsSync('test-results/results.json')) {
+                const results = JSON.parse(fs.readFileSync('test-results/results.json', 'utf8'));
+                
+                let total = 0;
+                let passed = 0;
+                let failed = 0;
+                
+                results.suites?.forEach(suite => {
+                  suite.specs?.forEach(spec => {
+                    spec.tests?.forEach(test => {
+                      total++;
+                      if (test.status === 'passed') passed++;
+                      if (test.status === 'failed') failed++;
+                    });
+                  });
+                });
+                
+                summary += `- **Total Tests:** ${total}\n`;
+                summary += `- **Passed:** ✅ ${passed}\n`;
+                summary += `- **Failed:** ❌ ${failed}\n\n`;
+                
+                if (failed > 0) {
+                  summary += '⚠️ Visual differences detected. Review the artifacts for details.\n';
+                } else {
+                  summary += '✅ All visual regression tests passed!\n';
+                }
+              } else {
+                summary += '⚠️ Test results file not found\n';
+              }
+            } catch (error) {
+              summary += `⚠️ Could not parse test results: ${error.message}\n`;
+            }
             
-            if [ "$FAILED" -gt 0 ]; then
-              echo "⚠️ Visual differences detected. Review the artifacts for details." >> $GITHUB_STEP_SUMMARY
-            else
-              echo "✅ All visual regression tests passed!" >> $GITHUB_STEP_SUMMARY
-            fi
-          else
-            echo "⚠️ Test results file not found" >> $GITHUB_STEP_SUMMARY
-          fi
+            await core.summary.addRaw(summary).write();
 
       - name: Comment PR with results
         if: always() && github.event_name == 'pull_request'
