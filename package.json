@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "dev:mocked": " NEXT_PUBLIC_USE_MOCKS=true next dev",
