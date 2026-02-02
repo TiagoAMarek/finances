@@ -8,6 +8,7 @@ import {
   LogOut,
   PieChart,
   Receipt,
+  Settings,
   Tag,
   User,
 } from "lucide-react";
@@ -159,6 +160,14 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Configurações">
+              <Link href="/settings">
+                <Settings className="size-4" />
+                <span>Configurações</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg">
               <div className="flex items-center gap-3">

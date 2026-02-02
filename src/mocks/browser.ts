@@ -4,10 +4,12 @@ import { creditCardHandlers } from "../../__tests__/mocks/handlers/credit-cards"
 import { transactionHandlers } from "../../__tests__/mocks/handlers/transactions";
 import { authHandlers } from "../../__tests__/mocks/handlers/auth";
 import { categoryHandlers } from "../../__tests__/mocks/handlers/categories";
+import { userHandlers } from "../../__tests__/mocks/handlers/users";
 
 // Setup MSW browser worker with all API handlers
 export const worker = setupWorker(
   ...authHandlers,
+  ...userHandlers,
   ...accountHandlers,
   ...creditCardHandlers,
   ...transactionHandlers,
