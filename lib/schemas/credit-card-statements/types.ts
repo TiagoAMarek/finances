@@ -53,3 +53,26 @@ export type StatementImportResult = {
   updatedCurrentBill: boolean;
   newCurrentBill?: string;
 };
+
+// API Response types
+export type GetStatementsResponse = {
+  data: CreditCardStatementWithCard[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+export type GetStatementDetailsResponse = CreditCardStatementWithCard;
+
+export type LineItemWithRelations = StatementLineItem & {
+  suggestedCategory?: { id: number; name: string; type: string } | null;
+  finalCategory?: { id: number; name: string; type: string } | null;
+  duplicateOf?: { id: number; date: Date; amount: string; description: string } | null;
+};
+
+export type GetLineItemsResponse = {
+  data: LineItemWithRelations[];
+};
