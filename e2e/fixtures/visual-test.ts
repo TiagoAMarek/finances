@@ -1,6 +1,5 @@
 import { test as base, Page } from '@playwright/test';
 import { setupAuth } from '../utils/auth';
-import { preparePageForVisualTest } from '../utils/visual';
 import { VIEWPORTS, COLOR_SCHEME, FIXED_DATE } from '../config/constants';
 
 /**
