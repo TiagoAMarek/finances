@@ -3,19 +3,27 @@ import { SignJWT, jwtVerify } from "jose";
 import { NextRequest } from "next/server";
 import { ZodError } from "zod";
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required");
-}
-
 // Security: Validate JWT secret has minimum length for HS256 (recommend 32+ characters)
 const MIN_JWT_SECRET_LENGTH = 32;
-if (process.env.JWT_SECRET.length < MIN_JWT_SECRET_LENGTH) {
-  throw new Error(
-    `JWT_SECRET must be at least ${MIN_JWT_SECRET_LENGTH} characters long for secure HS256 signing`
-  );
-}
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+/**
+ * Lazily validates and retrieves JWT_SECRET.
+ * This is called at runtime (not module initialization) to avoid breaking Next.js build
+ * when environment variables aren't available during static analysis phase.
+ */
+function getJwtSecret(): Uint8Array {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET environment variable is required");
+  }
+
+  if (process.env.JWT_SECRET.length < MIN_JWT_SECRET_LENGTH) {
+    throw new Error(
+      `JWT_SECRET must be at least ${MIN_JWT_SECRET_LENGTH} characters long for secure HS256 signing`
+    );
+  }
+
+  return new TextEncoder().encode(process.env.JWT_SECRET);
+}
 
 export async function hashPassword(password: string): Promise<string> {
   return await bcrypt.hash(password, 12);
@@ -32,18 +40,20 @@ export async function signToken(payload: {
   userId: number;
   email: string;
 }): Promise<string> {
+  const jwtSecret = getJwtSecret();
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("24h")
-    .sign(JWT_SECRET);
+    .sign(jwtSecret);
 }
 
 export async function verifyToken(
   token: string,
 ): Promise<{ userId: number; email: string } | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const jwtSecret = getJwtSecret();
+    const { payload } = await jwtVerify(token, jwtSecret);
     return payload as { userId: number; email: string };
   } catch {
     return null;
