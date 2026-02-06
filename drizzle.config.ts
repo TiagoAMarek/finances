@@ -1,10 +1,20 @@
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+function getDatabaseUrl(): string {
+  if (!process.env.DATABASE_URL) {
+    throw new Error(
+      "DATABASE_URL environment variable is required for Drizzle migrations"
+    );
+  }
+  return process.env.DATABASE_URL;
+}
+
+export default defineConfig({
   schema: "./app/api/lib/schema.ts",
   out: "./drizzle",
-  driver: "pg",
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL!,
+    url: getDatabaseUrl(),
   },
-} satisfies Config;
+});
+

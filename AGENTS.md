@@ -33,6 +33,15 @@
 - File layout: Next.js app router under `app/`, API routes under `app/api/`
 - Testing: Vitest with environments (server/node, client/jsdom, browser/playwright); mocks in `__tests__/mocks/`
 
+## Schema Architecture (Drizzle + Zod)
+
+Hybrid approach using drizzle-zod for entity types and custom Zod for API validation:
+
+- **Entity types** (`*Schema` in `entity.ts`): Use drizzle-zod `*SelectSchema` re-exported from `drizzle-schemas.ts`
+- **API validation** (`*CreateSchema`, `*UpdateSchema` in `api.ts`): Custom Zod with business logic, Portuguese errors, defaults
+- **Drizzle Insert/Update**: Generated as `*DrizzleInsertSchema`/`*DrizzleUpdateSchema` but not used (custom schemas preferred)
+- Source: `lib/schemas/drizzle-schemas.ts` generates all schemas from DB tables via drizzle-zod
+
 ## Repo Assistant Rules
 
 - GitHub Copilot instructions: `.github/copilot-instructions.md` (comprehensive project guide)

@@ -1,9 +1,11 @@
 packages:
-  - '.'
+  - .
 
 onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
+  - '@tailwindcss/oxide'
+  - better-sqlite3
   - es5-ext
   - esbuild
+  - msw
   - sharp
   - unrs-resolver
