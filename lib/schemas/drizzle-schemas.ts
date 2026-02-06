@@ -61,7 +61,7 @@ export const UserDrizzleUpdateSchema = createUpdateSchema(users);
 // Categories
 // ============================================================================
 export const CategorySelectSchema = createSelectSchema(categories, {
-  createdAt: z.coerce.string(), // API returns ISO string, DB returns Date. Coerce handles both.
+  createdAt: z.string(), // Drizzle maps timestamp to ISO string
   type: z.enum(["income", "expense", "both"]), // Enforce Enum instead of generic string
 });
 export const CategoryDrizzleInsertSchema = createInsertSchema(categories);
@@ -91,11 +91,11 @@ export const CreditCardDrizzleUpdateSchema = createUpdateSchema(creditCards);
 // Transactions
 // ============================================================================
 export const TransactionSelectSchema = createSelectSchema(transactions, {
-  toAccountId: (schema) => schema.nullable().optional(),
-  category: (schema) => schema.nullable().optional(),
+  toAccountId: (schema) => schema.nullable(),
+  category: (schema) => schema.nullable(),
   type: z.enum(["income", "expense", "transfer"]), // Enforce Enum
   amount: z.string(), // Drizzle already maps decimal to string, but explicit doesn't hurt
-  date: z.coerce.string(),   // Drizzle already maps date to string
+  date: z.string(),   // Drizzle already maps date to string in yyyy-mm-dd format
 });
 export const TransactionDrizzleInsertSchema = createInsertSchema(transactions);
 export const TransactionDrizzleUpdateSchema = createUpdateSchema(transactions);

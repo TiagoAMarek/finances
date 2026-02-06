@@ -15,6 +15,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
+    toAccountId: null,
   },
   {
     id: 2,
@@ -27,6 +28,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: null,
     creditCardId: 1,
+    toAccountId: null,
   },
   {
     id: 3,
@@ -39,6 +41,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
+    toAccountId: null,
   },
   {
     id: 4,
@@ -51,6 +54,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
+    toAccountId: null,
   },
   {
     id: 5,
@@ -63,6 +67,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
+    toAccountId: null,
   },
   {
     id: 6,
@@ -75,6 +80,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: null,
     creditCardId: 2,
+    toAccountId: null,
   },
   {
     id: 7,
@@ -87,6 +93,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: null,
     creditCardId: 1,
+    toAccountId: null,
   },
   {
     id: 8,
@@ -112,6 +119,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
+    toAccountId: null,
   },
   {
     id: 10,
@@ -124,6 +132,7 @@ export const mockTransactions: Transaction[] = [
     ownerId: 1,
     accountId: 1,
     creditCardId: null,
+    toAccountId: null,
   },
 ];
 
@@ -143,5 +152,6 @@ export const createMockTransaction = (
   ownerId: 1,
   accountId: 1,
   creditCardId: null,
+  toAccountId: null,
   ...overrides,
 });
