@@ -35,10 +35,18 @@ function initDb(): ReturnType<typeof drizzle> {
 /**
  * Database connection instance.
  * Uses a Proxy to lazily initialize the connection when first accessed.
+ * The real database instance is cached after first initialization to avoid
+ * repeated validation and function call overhead.
  */
+let _proxyInitialized = false;
 export const db = new Proxy({} as ReturnType<typeof drizzle>, {
   get(target, prop) {
-    const realDb = initDb();
-    return realDb[prop as keyof typeof realDb];
+    // Cache the real database instance in the target after first access
+    if (!_proxyInitialized) {
+      const realDb = initDb();
+      Object.assign(target, realDb);
+      _proxyInitialized = true;
+    }
+    return target[prop as keyof typeof target];
   },
 });
