@@ -22,6 +22,13 @@
       "when": 1769537407151,
       "tag": "0002_many_power_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1770044609593,
+      "tag": "0003_icy_banshee",
+      "breakpoints": true
     }
   ]
 }

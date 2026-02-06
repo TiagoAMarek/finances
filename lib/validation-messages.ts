@@ -37,6 +37,12 @@ export const VALIDATION_MESSAGES = {
     amountPositive: "Valor deve ser maior que zero",
   },
 
+  // Invalid field messages
+  invalid: {
+    amount: "Valor inválido",
+    creditCard: "Cartão de crédito inválido",
+  },
+
   // Length validation messages
   length: {
     nameMin: "Nome deve ter pelo menos 2 caracteres",

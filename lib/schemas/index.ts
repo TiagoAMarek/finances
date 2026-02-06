@@ -13,6 +13,9 @@ export * from "./accounts";
 // Credit card schemas
 export * from "./credit-cards";
 
+// Credit card statements schemas
+export * from "./credit-card-statements";
+
 // Category schemas
 export * from "./categories";
 
