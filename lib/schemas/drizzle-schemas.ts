@@ -99,3 +99,13 @@ export const TransactionSelectSchema = createSelectSchema(transactions, {
 });
 export const TransactionDrizzleInsertSchema = createInsertSchema(transactions);
 export const TransactionDrizzleUpdateSchema = createUpdateSchema(transactions);
+
+// ============================================================================
+// Inferred Types - Convenience exports for type usage throughout the app
+// ============================================================================
+export type User = z.infer<typeof UserSelectSchema>;
+export type Category = z.infer<typeof CategorySelectSchema>;
+export type DefaultCategory = z.infer<typeof DefaultCategorySelectSchema>;
+export type BankAccount = z.infer<typeof BankAccountSelectSchema>;
+export type CreditCard = z.infer<typeof CreditCardSelectSchema>;
+export type Transaction = z.infer<typeof TransactionSelectSchema>;
