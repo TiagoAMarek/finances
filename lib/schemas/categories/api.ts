@@ -5,9 +5,7 @@ import { VALIDATION_MESSAGES, requiredMessage, formatMessage } from "../base/val
 export const CategoryCreateSchema = z.object({
   name: z.string().min(1, requiredMessage("name")),
   type: z.enum(["income", "expense", "both"], {
-    errorMap: () => ({
-      message: VALIDATION_MESSAGES.enums.categoryType,
-    }),
+    error: () => VALIDATION_MESSAGES.enums.categoryType,
   }),
   color: z
     .string()
@@ -20,9 +18,7 @@ export const CategoryUpdateSchema = z.object({
   name: z.string().min(1, requiredMessage("name")).optional(),
   type: z
     .enum(["income", "expense", "both"], {
-      errorMap: () => ({
-        message: VALIDATION_MESSAGES.enums.categoryType,
-      }),
+      error: () => VALIDATION_MESSAGES.enums.categoryType,
     })
     .optional(),
   color: z

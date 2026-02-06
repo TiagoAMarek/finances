@@ -81,7 +81,7 @@ export function createSuccessResponse(data: unknown, status: number = 200) {
 
 export function handleZodError(error: unknown): Response | null {
   if (error instanceof ZodError) {
-    const errorMessage = error.errors[0]?.message || "Invalid input data";
+    const errorMessage = error.issues[0]?.message || "Invalid input data";
     return createErrorResponse(errorMessage, 400);
   }
   return null;

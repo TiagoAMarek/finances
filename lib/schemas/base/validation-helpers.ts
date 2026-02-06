@@ -10,7 +10,7 @@ export { VALIDATION_MESSAGES, requiredMessage, formatMessage };
  * Accepts formats like: "123", "123.45", "0.5"
  * Rejects: negative numbers, non-numeric strings, more than 2 decimals
  */
-export function validAmount(fieldName?: string): z.ZodEffects<z.ZodString, string, string> {
+export function validAmount(fieldName?: string) {
   let message: string = VALIDATION_MESSAGES.required.amount;
   
   // Type-safe field name lookup

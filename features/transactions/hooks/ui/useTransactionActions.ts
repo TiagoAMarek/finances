@@ -34,7 +34,7 @@ export function useTransactionActions() {
 
     if (!parseResult.success) {
       // If validation fails, show the first error and reject
-      const firstError = parseResult.error.errors[0];
+      const firstError = parseResult.error.issues[0];
       toast.error(firstError.message);
       return Promise.reject(new Error(firstError.message));
     }
