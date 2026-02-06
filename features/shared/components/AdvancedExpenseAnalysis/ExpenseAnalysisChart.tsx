@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   CartesianGrid,
   Line,
@@ -10,10 +10,6 @@ import {
 } from "recharts";
 
 import { formatCurrency } from "@/lib/expense-utils";
-
-// Disable animations in test/visual regression environments
-const isTestEnvironment = process.env.NODE_ENV === 'test' || 
-                          process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 /**
  * Props for the tooltip component
@@ -99,6 +95,14 @@ export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
       ? 'p-2'
       : 'p-2 h-64 sm:h-80 lg:h-[350px]';
 
+    // Check environment inside component to avoid build-time evaluation
+    const isAnimationActive = useMemo(() => {
+      // Disable animations in test/visual regression environments
+      if (typeof window === 'undefined') return true; // Server-side, animations don't matter
+      return process.env.NODE_ENV !== 'test' && 
+             process.env.NEXT_PUBLIC_USE_MOCKS !== 'true';
+    }, []);
+
     return (
       <div className={containerClass} style={height ? { height: `${height}px` } : undefined}>
         <ResponsiveContainer height="100%" width="100%">
@@ -136,7 +140,7 @@ export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
                 r: 6,
                 className: "transition-all duration-200 hover:r-8",
               }}
-              isAnimationActive={!isTestEnvironment}
+              isAnimationActive={isAnimationActive}
               stroke="#ef4444"
               strokeWidth={3}
               type="monotone"
