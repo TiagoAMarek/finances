@@ -43,6 +43,18 @@ export const VALIDATION_MESSAGES = {
     creditCard: "Cartão de crédito inválido",
   },
 
+  // File upload validation messages
+  file: {
+    base64Invalid: "Dados do arquivo devem estar em formato Base64 válido",
+    fileNameInvalid: "Nome do arquivo contém caracteres inválidos",
+    fileTooLarge: "Arquivo excede o tamanho máximo permitido (10MB)",
+    fileNameRequired: "Nome do arquivo é obrigatório",
+    fileDataRequired: "Dados do arquivo são obrigatórios",
+    bankCodeRequired: "Código do banco é obrigatório",
+    bankCodeMax: "Código do banco deve ter no máximo 50 caracteres",
+    fileNameMax: "Nome do arquivo deve ter no máximo 255 caracteres",
+  },
+
   // Length validation messages
   length: {
     nameMin: "Nome deve ter pelo menos 2 caracteres",
@@ -93,7 +105,7 @@ export const VALIDATION_MESSAGES = {
   // Success messages
   success: {
     created: "Criado com sucesso",
-    updated: "Atualizado com sucesso", 
+    updated: "Atualizado com sucesso",
     deleted: "Excluído com sucesso",
     saved: "Salvo com sucesso",
     login: "Login realizado com sucesso",
@@ -128,7 +140,7 @@ export function getValidationMessage(
     console.warn(`Missing validation message: ${category}.${key}`);
     return "Erro de validação";
   }
-  
+
   // Replace placeholders if any
   return args.reduce((msg, arg, index) => {
     return msg.replace(`{${index}}`, arg);

@@ -12,11 +12,14 @@ import {
 } from "@/lib/schemas/credit-card-statements/api";
 
 describe("StatementUploadSchema", () => {
+  // Valid base64 encoded content
+  const validBase64 = "SGVsbG8gV29ybGQh"; // "Hello World!" in base64
+
   const validUpload = {
     creditCardId: 1,
     bankCode: "itau",
     fileName: "statement.pdf",
-    fileData: "base64encodeddata",
+    fileData: validBase64,
   };
 
   describe("valid data", () => {
@@ -30,8 +33,18 @@ describe("StatementUploadSchema", () => {
     });
 
     it("should accept long file names up to 255 chars", () => {
-      const longFileName = { ...validUpload, fileName: "a".repeat(255) };
+      const longFileName = { ...validUpload, fileName: "a".repeat(251) + ".pdf" };
       expect(() => StatementUploadSchema.parse(longFileName)).not.toThrow();
+    });
+
+    it("should accept valid base64 with padding", () => {
+      const withPadding = { ...validUpload, fileData: "SGVsbG8=" };
+      expect(() => StatementUploadSchema.parse(withPadding)).not.toThrow();
+    });
+
+    it("should accept valid base64 with double padding", () => {
+      const withDoublePadding = { ...validUpload, fileData: "SGVs==" };
+      expect(() => StatementUploadSchema.parse(withDoublePadding)).not.toThrow();
     });
   });
 
@@ -74,6 +87,61 @@ describe("StatementUploadSchema", () => {
     it("should reject empty fileData", () => {
       const invalid = { ...validUpload, fileData: "" };
       expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+  });
+
+  describe("security - path traversal", () => {
+    it("should reject fileName with double dots (..)", () => {
+      const invalid = { ...validUpload, fileName: "../../../etc/passwd" };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+
+    it("should reject fileName with forward slashes", () => {
+      const invalid = { ...validUpload, fileName: "path/to/file.pdf" };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+
+    it("should reject fileName with backslashes", () => {
+      const invalid = { ...validUpload, fileName: "path\\to\\file.pdf" };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+
+    it("should reject fileName with mixed path separators", () => {
+      const invalid = { ...validUpload, fileName: "..\\secret/file.pdf" };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+  });
+
+  describe("security - base64 validation", () => {
+    it("should reject invalid base64 characters (special chars)", () => {
+      const invalid = { ...validUpload, fileData: "SGVsbG8@V29ybGQh" };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+
+    it("should reject invalid base64 characters (spaces)", () => {
+      const invalid = { ...validUpload, fileData: "SGVs bG8g V29y" };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+
+    it("should reject invalid base64 characters (unicode)", () => {
+      const invalid = { ...validUpload, fileData: "SGVsbG8ñV29ybGQ=" };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+  });
+
+  describe("security - file size limit", () => {
+    it("should reject files exceeding size limit", () => {
+      // Create a string larger than 14MB (the limit)
+      const largeData = "A".repeat(14_000_001);
+      const invalid = { ...validUpload, fileData: largeData };
+      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    });
+
+    it("should accept files at the size limit", () => {
+      // Create a string exactly at the limit
+      const maxData = "A".repeat(14_000_000);
+      const valid = { ...validUpload, fileData: maxData };
+      expect(() => StatementUploadSchema.parse(valid)).not.toThrow();
     });
   });
 });
