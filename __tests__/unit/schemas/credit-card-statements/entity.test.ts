@@ -38,19 +38,13 @@ describe("CreditCardStatementSchema", () => {
       expect(() => CreditCardStatementSchema.parse(withImportedAt)).not.toThrow();
     });
 
-    it("should accept all valid status values", () => {
-      const statuses: Array<"pending" | "reviewed" | "imported" | "cancelled"> = [
-        "pending",
-        "reviewed",
-        "imported",
-        "cancelled",
-      ];
-
-      statuses.forEach((status) => {
+    it.each(["pending", "reviewed", "imported", "cancelled"] as const)(
+      "should accept status '%s'",
+      (status) => {
         const statement = { ...validStatement, status };
         expect(() => CreditCardStatementSchema.parse(statement)).not.toThrow();
-      });
-    });
+      }
+    );
 
     it("should accept zero amounts", () => {
       const zeroAmounts = {
@@ -67,33 +61,15 @@ describe("CreditCardStatementSchema", () => {
   });
 
   describe("invalid data", () => {
-    it("should reject negative previousBalance", () => {
-      const invalid = { ...validStatement, previousBalance: "-10.00" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative paymentsReceived", () => {
-      const invalid = { ...validStatement, paymentsReceived: "-50.00" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative purchases", () => {
-      const invalid = { ...validStatement, purchases: "-100.00" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative fees", () => {
-      const invalid = { ...validStatement, fees: "-10.00" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative interest", () => {
-      const invalid = { ...validStatement, interest: "-5.00" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative totalAmount", () => {
-      const invalid = { ...validStatement, totalAmount: "-100.00" };
+    it.each([
+      ["previousBalance", "-10.00"],
+      ["paymentsReceived", "-50.00"],
+      ["purchases", "-100.00"],
+      ["fees", "-10.00"],
+      ["interest", "-5.00"],
+      ["totalAmount", "-100.00"],
+    ])("should reject negative %s", (field, value) => {
+      const invalid = { ...validStatement, [field]: value };
       expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
     });
 
@@ -112,23 +88,19 @@ describe("CreditCardStatementSchema", () => {
       expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
     });
 
-    it("should reject amounts without decimal places", () => {
-      const invalid = { ...validStatement, totalAmount: "100" };
+    it.each([
+      ["without decimal places", "100"],
+      ["with wrong decimal places", "100.1"],
+    ])("should reject amounts %s", (_, value) => {
+      const invalid = { ...validStatement, totalAmount: value };
       expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
     });
 
-    it("should reject amounts with wrong decimal places", () => {
-      const invalid = { ...validStatement, totalAmount: "100.1" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative ID", () => {
-      const invalid = { ...validStatement, id: -1 };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject zero ID", () => {
-      const invalid = { ...validStatement, id: 0 };
+    it.each([
+      ["negative", -1],
+      ["zero", 0],
+    ])("should reject %s ID", (_, value) => {
+      const invalid = { ...validStatement, id: value };
       expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
     });
   });
@@ -156,39 +128,22 @@ describe("StatementLineItemSchema", () => {
       expect(() => StatementLineItemSchema.parse(reversal)).not.toThrow();
     });
 
-    it("should accept all valid type values", () => {
-      const types: Array<"purchase" | "payment" | "fee" | "interest" | "reversal"> = [
-        "purchase",
-        "payment",
-        "fee",
-        "interest",
-        "reversal",
-      ];
-
-      types.forEach((type) => {
+    it.each(["purchase", "payment", "fee", "interest", "reversal"] as const)(
+      "should accept type '%s'",
+      (type) => {
         const item = { ...validLineItem, type };
         expect(() => StatementLineItemSchema.parse(item)).not.toThrow();
-      });
-    });
+      }
+    );
 
-    it("should accept optional category", () => {
-      const withCategory = { ...validLineItem, category: "Alimentação" };
-      expect(() => StatementLineItemSchema.parse(withCategory)).not.toThrow();
-    });
-
-    it("should accept optional suggestedCategoryId", () => {
-      const withSuggestedCategory = { ...validLineItem, suggestedCategoryId: 5 };
-      expect(() => StatementLineItemSchema.parse(withSuggestedCategory)).not.toThrow();
-    });
-
-    it("should accept optional finalCategoryId", () => {
-      const withFinalCategory = { ...validLineItem, finalCategoryId: 5 };
-      expect(() => StatementLineItemSchema.parse(withFinalCategory)).not.toThrow();
-    });
-
-    it("should accept optional transactionId", () => {
-      const withTransaction = { ...validLineItem, transactionId: 10 };
-      expect(() => StatementLineItemSchema.parse(withTransaction)).not.toThrow();
+    it.each([
+      ["category", "Alimentação"],
+      ["suggestedCategoryId", 5],
+      ["finalCategoryId", 5],
+      ["transactionId", 10],
+    ])("should accept optional %s", (field, value) => {
+      const withField = { ...validLineItem, [field]: value };
+      expect(() => StatementLineItemSchema.parse(withField)).not.toThrow();
     });
 
     it("should accept duplicate with reason", () => {
@@ -215,13 +170,11 @@ describe("StatementLineItemSchema", () => {
       expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
     });
 
-    it("should reject amount without decimal places", () => {
-      const invalid = { ...validLineItem, amount: "100" };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject amount with wrong decimal places", () => {
-      const invalid = { ...validLineItem, amount: "100.1" };
+    it.each([
+      ["without decimal places", "100"],
+      ["with wrong decimal places", "100.1"],
+    ])("should reject amount %s", (_, value) => {
+      const invalid = { ...validLineItem, amount: value };
       expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
     });
 
@@ -230,23 +183,19 @@ describe("StatementLineItemSchema", () => {
       expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
     });
 
-    it("should reject description longer than 500 chars", () => {
-      const invalid = { ...validLineItem, description: "a".repeat(501) };
+    it.each([
+      ["longer than 500 chars", "a".repeat(501)],
+      ["empty", ""],
+    ])("should reject description %s", (_, value) => {
+      const invalid = { ...validLineItem, description: value };
       expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
     });
 
-    it("should reject empty description", () => {
-      const invalid = { ...validLineItem, description: "" };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative statementId", () => {
-      const invalid = { ...validLineItem, statementId: -1 };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject zero statementId", () => {
-      const invalid = { ...validLineItem, statementId: 0 };
+    it.each([
+      ["negative", -1],
+      ["zero", 0],
+    ])("should reject %s statementId", (_, value) => {
+      const invalid = { ...validLineItem, statementId: value };
       expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
     });
   });
@@ -254,33 +203,28 @@ describe("StatementLineItemSchema", () => {
 
 describe("Enum schemas", () => {
   describe("StatementStatusEnum", () => {
-    it("should accept all valid status values", () => {
-      expect(() => StatementStatusEnum.parse("pending")).not.toThrow();
-      expect(() => StatementStatusEnum.parse("reviewed")).not.toThrow();
-      expect(() => StatementStatusEnum.parse("imported")).not.toThrow();
-      expect(() => StatementStatusEnum.parse("cancelled")).not.toThrow();
-    });
+    it.each(["pending", "reviewed", "imported", "cancelled"])(
+      "should accept status '%s'",
+      (status) => {
+        expect(() => StatementStatusEnum.parse(status)).not.toThrow();
+      }
+    );
 
-    it("should reject invalid status values", () => {
-      expect(() => StatementStatusEnum.parse("invalid")).toThrow();
-      expect(() => StatementStatusEnum.parse("")).toThrow();
-      expect(() => StatementStatusEnum.parse(null)).toThrow();
+    it.each(["invalid", "", null])("should reject invalid value %p", (value) => {
+      expect(() => StatementStatusEnum.parse(value)).toThrow();
     });
   });
 
   describe("LineItemTypeEnum", () => {
-    it("should accept all valid type values", () => {
-      expect(() => LineItemTypeEnum.parse("purchase")).not.toThrow();
-      expect(() => LineItemTypeEnum.parse("payment")).not.toThrow();
-      expect(() => LineItemTypeEnum.parse("fee")).not.toThrow();
-      expect(() => LineItemTypeEnum.parse("interest")).not.toThrow();
-      expect(() => LineItemTypeEnum.parse("reversal")).not.toThrow();
-    });
+    it.each(["purchase", "payment", "fee", "interest", "reversal"])(
+      "should accept type '%s'",
+      (type) => {
+        expect(() => LineItemTypeEnum.parse(type)).not.toThrow();
+      }
+    );
 
-    it("should reject invalid type values", () => {
-      expect(() => LineItemTypeEnum.parse("invalid")).toThrow();
-      expect(() => LineItemTypeEnum.parse("")).toThrow();
-      expect(() => LineItemTypeEnum.parse(null)).toThrow();
+    it.each(["invalid", "", null])("should reject invalid value %p", (value) => {
+      expect(() => LineItemTypeEnum.parse(value)).toThrow();
     });
   });
 });
