@@ -21,6 +21,7 @@ export const transactionHandlers = [
       id: Math.max(...mockTransactions.map((t) => t.id)) + 1,
       ...newTransaction,
       ownerId: 1,
+      category: null, // Legacy field
       categoryId: newTransaction.categoryId ?? null,
       accountId: newTransaction.accountId ?? null,
       creditCardId: newTransaction.creditCardId ?? null,
@@ -36,6 +37,7 @@ export const transactionHandlers = [
       id: Math.max(...mockTransactions.map((t) => t.id)) + 1,
       ...newTransaction,
       ownerId: 1,
+      category: null, // Legacy field
       categoryId: newTransaction.categoryId ?? null,
       accountId: newTransaction.accountId ?? null,
       creditCardId: newTransaction.creditCardId ?? null,
