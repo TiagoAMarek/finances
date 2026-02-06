@@ -7,6 +7,7 @@ import { Page } from '@playwright/test';
 
 /**
  * Wait for all Recharts to be fully rendered
+ * Implements community best practices for chart stability
  * This replaces the 1500ms hard-coded wait for charts
  */
 export async function waitForChartsToRender(page: Page): Promise<void> {
@@ -40,8 +41,32 @@ export async function waitForChartsToRender(page: Page): Promise<void> {
       { timeout: 5000 }
     );
     
-    // Wait for one animation frame to ensure everything is painted
-    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
+    // Wait for chart dimensions to stabilize (community best practice)
+    await page.waitForFunction(
+      () => {
+        const charts = document.querySelectorAll('.recharts-wrapper');
+        return Array.from(charts).every(chart => {
+          const svg = chart.querySelector('svg');
+          if (!svg) return false;
+          
+          // Verify SVG has non-zero computed dimensions
+          const rect = svg.getBoundingClientRect();
+          return rect && rect.width > 0 && rect.height > 0;
+        });
+      },
+      { timeout: 3000 }
+    );
+    
+    // Small stabilization delay to ensure all rendering is complete
+    // This is a community-recommended practice for chart libraries
+    await page.evaluate(() => new Promise(resolve => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    }));
+    
+    // Additional 50ms buffer for any final paint operations
+    await page.waitForTimeout(50);
     
   } catch (error) {
     // If waiting fails, chart might not be present or already rendered

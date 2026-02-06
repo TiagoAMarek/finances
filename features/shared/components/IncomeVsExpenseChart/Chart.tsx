@@ -16,6 +16,10 @@ interface ChartProps {
   height?: number;
 }
 
+// Disable animations in test/visual regression environments
+const isTestEnvironment = process.env.NODE_ENV === 'test' || 
+                          process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
+
 /**
  * Chart visualization component for income vs expense data
  */
@@ -53,12 +57,14 @@ export const Chart = memo<ChartProps>(({ data, height }) => {
           <Bar
             dataKey="receitas"
             fill="#22c55e"
+            isAnimationActive={!isTestEnvironment}
             name="Receitas"
             radius={[2, 2, 0, 0]}
           />
           <Bar
             dataKey="despesas"
             fill="#ef4444"
+            isAnimationActive={!isTestEnvironment}
             name="Despesas"
             radius={[2, 2, 0, 0]}
           />

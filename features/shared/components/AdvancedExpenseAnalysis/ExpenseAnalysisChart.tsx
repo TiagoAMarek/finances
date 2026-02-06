@@ -11,6 +11,10 @@ import {
 
 import { formatCurrency } from "@/lib/expense-utils";
 
+// Disable animations in test/visual regression environments
+const isTestEnvironment = process.env.NODE_ENV === 'test' || 
+                          process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
+
 /**
  * Props for the tooltip component
  */
@@ -87,6 +91,7 @@ const CustomTooltip = memo<TooltipProps>(function CustomTooltip({
  * - Custom tooltip with transaction details
  * - Responsive design with configurable height
  * - Consistent styling with application theme
+ * - Animations disabled in test environments for stability
  */
 export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
   function ExpenseAnalysisChart({ data, height }) {
@@ -131,6 +136,7 @@ export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
                 r: 6,
                 className: "transition-all duration-200 hover:r-8",
               }}
+              isAnimationActive={!isTestEnvironment}
               stroke="#ef4444"
               strokeWidth={3}
               type="monotone"
