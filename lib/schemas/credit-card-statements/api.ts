@@ -5,31 +5,19 @@ import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
 
 import { StatementStatusEnum, LineItemTypeEnum } from "./entity";
 
-// Base64 validation regex (standard base64 alphabet + padding)
-const BASE64_REGEX = /^[A-Za-z0-9+/]*={0,2}$/;
-
-// Maximum file size in base64 characters (~10MB file = ~13.3MB base64)
-const MAX_FILE_DATA_LENGTH = 14_000_000;
-
 // Statement Upload Schema
+// Note: File data not stored - only metadata (fileName, fileHash) persisted after parsing
 export const StatementUploadSchema = z.object({
   creditCardId: z
-    .number({
-      required_error: VALIDATION_MESSAGES.required.creditCard,
-      invalid_type_error: VALIDATION_MESSAGES.invalid.creditCard,
-    })
+    .number({ error: VALIDATION_MESSAGES.invalid.creditCard })
     .int()
     .positive(VALIDATION_MESSAGES.invalid.creditCard),
   bankCode: z
-    .string({
-      required_error: VALIDATION_MESSAGES.file.bankCodeRequired,
-    })
+    .string({ error: VALIDATION_MESSAGES.file.bankCodeRequired })
     .min(1, VALIDATION_MESSAGES.file.bankCodeRequired)
     .max(50, VALIDATION_MESSAGES.file.bankCodeMax),
   fileName: z
-    .string({
-      required_error: VALIDATION_MESSAGES.file.fileNameRequired,
-    })
+    .string({ error: VALIDATION_MESSAGES.file.fileNameRequired })
     .min(1, VALIDATION_MESSAGES.file.fileNameRequired)
     .max(255, VALIDATION_MESSAGES.file.fileNameMax)
     // Security: Prevent path traversal and invalid characters
@@ -37,21 +25,9 @@ export const StatementUploadSchema = z.object({
       (val) => !val.includes("..") && !val.includes("/") && !val.includes("\\"),
       VALIDATION_MESSAGES.file.fileNameInvalid
     ),
-  fileData: z
-    .string({
-      required_error: VALIDATION_MESSAGES.file.fileDataRequired,
-    })
-    .min(1, VALIDATION_MESSAGES.file.fileDataRequired)
-    // Security: Validate base64 format
-    .refine(
-      (val) => BASE64_REGEX.test(val),
-      VALIDATION_MESSAGES.file.base64Invalid
-    )
-    // Security: Enforce file size limit (~10MB)
-    .refine(
-      (val) => val.length <= MAX_FILE_DATA_LENGTH,
-      VALIDATION_MESSAGES.file.fileTooLarge
-    ),
+  fileHash: z
+    .string({ error: VALIDATION_MESSAGES.file.fileHashRequired })
+    .length(64, VALIDATION_MESSAGES.file.fileHashLength),
 });
 
 // Statement Update Schema

@@ -65,7 +65,7 @@ export const StatementLineItemSchema = z.object({
   transactionId: z.number().int().positive().nullable().optional(), // After import
   isDuplicate: z.boolean(),
   duplicateReason: z.string().max(255).nullable().optional(),
-  rawData: z.record(z.any()).nullable().optional(), // JSONB field
+  rawData: z.record(z.string(), z.any()).nullable().optional(), // JSONB field
   createdAt: z.string().datetime(),
 });
 
