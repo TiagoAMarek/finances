@@ -1,6 +1,8 @@
 import { z } from "zod";
+
 import { validAmount } from "@/lib/schemas/base/validation-helpers";
 import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
+
 import { StatementStatusEnum, LineItemTypeEnum } from "./entity";
 
 // Statement Upload Schema
@@ -76,7 +78,7 @@ export const StatementListQuerySchema = z.object({
 export const ParsedLineItemSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   description: z.string().min(1).max(500),
-  amount: z.string().regex(/^\d+\.\d{2}$/),
+  amount: z.string().regex(/^-?\d+\.\d{2}$/, "Valor deve estar no formato 0.00 ou -0.00"), // Allow negative for reversals
   type: LineItemTypeEnum,
   category: z.string().max(100).optional(),
 });
@@ -85,11 +87,23 @@ export const ParsedStatementSchema = z.object({
   bankCode: z.string().min(1).max(50),
   statementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  previousBalance: z.string().regex(/^\d+\.\d{2}$/),
-  paymentsReceived: z.string().regex(/^\d+\.\d{2}$/),
-  purchases: z.string().regex(/^\d+\.\d{2}$/),
-  fees: z.string().regex(/^\d+\.\d{2}$/),
-  interest: z.string().regex(/^\d+\.\d{2}$/),
-  totalAmount: z.string().regex(/^\d+\.\d{2}$/),
+  previousBalance: z.string()
+    .regex(/^\d+\.\d{2}$/)
+    .refine(val => parseFloat(val) >= 0, "Saldo anterior não pode ser negativo"),
+  paymentsReceived: z.string()
+    .regex(/^\d+\.\d{2}$/)
+    .refine(val => parseFloat(val) >= 0, "Pagamentos recebidos não podem ser negativos"),
+  purchases: z.string()
+    .regex(/^\d+\.\d{2}$/)
+    .refine(val => parseFloat(val) >= 0, "Compras não podem ser negativas"),
+  fees: z.string()
+    .regex(/^\d+\.\d{2}$/)
+    .refine(val => parseFloat(val) >= 0, "Taxas não podem ser negativas"),
+  interest: z.string()
+    .regex(/^\d+\.\d{2}$/)
+    .refine(val => parseFloat(val) >= 0, "Juros não podem ser negativos"),
+  totalAmount: z.string()
+    .regex(/^\d+\.\d{2}$/)
+    .refine(val => parseFloat(val) >= 0, "Valor total não pode ser negativo"),
   lineItems: z.array(ParsedLineItemSchema),
 });

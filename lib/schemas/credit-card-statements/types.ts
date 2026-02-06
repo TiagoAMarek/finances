@@ -1,12 +1,5 @@
 import { z } from "zod";
-import {
-  CreditCardStatementSchema,
-  StatementLineItemSchema,
-  CreditCardStatementWithLineItemsSchema,
-  CreditCardStatementWithCardSchema,
-  StatementStatusEnum,
-  LineItemTypeEnum,
-} from "./entity";
+
 import {
   StatementUploadSchema,
   StatementUpdateSchema,
@@ -17,6 +10,14 @@ import {
   ParsedLineItemSchema,
   ParsedStatementSchema,
 } from "./api";
+import {
+  CreditCardStatementSchema,
+  StatementLineItemSchema,
+  CreditCardStatementWithLineItemsSchema,
+  CreditCardStatementWithCardSchema,
+  StatementStatusEnum,
+  LineItemTypeEnum,
+} from "./entity";
 
 // Entity types
 export type CreditCardStatement = z.infer<typeof CreditCardStatementSchema>;
@@ -70,7 +71,7 @@ export type GetStatementDetailsResponse = CreditCardStatementWithCard;
 export type LineItemWithRelations = StatementLineItem & {
   suggestedCategory?: { id: number; name: string; type: string } | null;
   finalCategory?: { id: number; name: string; type: string } | null;
-  duplicateOf?: { id: number; date: Date; amount: string; description: string } | null;
+  duplicateOf?: { id: number; date: string; amount: string; description: string } | null;
 };
 
 export type GetLineItemsResponse = {
