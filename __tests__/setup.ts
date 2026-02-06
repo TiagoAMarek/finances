@@ -3,8 +3,12 @@ import { vi } from "vitest";
 
 // Mock system time to match visual regression tests and mock data
 // All mock transactions are dated in January 2024, so we need to set
-// the system time to that month for dashboard calculations to work correctly
-vi.setSystemTime(new Date('2024-01-25T12:00:00.000Z'));
+// the system time to that month for dashboard calculations to work correctly.
+// Use fake timers that only mock Date so other timers (e.g. RTL) keep working.
+vi.useFakeTimers({
+  now: new Date("2024-01-25T12:00:00.000Z"),
+  toFake: ["Date"],
+});
 
 // Mock next/navigation
 vi.mock("next/navigation", () => ({

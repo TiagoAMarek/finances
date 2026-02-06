@@ -240,15 +240,18 @@ export async function hideScrollbars(page: Page): Promise<void> {
 export async function hideNextJsDevIndicators(page: Page): Promise<void> {
   await page.addStyleTag({
     content: `
-      /* Hide Next.js dev mode build indicator button */
+      /* Hide Next.js dev mode build indicator button and overlays */
+      /* Use specific selectors to avoid hiding the main app container */
       #__next-build-watcher,
-      [id^="__next"],
-      [class*="__next"],
       [data-nextjs-toast-errors-parent],
       [data-nextjs-dialog-overlay],
-      [id*="nextjs"],
+      [data-nextjs-dialog],
+      [data-nextjs-portal],
       .__next-dev-overlay,
-      nextjs-portal {
+      nextjs-portal,
+      [id*="nextjs-portal"],
+      [class*="nextjs-toast"],
+      [class*="nextjs-dialog"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
