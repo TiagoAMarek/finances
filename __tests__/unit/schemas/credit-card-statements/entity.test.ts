@@ -33,11 +33,6 @@ describe("CreditCardStatementSchema", () => {
       expect(() => CreditCardStatementSchema.parse(validStatement)).not.toThrow();
     });
 
-    it("should accept statement with optional fileData", () => {
-      const withFileData = { ...validStatement, fileData: "base64data" };
-      expect(() => CreditCardStatementSchema.parse(withFileData)).not.toThrow();
-    });
-
     it("should accept statement with optional importedAt", () => {
       const withImportedAt = { ...validStatement, importedAt: "2024-01-16T10:00:00Z" };
       expect(() => CreditCardStatementSchema.parse(withImportedAt)).not.toThrow();

@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS "credit_card_statements" (
 	"total_amount" numeric(10, 2) DEFAULT '0.00' NOT NULL,
 	"file_name" varchar(255) NOT NULL,
 	"file_hash" varchar(64) NOT NULL,
-	"file_data" text,
 	"status" varchar(20) DEFAULT 'pending' NOT NULL,
 	"imported_at" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,

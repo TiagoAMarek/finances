@@ -113,8 +113,7 @@ export const creditCardStatements = pgTable("credit_card_statements", {
     .default("0.00")
     .notNull(), // amount due
   fileName: varchar("file_name", { length: 255 }).notNull(),
-  fileHash: varchar("file_hash", { length: 64 }).notNull(), // SHA-256
-  fileData: text("file_data"), // Base64 encoded PDF data (TODO: consider moving to object storage for better performance)
+  fileHash: varchar("file_hash", { length: 64 }).notNull(), // SHA-256 for duplicate detection
   status: varchar("status", { length: 20 })
     .$type<"pending" | "reviewed" | "imported" | "cancelled">()
     .default("pending")

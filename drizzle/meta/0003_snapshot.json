@@ -244,12 +244,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "file_data": {
-          "name": "file_data",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "status": {
           "name": "status",
           "type": "varchar(20)",

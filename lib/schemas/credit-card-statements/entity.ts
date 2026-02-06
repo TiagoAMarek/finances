@@ -44,8 +44,7 @@ export const CreditCardStatementSchema = z.object({
     .regex(/^\d+\.\d{2}$/, "Valor total deve estar no formato 0.00")
     .refine(val => parseFloat(val) >= 0, "Valor total não pode ser negativo"),
   fileName: z.string().min(1).max(255),
-  fileHash: z.string().length(64), // SHA-256 hash
-  fileData: z.string().nullable().optional(), // Base64 encoded PDF
+  fileHash: z.string().length(64), // SHA-256 hash for duplicate detection
   status: StatementStatusEnum,
   importedAt: z.string().datetime().nullable().optional(),
   createdAt: z.string().datetime(),

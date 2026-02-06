@@ -56,8 +56,8 @@ export const StatementUploadSchema = z.object({
 
 // Statement Update Schema
 export const StatementUpdateSchema = z.object({
-  statementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data da fatura inválida").optional(),
-  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data de vencimento inválida").optional(),
+  statementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, VALIDATION_MESSAGES.statement.statementDateInvalid).optional(),
+  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, VALIDATION_MESSAGES.statement.dueDateInvalid).optional(),
   previousBalance: validAmount().optional(),
   paymentsReceived: validAmount().optional(),
   purchases: validAmount().optional(),
@@ -75,7 +75,7 @@ export const LineItemUpdateSchema = z.object({
 });
 
 export const LineItemsBulkUpdateSchema = z.object({
-  lineItems: z.array(LineItemUpdateSchema).min(1, "Pelo menos um item deve ser atualizado"),
+  lineItems: z.array(LineItemUpdateSchema).min(1, VALIDATION_MESSAGES.statement.lineItemsMin),
 });
 
 // Import Statement Schema
@@ -99,7 +99,7 @@ export const StatementListQuerySchema = z.object({
 export const ParsedLineItemSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   description: z.string().min(1).max(500),
-  amount: z.string().regex(/^-?\d+\.\d{2}$/, "Valor deve estar no formato 0.00 ou -0.00"), // Allow negative for reversals
+  amount: z.string().regex(/^-?\d+\.\d{2}$/, VALIDATION_MESSAGES.statement.amountFormat), // Allow negative for reversals
   type: LineItemTypeEnum,
   category: z.string().max(100).optional(),
 });
@@ -110,21 +110,21 @@ export const ParsedStatementSchema = z.object({
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   previousBalance: z.string()
     .regex(/^\d+\.\d{2}$/)
-    .refine(val => parseFloat(val) >= 0, "Saldo anterior não pode ser negativo"),
+    .refine(val => parseFloat(val) >= 0, VALIDATION_MESSAGES.statement.previousBalanceNegative),
   paymentsReceived: z.string()
     .regex(/^\d+\.\d{2}$/)
-    .refine(val => parseFloat(val) >= 0, "Pagamentos recebidos não podem ser negativos"),
+    .refine(val => parseFloat(val) >= 0, VALIDATION_MESSAGES.statement.paymentsReceivedNegative),
   purchases: z.string()
     .regex(/^\d+\.\d{2}$/)
-    .refine(val => parseFloat(val) >= 0, "Compras não podem ser negativas"),
+    .refine(val => parseFloat(val) >= 0, VALIDATION_MESSAGES.statement.purchasesNegative),
   fees: z.string()
     .regex(/^\d+\.\d{2}$/)
-    .refine(val => parseFloat(val) >= 0, "Taxas não podem ser negativas"),
+    .refine(val => parseFloat(val) >= 0, VALIDATION_MESSAGES.statement.feesNegative),
   interest: z.string()
     .regex(/^\d+\.\d{2}$/)
-    .refine(val => parseFloat(val) >= 0, "Juros não podem ser negativos"),
+    .refine(val => parseFloat(val) >= 0, VALIDATION_MESSAGES.statement.interestNegative),
   totalAmount: z.string()
     .regex(/^\d+\.\d{2}$/)
-    .refine(val => parseFloat(val) >= 0, "Valor total não pode ser negativo"),
+    .refine(val => parseFloat(val) >= 0, VALIDATION_MESSAGES.statement.totalAmountNegative),
   lineItems: z.array(ParsedLineItemSchema),
 });
