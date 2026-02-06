@@ -1,5 +1,5 @@
 {
-  "id": "b4456b76-1e7c-4429-a4ef-c5d569c945b9",
+  "id": "c5366078-e907-4df9-8dd6-82db9881172a",
   "prevId": "f9a75b0c-5fc3-41e8-840e-3b7b05fbeaa3",
   "version": "5",
   "dialect": "pg",
@@ -300,13 +300,6 @@
           ],
           "isUnique": false
         },
-        "credit_card_statements_file_hash_idx": {
-          "name": "credit_card_statements_file_hash_idx",
-          "columns": [
-            "file_hash"
-          ],
-          "isUnique": false
-        },
         "credit_card_statements_owner_created_at_idx": {
           "name": "credit_card_statements_owner_created_at_idx",
           "columns": [
@@ -345,7 +338,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "credit_card_statements_file_hash_unique": {
+          "name": "credit_card_statements_file_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "file_hash"
+          ]
+        }
+      }
     },
     "credit_cards": {
       "name": "credit_cards",
@@ -554,13 +555,6 @@
           "name": "statement_line_items_transaction_idx",
           "columns": [
             "transaction_id"
-          ],
-          "isUnique": false
-        },
-        "statement_line_items_duplicate_idx": {
-          "name": "statement_line_items_duplicate_idx",
-          "columns": [
-            "is_duplicate"
           ],
           "isUnique": false
         },

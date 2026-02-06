@@ -11,6 +11,7 @@ import {
   index,
   text,
   jsonb,
+  unique,
 } from "drizzle-orm/pg-core";
 
 // Users table
@@ -113,8 +114,11 @@ export const creditCardStatements = pgTable("credit_card_statements", {
     .notNull(), // amount due
   fileName: varchar("file_name", { length: 255 }).notNull(),
   fileHash: varchar("file_hash", { length: 64 }).notNull(), // SHA-256
-  fileData: text("file_data"), // Base64 encoded PDF data
-  status: varchar("status", { length: 20 }).default("pending").notNull(), // 'pending', 'reviewed', 'imported', 'cancelled'
+  fileData: text("file_data"), // Base64 encoded PDF data (TODO: consider moving to object storage for better performance)
+  status: varchar("status", { length: 20 })
+    .$type<"pending" | "reviewed" | "imported" | "cancelled">()
+    .default("pending")
+    .notNull(),
   importedAt: timestamp("imported_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -126,7 +130,7 @@ export const creditCardStatements = pgTable("credit_card_statements", {
   // Performance: Index for statement date queries
   statementDateIdx: index("credit_card_statements_statement_date_idx").on(table.statementDate),
   // Uniqueness: Prevent duplicate file uploads
-  fileHashIdx: index("credit_card_statements_file_hash_idx").on(table.fileHash),
+  fileHashUnique: unique("credit_card_statements_file_hash_unique").on(table.fileHash),
   // Performance: Composite index for owner and creation date
   ownerCreatedAtIdx: index("credit_card_statements_owner_created_at_idx").on(table.ownerId, table.createdAt),
 }));
@@ -154,8 +158,6 @@ export const statementLineItems = pgTable("statement_line_items", {
   statementIdx: index("statement_line_items_statement_idx").on(table.statementId),
   // Performance: Index for finding linked transactions
   transactionIdx: index("statement_line_items_transaction_idx").on(table.transactionId),
-  // Performance: Index for duplicate detection queries
-  duplicateIdx: index("statement_line_items_duplicate_idx").on(table.isDuplicate),
   // Performance: Composite index for date, amount, description (duplicate detection)
   dateAmountDescIdx: index("statement_line_items_date_amount_desc_idx").on(table.date, table.amount, table.description),
 }));
