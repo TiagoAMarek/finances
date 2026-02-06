@@ -22,6 +22,12 @@ concurrency:
   group: visual-tests-${{ github.ref }}
   cancel-in-progress: true
 
+# Required permissions for commenting on PRs
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   visual-tests:
     name: Visual Tests (Chromium + Mocked APIs)
@@ -176,30 +182,38 @@ jobs:
             body += '\n---\n';
             body += '*Tests run with mocked APIs for consistency*\n';
             
-            // Create or update comment
-            const { data: comments } = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            
-            const botComment = comments.find(comment => 
-              comment.user?.type === 'Bot' && 
-              comment.body?.includes('Visual Regression Test Results')
-            );
-            
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                comment_id: botComment.id,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body
-              });
-            } else {
-              await github.rest.issues.createComment({
+            // Try to create or update comment (non-blocking)
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body
               });
+              
+              const botComment = comments.find(comment => 
+                comment.user?.type === 'Bot' && 
+                comment.body?.includes('Visual Regression Test Results')
+              );
+              
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  comment_id: botComment.id,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body
+                });
+                console.log('✅ PR comment updated successfully');
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body
+                });
+                console.log('✅ PR comment created successfully');
+              }
+            } catch (error) {
+              // Log error but don't fail the workflow
+              console.warn('⚠️  Could not post PR comment (this is not critical):', error.message);
+              console.log('📊 Test results are still available in the workflow summary and artifacts');
             }

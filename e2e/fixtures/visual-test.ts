@@ -1,7 +1,6 @@
 import { test as base, Page } from '@playwright/test';
 import { setupAuth } from '../utils/auth';
-import { preparePageForVisualTest } from '../utils/visual';
-import { VIEWPORTS, COLOR_SCHEME, TEST_USER } from '../config/constants';
+import { VIEWPORTS, COLOR_SCHEME, FIXED_DATE } from '../config/constants';
 
 /**
  * Extended test fixtures for visual regression testing
@@ -58,8 +57,17 @@ type VisualTestFixtures = {
 };
 
 export const test = base.extend<VisualTestFixtures>({
+  // Override base page fixture to set clock for all tests
+  page: async ({ page }, use) => {
+    // Set fixed date for consistent screenshots
+    await page.clock.install({ time: FIXED_DATE });
+    await page.clock.runFor(0); // Ensure the time is set
+    await use(page);
+  },
+
   // Base fixture: authenticated page
   authenticatedPage: async ({ page }, use) => {
+    // Clock is already set by the base page fixture
     await setupAuth(page);
     await use(page);
   },
@@ -70,6 +78,9 @@ export const test = base.extend<VisualTestFixtures>({
       viewport: VIEWPORTS.MOBILE,
     });
     const page = await context.newPage();
+    // Set fixed date for consistent screenshots
+    await page.clock.install({ time: FIXED_DATE });
+    await page.clock.runFor(0); // Ensure the time is set
     await use(page);
     await context.close();
   },
@@ -79,6 +90,9 @@ export const test = base.extend<VisualTestFixtures>({
       viewport: VIEWPORTS.TABLET,
     });
     const page = await context.newPage();
+    // Set fixed date for consistent screenshots
+    await page.clock.install({ time: FIXED_DATE });
+    await page.clock.runFor(0); // Ensure the time is set
     await use(page);
     await context.close();
   },
@@ -88,12 +102,16 @@ export const test = base.extend<VisualTestFixtures>({
       viewport: VIEWPORTS.DESKTOP,
     });
     const page = await context.newPage();
+    // Set fixed date for consistent screenshots
+    await page.clock.install({ time: FIXED_DATE });
+    await page.clock.runFor(0); // Ensure the time is set
     await use(page);
     await context.close();
   },
 
   // Theme fixture
   darkModePage: async ({ page }, use) => {
+    // Clock is already set by the base page fixture
     // Use Playwright's emulateMedia for more reliable dark mode
     await page.emulateMedia({ colorScheme: COLOR_SCHEME.DARK });
     await use(page);
@@ -105,6 +123,9 @@ export const test = base.extend<VisualTestFixtures>({
       viewport: VIEWPORTS.MOBILE,
     });
     const page = await context.newPage();
+    // Set fixed date for consistent screenshots
+    await page.clock.install({ time: FIXED_DATE });
+    await page.clock.runFor(0); // Ensure the time is set
     await setupAuth(page);
     await use(page);
     await context.close();
@@ -115,6 +136,9 @@ export const test = base.extend<VisualTestFixtures>({
       viewport: VIEWPORTS.TABLET,
     });
     const page = await context.newPage();
+    // Set fixed date for consistent screenshots
+    await page.clock.install({ time: FIXED_DATE });
+    await page.clock.runFor(0); // Ensure the time is set
     await setupAuth(page);
     await use(page);
     await context.close();
@@ -122,6 +146,7 @@ export const test = base.extend<VisualTestFixtures>({
 
   // Combined fixtures: auth + theme
   authenticatedDarkPage: async ({ page }, use) => {
+    // Clock is already set by the base page fixture
     await setupAuth(page);
     await page.emulateMedia({ colorScheme: COLOR_SCHEME.DARK });
     await use(page);
@@ -129,6 +154,7 @@ export const test = base.extend<VisualTestFixtures>({
 
   // Prepared page fixture
   preparedPage: async ({ page }, use) => {
+    // Clock is already set by the base page fixture
     // Note: preparePageForVisualTest should be called after navigation
     // This fixture just provides the page, caller still needs to navigate and prepare
     await use(page);

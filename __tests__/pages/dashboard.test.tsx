@@ -202,11 +202,9 @@ describe("Dashboard Page", () => {
       renderWithProviders(<DashboardPage />);
 
       await waitFor(() => {
-        // Should display monthly income metric - check for the label
-        expect(screen.getByText("Receitas do Mês")).toBeInTheDocument();
-        // Check that we have some currency values displayed (R$)
-        const currencyElements = screen.getAllByText(/R\$/);
-        expect(currencyElements.length).toBeGreaterThan(0);
+        // Should display monthly income metric (total of all January 2024 incomes: 5500 + 2500 = 8000)
+        const monthlyIncomeElements = screen.getAllByText(/R\$\s*8\.000/);
+        expect(monthlyIncomeElements.length).toBeGreaterThan(0);
       });
     });
 
