@@ -55,6 +55,20 @@ export const VALIDATION_MESSAGES = {
     fileNameMax: "Nome do arquivo deve ter no máximo 255 caracteres",
   },
 
+  // Statement validation messages
+  statement: {
+    statementDateInvalid: "Data da fatura inválida",
+    dueDateInvalid: "Data de vencimento inválida",
+    lineItemsMin: "Pelo menos um item deve ser atualizado",
+    amountFormat: "Valor deve estar no formato 0.00 ou -0.00",
+    previousBalanceNegative: "Saldo anterior não pode ser negativo",
+    paymentsReceivedNegative: "Pagamentos recebidos não podem ser negativos",
+    purchasesNegative: "Compras não podem ser negativas",
+    feesNegative: "Taxas não podem ser negativas",
+    interestNegative: "Juros não podem ser negativos",
+    totalAmountNegative: "Valor total não pode ser negativo",
+  },
+
   // Length validation messages
   length: {
     nameMin: "Nome deve ter pelo menos 2 caracteres",
