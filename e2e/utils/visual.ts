@@ -233,6 +233,32 @@ export async function hideScrollbars(page: Page): Promise<void> {
 }
 
 /**
+ * Hide Next.js development mode indicators (build button, error overlay, etc.)
+ * These elements appear only in dev mode and would cause visual regression test failures
+ * @param page - Playwright page instance
+ */
+export async function hideNextJsDevIndicators(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: `
+      /* Hide Next.js dev mode build indicator button */
+      #__next-build-watcher,
+      [id^="__next"],
+      [class*="__next"],
+      [data-nextjs-toast-errors-parent],
+      [data-nextjs-dialog-overlay],
+      [id*="nextjs"],
+      .__next-dev-overlay,
+      nextjs-portal {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    `,
+  });
+}
+
+/**
  * Disable all animations including Recharts animations
  * @param page - Playwright page instance
  */
@@ -301,6 +327,9 @@ export async function preparePageForVisualTest(page: Page): Promise<void> {
   
   // Wait for network to be idle
   await page.waitForLoadState('networkidle');
+  
+  // Hide Next.js development mode indicators
+  await hideNextJsDevIndicators(page);
   
   // Disable all animations (including Recharts)
   await disableAnimations(page);
