@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { BankAccount } from "@/lib/schemas";
+import { BankAccount, BankAccountCreateInput } from "@/lib/schemas";
 
 import { useCreateAccount, useUpdateAccount, useDeleteAccount } from "../data";
 
@@ -20,12 +20,9 @@ export function useAccountActions() {
   const updateAccountMutation = useUpdateAccount();
   const deleteAccountMutation = useDeleteAccount();
 
-  const handleCreate = async (data: { name: string; balance: string }) => {
+  const handleCreate = async (data: BankAccountCreateInput) => {
     createAccountMutation.mutate(
-      {
-        ...data,
-        currency: "BRL",
-      },
+      data,
       {
         onSuccess: () => {
           toast.success("Conta criada com sucesso!");
