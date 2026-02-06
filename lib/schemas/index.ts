@@ -25,5 +25,9 @@ export * from "./reports";
 // Base/shared schemas
 export * from "./base/api-responses";
 
+// Drizzle-Zod generated schemas (for direct use if needed)
+// These are also re-exported through entity.ts files for convenience
+export * from "./drizzle-schemas";
+
 // Note: validation helpers are not exported from here as they were not originally exported from schemas.ts
 // They are available from "./base/validation-helpers" for internal schema use
