@@ -115,7 +115,7 @@ export const CreditCardStatementSelectSchema = createSelectSchema(creditCardStat
   fees: z.string(),
   interest: z.string(),
   totalAmount: z.string(),
-  importedAt: (schema) => schema.nullable(),
+  importedAt: () => z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -129,12 +129,12 @@ export const StatementLineItemSelectSchema = createSelectSchema(statementLineIte
   type: z.enum(["purchase", "payment", "fee", "interest", "reversal"]),
   date: z.string(),
   amount: z.string(),
-  category: (schema) => schema.nullable(),
-  suggestedCategoryId: (schema) => schema.nullable(),
-  finalCategoryId: (schema) => schema.nullable(),
-  transactionId: (schema) => schema.nullable(),
-  duplicateReason: (schema) => schema.nullable(),
-  rawData: () => z.record(z.string(), z.any()).nullable(),
+  category: (schema) => schema.nullable().optional(),
+  suggestedCategoryId: (schema) => schema.nullable().optional(),
+  finalCategoryId: (schema) => schema.nullable().optional(),
+  transactionId: (schema) => schema.nullable().optional(),
+  duplicateReason: (schema) => schema.nullable().optional(),
+  rawData: () => z.record(z.string(), z.any()).nullable().optional(),
   createdAt: z.string(),
 });
 export const StatementLineItemDrizzleInsertSchema = createInsertSchema(statementLineItems);

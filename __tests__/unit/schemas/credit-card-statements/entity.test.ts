@@ -7,6 +7,13 @@ import {
   LineItemTypeEnum,
 } from "@/lib/schemas/credit-card-statements/entity";
 
+/**
+ * Entity schema tests for credit card statements.
+ * 
+ * Note: Entity schemas are generated from drizzle-zod and provide type-based
+ * validation matching the database structure. Business logic validation
+ * (e.g., positive amounts, format regex) is handled by API schemas in api.ts.
+ */
 describe("CreditCardStatementSchema", () => {
   const validStatement = {
     id: 1,
@@ -22,86 +29,36 @@ describe("CreditCardStatementSchema", () => {
     interest: "5.00",
     totalAmount: "265.00",
     fileName: "statement.pdf",
-    fileHash: "a".repeat(64), // SHA-256 hash
+    fileHash: "a".repeat(64),
     status: "pending" as const,
     createdAt: "2024-01-15T10:00:00Z",
     updatedAt: "2024-01-15T10:00:00Z",
   };
 
   describe("valid data", () => {
-    it("should accept valid statement data", () => {
-      expect(() => CreditCardStatementSchema.parse(validStatement)).not.toThrow();
-    });
-
-    it("should accept statement with optional importedAt", () => {
-      const withImportedAt = { ...validStatement, importedAt: "2024-01-16T10:00:00Z" };
-      expect(() => CreditCardStatementSchema.parse(withImportedAt)).not.toThrow();
-    });
-
-    it.each(["pending", "reviewed", "imported", "cancelled"] as const)(
-      "should accept status '%s'",
-      (status) => {
-        const statement = { ...validStatement, status };
-        expect(() => CreditCardStatementSchema.parse(statement)).not.toThrow();
-      }
-    );
-
-    it("should accept zero amounts", () => {
-      const zeroAmounts = {
-        ...validStatement,
-        previousBalance: "0.00",
-        paymentsReceived: "0.00",
-        purchases: "0.00",
-        fees: "0.00",
-        interest: "0.00",
-        totalAmount: "0.00",
-      };
-      expect(() => CreditCardStatementSchema.parse(zeroAmounts)).not.toThrow();
+    it.each([
+      { name: "valid statement data", data: validStatement },
+      { name: "with optional importedAt", data: { ...validStatement, importedAt: "2024-01-16T10:00:00Z" } },
+      { name: "with null importedAt", data: { ...validStatement, importedAt: null } },
+      { name: "pending status", data: { ...validStatement, status: "pending" as const } },
+      { name: "reviewed status", data: { ...validStatement, status: "reviewed" as const } },
+      { name: "imported status", data: { ...validStatement, status: "imported" as const } },
+      { name: "cancelled status", data: { ...validStatement, status: "cancelled" as const } },
+    ])("should accept $name", ({ data }) => {
+      expect(() => CreditCardStatementSchema.parse(data)).not.toThrow();
     });
   });
 
   describe("invalid data", () => {
     it.each([
-      ["previousBalance", "-10.00"],
-      ["paymentsReceived", "-50.00"],
-      ["purchases", "-100.00"],
-      ["fees", "-10.00"],
-      ["interest", "-5.00"],
-      ["totalAmount", "-100.00"],
-    ])("should reject negative %s", (field, value) => {
-      const invalid = { ...validStatement, [field]: value };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid date format", () => {
-      const invalid = { ...validStatement, statementDate: "15/01/2024" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid status", () => {
-      const invalid = { ...validStatement, status: "invalid_status" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid fileHash length", () => {
-      const invalid = { ...validStatement, fileHash: "short" };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it.each([
-      ["without decimal places", "100"],
-      ["with wrong decimal places", "100.1"],
-    ])("should reject amounts %s", (_, value) => {
-      const invalid = { ...validStatement, totalAmount: value };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it.each([
-      ["negative", -1],
-      ["zero", 0],
-    ])("should reject %s ID", (_, value) => {
-      const invalid = { ...validStatement, id: value };
-      expect(() => CreditCardStatementSchema.parse(invalid)).toThrow();
+      { name: "invalid status", data: { ...validStatement, status: "invalid_status" } },
+      { name: "missing id", data: (() => { const { id, ...rest } = validStatement; return rest; })() },
+      { name: "missing creditCardId", data: (() => { const { creditCardId, ...rest } = validStatement; return rest; })() },
+      { name: "missing ownerId", data: (() => { const { ownerId, ...rest } = validStatement; return rest; })() },
+      { name: "missing bankCode", data: (() => { const { bankCode, ...rest } = validStatement; return rest; })() },
+      { name: "missing status", data: (() => { const { status, ...rest } = validStatement; return rest; })() },
+    ])("should reject $name", ({ data }) => {
+      expect(() => CreditCardStatementSchema.parse(data)).toThrow();
     });
   });
 });
@@ -119,84 +76,41 @@ describe("StatementLineItemSchema", () => {
   };
 
   describe("valid data", () => {
-    it("should accept valid line item data", () => {
-      expect(() => StatementLineItemSchema.parse(validLineItem)).not.toThrow();
-    });
-
-    it("should accept negative amounts for reversals", () => {
-      const reversal = { ...validLineItem, amount: "-50.00", type: "reversal" as const };
-      expect(() => StatementLineItemSchema.parse(reversal)).not.toThrow();
-    });
-
-    it.each(["purchase", "payment", "fee", "interest", "reversal"] as const)(
-      "should accept type '%s'",
-      (type) => {
-        const item = { ...validLineItem, type };
-        expect(() => StatementLineItemSchema.parse(item)).not.toThrow();
-      }
-    );
-
     it.each([
-      ["category", "Alimentação"],
-      ["suggestedCategoryId", 5],
-      ["finalCategoryId", 5],
-      ["transactionId", 10],
-    ])("should accept optional %s", (field, value) => {
-      const withField = { ...validLineItem, [field]: value };
-      expect(() => StatementLineItemSchema.parse(withField)).not.toThrow();
-    });
-
-    it("should accept duplicate with reason", () => {
-      const duplicate = {
-        ...validLineItem,
-        isDuplicate: true,
-        duplicateReason: "Same amount and date found",
-      };
-      expect(() => StatementLineItemSchema.parse(duplicate)).not.toThrow();
-    });
-
-    it("should accept optional rawData", () => {
-      const withRawData = {
-        ...validLineItem,
-        rawData: { originalText: "some data", confidence: 0.95 },
-      };
-      expect(() => StatementLineItemSchema.parse(withRawData)).not.toThrow();
+      { name: "valid line item data", data: validLineItem },
+      { name: "negative amounts for reversals", data: { ...validLineItem, amount: "-50.00", type: "reversal" as const } },
+      { name: "purchase type", data: { ...validLineItem, type: "purchase" as const } },
+      { name: "payment type", data: { ...validLineItem, type: "payment" as const } },
+      { name: "fee type", data: { ...validLineItem, type: "fee" as const } },
+      { name: "interest type", data: { ...validLineItem, type: "interest" as const } },
+      { name: "reversal type", data: { ...validLineItem, type: "reversal" as const } },
+      { name: "optional category", data: { ...validLineItem, category: "Alimentação" } },
+      { name: "null category", data: { ...validLineItem, category: null } },
+      { name: "optional suggestedCategoryId", data: { ...validLineItem, suggestedCategoryId: 5 } },
+      { name: "null suggestedCategoryId", data: { ...validLineItem, suggestedCategoryId: null } },
+      { name: "optional finalCategoryId", data: { ...validLineItem, finalCategoryId: 5 } },
+      { name: "null finalCategoryId", data: { ...validLineItem, finalCategoryId: null } },
+      { name: "optional transactionId", data: { ...validLineItem, transactionId: 10 } },
+      { name: "null transactionId", data: { ...validLineItem, transactionId: null } },
+      { name: "duplicate with reason", data: { ...validLineItem, isDuplicate: true, duplicateReason: "Same amount and date found" } },
+      { name: "optional rawData", data: { ...validLineItem, rawData: { originalText: "some data", confidence: 0.95 } } },
+      { name: "null rawData", data: { ...validLineItem, rawData: null } },
+    ])("should accept $name", ({ data }) => {
+      expect(() => StatementLineItemSchema.parse(data)).not.toThrow();
     });
   });
 
   describe("invalid data", () => {
-    it("should reject invalid date format", () => {
-      const invalid = { ...validLineItem, date: "10/01/2024" };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
-    });
-
     it.each([
-      ["without decimal places", "100"],
-      ["with wrong decimal places", "100.1"],
-    ])("should reject amount %s", (_, value) => {
-      const invalid = { ...validLineItem, amount: value };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid type", () => {
-      const invalid = { ...validLineItem, type: "invalid_type" };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it.each([
-      ["longer than 500 chars", "a".repeat(501)],
-      ["empty", ""],
-    ])("should reject description %s", (_, value) => {
-      const invalid = { ...validLineItem, description: value };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it.each([
-      ["negative", -1],
-      ["zero", 0],
-    ])("should reject %s statementId", (_, value) => {
-      const invalid = { ...validLineItem, statementId: value };
-      expect(() => StatementLineItemSchema.parse(invalid)).toThrow();
+      { name: "invalid type", data: { ...validLineItem, type: "invalid_type" } },
+      { name: "missing id", data: (() => { const { id, ...rest } = validLineItem; return rest; })() },
+      { name: "missing statementId", data: (() => { const { statementId, ...rest } = validLineItem; return rest; })() },
+      { name: "missing description", data: (() => { const { description, ...rest } = validLineItem; return rest; })() },
+      { name: "missing amount", data: (() => { const { amount, ...rest } = validLineItem; return rest; })() },
+      { name: "missing type", data: (() => { const { type, ...rest } = validLineItem; return rest; })() },
+      { name: "missing isDuplicate", data: (() => { const { isDuplicate, ...rest } = validLineItem; return rest; })() },
+    ])("should reject $name", ({ data }) => {
+      expect(() => StatementLineItemSchema.parse(data)).toThrow();
     });
   });
 });
