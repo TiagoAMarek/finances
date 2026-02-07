@@ -23,96 +23,41 @@ describe("StatementUploadSchema", () => {
   };
 
   describe("valid data", () => {
-    it("should accept valid upload data", () => {
-      expect(() => StatementUploadSchema.parse(validUpload)).not.toThrow();
-    });
-
-    it("should accept long bank codes up to 50 chars", () => {
-      const longBankCode = { ...validUpload, bankCode: "a".repeat(50) };
-      expect(() => StatementUploadSchema.parse(longBankCode)).not.toThrow();
-    });
-
-    it("should accept long file names up to 255 chars", () => {
-      const longFileName = { ...validUpload, fileName: "a".repeat(251) + ".pdf" };
-      expect(() => StatementUploadSchema.parse(longFileName)).not.toThrow();
-    });
-
-    it("should accept valid SHA-256 hash", () => {
-      const withHash = { ...validUpload, fileHash: "b".repeat(64) };
-      expect(() => StatementUploadSchema.parse(withHash)).not.toThrow();
+    it.each([
+      { name: "valid upload data", data: validUpload },
+      { name: "long bank codes up to 50 chars", data: { ...validUpload, bankCode: "a".repeat(50) } },
+      { name: "long file names up to 255 chars", data: { ...validUpload, fileName: "a".repeat(251) + ".pdf" } },
+      { name: "valid SHA-256 hash", data: { ...validUpload, fileHash: "b".repeat(64) } },
+    ])("should accept $name", ({ data }) => {
+      expect(() => StatementUploadSchema.parse(data)).not.toThrow();
     });
   });
 
   describe("invalid data", () => {
-    it("should reject missing creditCardId", () => {
-      const { creditCardId, ...invalid } = validUpload;
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative creditCardId", () => {
-      const invalid = { ...validUpload, creditCardId: -1 };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject zero creditCardId", () => {
-      const invalid = { ...validUpload, creditCardId: 0 };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject empty bankCode", () => {
-      const invalid = { ...validUpload, bankCode: "" };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject bankCode longer than 50 chars", () => {
-      const invalid = { ...validUpload, bankCode: "a".repeat(51) };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject empty fileName", () => {
-      const invalid = { ...validUpload, fileName: "" };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject fileName longer than 255 chars", () => {
-      const invalid = { ...validUpload, fileName: "a".repeat(256) };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject empty fileHash", () => {
-      const invalid = { ...validUpload, fileHash: "" };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject fileHash shorter than 64 chars", () => {
-      const invalid = { ...validUpload, fileHash: "a".repeat(63) };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject fileHash longer than 64 chars", () => {
-      const invalid = { ...validUpload, fileHash: "a".repeat(65) };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
+    it.each([
+      { name: "missing creditCardId", data: (() => { const { creditCardId, ...rest } = validUpload; return rest; })() },
+      { name: "negative creditCardId", data: { ...validUpload, creditCardId: -1 } },
+      { name: "zero creditCardId", data: { ...validUpload, creditCardId: 0 } },
+      { name: "empty bankCode", data: { ...validUpload, bankCode: "" } },
+      { name: "bankCode longer than 50 chars", data: { ...validUpload, bankCode: "a".repeat(51) } },
+      { name: "empty fileName", data: { ...validUpload, fileName: "" } },
+      { name: "fileName longer than 255 chars", data: { ...validUpload, fileName: "a".repeat(256) } },
+      { name: "empty fileHash", data: { ...validUpload, fileHash: "" } },
+      { name: "fileHash shorter than 64 chars", data: { ...validUpload, fileHash: "a".repeat(63) } },
+      { name: "fileHash longer than 64 chars", data: { ...validUpload, fileHash: "a".repeat(65) } },
+    ])("should reject $name", ({ data }) => {
+      expect(() => StatementUploadSchema.parse(data)).toThrow();
     });
   });
 
   describe("security - path traversal", () => {
-    it("should reject fileName with double dots (..)", () => {
-      const invalid = { ...validUpload, fileName: "../../../etc/passwd" };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject fileName with forward slashes", () => {
-      const invalid = { ...validUpload, fileName: "path/to/file.pdf" };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject fileName with backslashes", () => {
-      const invalid = { ...validUpload, fileName: "path\\to\\file.pdf" };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject fileName with mixed path separators", () => {
-      const invalid = { ...validUpload, fileName: "..\\secret/file.pdf" };
+    it.each([
+      { name: "double dots (..)", fileName: "../../../etc/passwd" },
+      { name: "forward slashes", fileName: "path/to/file.pdf" },
+      { name: "backslashes", fileName: "path\\to\\file.pdf" },
+      { name: "mixed path separators", fileName: "..\\secret/file.pdf" },
+    ])("should reject fileName with $name", ({ fileName }) => {
+      const invalid = { ...validUpload, fileName };
       expect(() => StatementUploadSchema.parse(invalid)).toThrow();
     });
   });
@@ -120,45 +65,35 @@ describe("StatementUploadSchema", () => {
 
 describe("StatementUpdateSchema", () => {
   describe("valid data", () => {
-    it("should accept all optional fields", () => {
-      const update = {
-        statementDate: "2024-01-15",
-        dueDate: "2024-02-05",
-        previousBalance: "100.50",
-        paymentsReceived: "50.00",
-        purchases: "200.00",
-        fees: "10.00",
-        interest: "5.00",
-        totalAmount: "265.50",
-        status: "reviewed" as const,
-      };
-      expect(() => StatementUpdateSchema.parse(update)).not.toThrow();
-    });
-
-    it("should accept partial updates", () => {
-      const update = { status: "reviewed" as const };
-      expect(() => StatementUpdateSchema.parse(update)).not.toThrow();
-    });
-
-    it("should accept empty object", () => {
-      expect(() => StatementUpdateSchema.parse({})).not.toThrow();
+    it.each([
+      {
+        name: "all optional fields",
+        data: {
+          statementDate: "2024-01-15",
+          dueDate: "2024-02-05",
+          previousBalance: "100.50",
+          paymentsReceived: "50.00",
+          purchases: "200.00",
+          fees: "10.00",
+          interest: "5.00",
+          totalAmount: "265.50",
+          status: "reviewed" as const,
+        },
+      },
+      { name: "partial updates", data: { status: "reviewed" as const } },
+      { name: "empty object", data: {} },
+    ])("should accept $name", ({ data }) => {
+      expect(() => StatementUpdateSchema.parse(data)).not.toThrow();
     });
   });
 
   describe("invalid data", () => {
-    it("should reject invalid date format", () => {
-      const invalid = { statementDate: "15/01/2024" };
-      expect(() => StatementUpdateSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid status", () => {
-      const invalid = { status: "invalid_status" };
-      expect(() => StatementUpdateSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative amounts", () => {
-      const invalid = { totalAmount: "-100" };
-      expect(() => StatementUpdateSchema.parse(invalid)).toThrow();
+    it.each([
+      { name: "invalid date format", data: { statementDate: "15/01/2024" } },
+      { name: "invalid status", data: { status: "invalid_status" } },
+      { name: "negative amounts", data: { totalAmount: "-100" } },
+    ])("should reject $name", ({ data }) => {
+      expect(() => StatementUpdateSchema.parse(data)).toThrow();
     });
 
     it("should accept amounts without decimal places (validAmount allows it)", () => {
@@ -177,35 +112,22 @@ describe("LineItemUpdateSchema", () => {
   };
 
   describe("valid data", () => {
-    it("should accept valid update data", () => {
-      expect(() => LineItemUpdateSchema.parse(validUpdate)).not.toThrow();
-    });
-
-    it("should accept null finalCategoryId", () => {
-      const withNull = { ...validUpdate, finalCategoryId: null };
-      expect(() => LineItemUpdateSchema.parse(withNull)).not.toThrow();
-    });
-
-    it("should accept only id", () => {
-      const minimal = { id: 1 };
-      expect(() => LineItemUpdateSchema.parse(minimal)).not.toThrow();
+    it.each([
+      { name: "valid update data", data: validUpdate },
+      { name: "null finalCategoryId", data: { ...validUpdate, finalCategoryId: null } },
+      { name: "only id", data: { id: 1 } },
+    ])("should accept $name", ({ data }) => {
+      expect(() => LineItemUpdateSchema.parse(data)).not.toThrow();
     });
   });
 
   describe("invalid data", () => {
-    it("should reject missing id", () => {
-      const { id, ...invalid } = validUpdate;
-      expect(() => LineItemUpdateSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative id", () => {
-      const invalid = { ...validUpdate, id: -1 };
-      expect(() => LineItemUpdateSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative finalCategoryId", () => {
-      const invalid = { ...validUpdate, finalCategoryId: -1 };
-      expect(() => LineItemUpdateSchema.parse(invalid)).toThrow();
+    it.each([
+      { name: "missing id", data: (() => { const { id, ...rest } = validUpdate; return rest; })() },
+      { name: "negative id", data: { ...validUpdate, id: -1 } },
+      { name: "negative finalCategoryId", data: { ...validUpdate, finalCategoryId: -1 } },
+    ])("should reject $name", ({ data }) => {
+      expect(() => LineItemUpdateSchema.parse(data)).toThrow();
     });
   });
 });
@@ -284,60 +206,59 @@ describe("StatementImportSchema", () => {
 
 describe("StatementListQuerySchema", () => {
   describe("valid data", () => {
-    it("should accept all query params", () => {
-      const valid = {
-        creditCardId: 1,
-        status: "pending",
-        startDate: "2024-01-01",
-        endDate: "2024-12-31",
-        page: 2,
-        limit: 50,
-      };
-      expect(() => StatementListQuerySchema.parse(valid)).not.toThrow();
-    });
-
-    it("should use default values", () => {
-      const result = StatementListQuerySchema.parse({});
-      expect(result.page).toBe(1);
-      expect(result.limit).toBe(20);
-    });
-
-    it("should coerce string numbers to numbers", () => {
-      const result = StatementListQuerySchema.parse({
-        creditCardId: "1",
-        page: "2",
-        limit: "30",
-      });
-      expect(result.creditCardId).toBe(1);
-      expect(result.page).toBe(2);
-      expect(result.limit).toBe(30);
+    it.each([
+      {
+        name: "all query params",
+        data: {
+          creditCardId: 1,
+          status: "pending",
+          startDate: "2024-01-01",
+          endDate: "2024-12-31",
+          page: 2,
+          limit: 50,
+        },
+        checks: (result: any) => {
+          expect(result.creditCardId).toBe(1);
+          expect(result.page).toBe(2);
+          expect(result.limit).toBe(50);
+        },
+      },
+      {
+        name: "default values",
+        data: {},
+        checks: (result: any) => {
+          expect(result.page).toBe(1);
+          expect(result.limit).toBe(20);
+        },
+      },
+      {
+        name: "string numbers coerced to numbers",
+        data: {
+          creditCardId: "1",
+          page: "2",
+          limit: "30",
+        },
+        checks: (result: any) => {
+          expect(result.creditCardId).toBe(1);
+          expect(result.page).toBe(2);
+          expect(result.limit).toBe(30);
+        },
+      },
+    ])("should accept $name", ({ data, checks }) => {
+      const result = StatementListQuerySchema.parse(data);
+      checks(result);
     });
   });
 
   describe("invalid data", () => {
-    it("should reject limit over 100", () => {
-      const invalid = { limit: 101 };
-      expect(() => StatementListQuerySchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative page", () => {
-      const invalid = { page: -1 };
-      expect(() => StatementListQuerySchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject zero page", () => {
-      const invalid = { page: 0 };
-      expect(() => StatementListQuerySchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid date format", () => {
-      const invalid = { startDate: "01/01/2024" };
-      expect(() => StatementListQuerySchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid status", () => {
-      const invalid = { status: "invalid" };
-      expect(() => StatementListQuerySchema.parse(invalid)).toThrow();
+    it.each([
+      { name: "limit over 100", data: { limit: 101 } },
+      { name: "negative page", data: { page: -1 } },
+      { name: "zero page", data: { page: 0 } },
+      { name: "invalid date format", data: { startDate: "01/01/2024" } },
+      { name: "invalid status", data: { status: "invalid" } },
+    ])("should reject $name", ({ data }) => {
+      expect(() => StatementListQuerySchema.parse(data)).toThrow();
     });
   });
 });
@@ -351,35 +272,22 @@ describe("ParsedLineItemSchema", () => {
   };
 
   describe("valid data", () => {
-    it("should accept valid parsed line item", () => {
-      expect(() => ParsedLineItemSchema.parse(validItem)).not.toThrow();
-    });
-
-    it("should accept negative amounts", () => {
-      const negative = { ...validItem, amount: "-50.00" };
-      expect(() => ParsedLineItemSchema.parse(negative)).not.toThrow();
-    });
-
-    it("should accept optional category", () => {
-      const withCategory = { ...validItem, category: "Alimentação" };
-      expect(() => ParsedLineItemSchema.parse(withCategory)).not.toThrow();
+    it.each([
+      { name: "valid parsed line item", data: validItem },
+      { name: "negative amounts", data: { ...validItem, amount: "-50.00" } },
+      { name: "optional category", data: { ...validItem, category: "Alimentação" } },
+    ])("should accept $name", ({ data }) => {
+      expect(() => ParsedLineItemSchema.parse(data)).not.toThrow();
     });
   });
 
   describe("invalid data", () => {
-    it("should reject amount without decimal places", () => {
-      const invalid = { ...validItem, amount: "100" };
-      expect(() => ParsedLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid date format", () => {
-      const invalid = { ...validItem, date: "10/01/2024" };
-      expect(() => ParsedLineItemSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject empty description", () => {
-      const invalid = { ...validItem, description: "" };
-      expect(() => ParsedLineItemSchema.parse(invalid)).toThrow();
+    it.each([
+      { name: "amount without decimal places", data: { ...validItem, amount: "100" } },
+      { name: "invalid date format", data: { ...validItem, date: "10/01/2024" } },
+      { name: "empty description", data: { ...validItem, description: "" } },
+    ])("should reject $name", ({ data }) => {
+      expect(() => ParsedLineItemSchema.parse(data)).toThrow();
     });
   });
 });
@@ -406,68 +314,38 @@ describe("ParsedStatementSchema", () => {
   };
 
   describe("valid data", () => {
-    it("should accept valid parsed statement", () => {
-      expect(() => ParsedStatementSchema.parse(validStatement)).not.toThrow();
-    });
-
-    it("should accept empty line items", () => {
-      const empty = { ...validStatement, lineItems: [] };
-      expect(() => ParsedStatementSchema.parse(empty)).not.toThrow();
-    });
-
-    it("should accept zero amounts", () => {
-      const zeros = {
-        ...validStatement,
-        previousBalance: "0.00",
-        paymentsReceived: "0.00",
-        purchases: "0.00",
-        fees: "0.00",
-        interest: "0.00",
-        totalAmount: "0.00",
-      };
-      expect(() => ParsedStatementSchema.parse(zeros)).not.toThrow();
+    it.each([
+      { name: "valid parsed statement", data: validStatement },
+      { name: "empty line items", data: { ...validStatement, lineItems: [] } },
+      {
+        name: "zero amounts",
+        data: {
+          ...validStatement,
+          previousBalance: "0.00",
+          paymentsReceived: "0.00",
+          purchases: "0.00",
+          fees: "0.00",
+          interest: "0.00",
+          totalAmount: "0.00",
+        },
+      },
+    ])("should accept $name", ({ data }) => {
+      expect(() => ParsedStatementSchema.parse(data)).not.toThrow();
     });
   });
 
   describe("invalid data", () => {
-    it("should reject negative previousBalance", () => {
-      const invalid = { ...validStatement, previousBalance: "-100.00" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative paymentsReceived", () => {
-      const invalid = { ...validStatement, paymentsReceived: "-50.00" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative purchases", () => {
-      const invalid = { ...validStatement, purchases: "-200.00" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative fees", () => {
-      const invalid = { ...validStatement, fees: "-10.00" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative interest", () => {
-      const invalid = { ...validStatement, interest: "-5.00" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject negative totalAmount", () => {
-      const invalid = { ...validStatement, totalAmount: "-265.00" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject invalid date format", () => {
-      const invalid = { ...validStatement, statementDate: "15/01/2024" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
-    });
-
-    it("should reject amounts without decimal places", () => {
-      const invalid = { ...validStatement, totalAmount: "100" };
-      expect(() => ParsedStatementSchema.parse(invalid)).toThrow();
+    it.each([
+      { name: "negative previousBalance", data: { ...validStatement, previousBalance: "-100.00" } },
+      { name: "negative paymentsReceived", data: { ...validStatement, paymentsReceived: "-50.00" } },
+      { name: "negative purchases", data: { ...validStatement, purchases: "-200.00" } },
+      { name: "negative fees", data: { ...validStatement, fees: "-10.00" } },
+      { name: "negative interest", data: { ...validStatement, interest: "-5.00" } },
+      { name: "negative totalAmount", data: { ...validStatement, totalAmount: "-265.00" } },
+      { name: "invalid date format", data: { ...validStatement, statementDate: "15/01/2024" } },
+      { name: "amounts without decimal places", data: { ...validStatement, totalAmount: "100" } },
+    ])("should reject $name", ({ data }) => {
+      expect(() => ParsedStatementSchema.parse(data)).toThrow();
     });
   });
 });

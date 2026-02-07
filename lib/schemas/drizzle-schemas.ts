@@ -134,7 +134,7 @@ export const StatementLineItemSelectSchema = createSelectSchema(statementLineIte
   finalCategoryId: (schema) => schema.nullable(),
   transactionId: (schema) => schema.nullable(),
   duplicateReason: (schema) => schema.nullable(),
-  rawData: (_schema) => z.record(z.string(), z.any()).nullable(),
+  rawData: () => z.record(z.string(), z.any()).nullable(),
   createdAt: z.string(),
 });
 export const StatementLineItemDrizzleInsertSchema = createInsertSchema(statementLineItems);
