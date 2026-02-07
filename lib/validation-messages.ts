@@ -37,6 +37,40 @@ export const VALIDATION_MESSAGES = {
     amountPositive: "Valor deve ser maior que zero",
   },
 
+  // Invalid field messages
+  invalid: {
+    amount: "Valor inválido",
+    creditCard: "Cartão de crédito inválido",
+  },
+
+  // File upload validation messages
+  file: {
+    base64Invalid: "Dados do arquivo devem estar em formato Base64 válido",
+    fileNameInvalid: "Nome do arquivo contém caracteres inválidos",
+    fileTooLarge: "Arquivo excede o tamanho máximo permitido (10MB)",
+    fileNameRequired: "Nome do arquivo é obrigatório",
+    fileDataRequired: "Dados do arquivo são obrigatórios",
+    fileHashRequired: "Hash do arquivo é obrigatório",
+    fileHashLength: "Hash do arquivo deve ter 64 caracteres (SHA-256)",
+    bankCodeRequired: "Código do banco é obrigatório",
+    bankCodeMax: "Código do banco deve ter no máximo 50 caracteres",
+    fileNameMax: "Nome do arquivo deve ter no máximo 255 caracteres",
+  },
+
+  // Statement validation messages
+  statement: {
+    statementDateInvalid: "Data da fatura inválida",
+    dueDateInvalid: "Data de vencimento inválida",
+    lineItemsMin: "Pelo menos um item deve ser atualizado",
+    amountFormat: "Valor deve estar no formato 0.00 ou -0.00",
+    previousBalanceNegative: "Saldo anterior não pode ser negativo",
+    paymentsReceivedNegative: "Pagamentos recebidos não podem ser negativos",
+    purchasesNegative: "Compras não podem ser negativas",
+    feesNegative: "Taxas não podem ser negativas",
+    interestNegative: "Juros não podem ser negativos",
+    totalAmountNegative: "Valor total não pode ser negativo",
+  },
+
   // Length validation messages
   length: {
     nameMin: "Nome deve ter pelo menos 2 caracteres",
@@ -87,7 +121,7 @@ export const VALIDATION_MESSAGES = {
   // Success messages
   success: {
     created: "Criado com sucesso",
-    updated: "Atualizado com sucesso", 
+    updated: "Atualizado com sucesso",
     deleted: "Excluído com sucesso",
     saved: "Salvo com sucesso",
     login: "Login realizado com sucesso",
@@ -122,7 +156,7 @@ export function getValidationMessage(
     console.warn(`Missing validation message: ${category}.${key}`);
     return "Erro de validação";
   }
-  
+
   // Replace placeholders if any
   return args.reduce((msg, arg, index) => {
     return msg.replace(`{${index}}`, arg);
