@@ -117,9 +117,9 @@ export const creditCardStatements = pgTable("credit_card_statements", {
     .$type<"pending" | "reviewed" | "imported" | "cancelled">()
     .default("pending")
     .notNull(),
-  importedAt: timestamp("imported_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  importedAt: timestamp("imported_at", { mode: "string" }),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 }, (table) => ({
   // Performance: Index for filtering statements by credit card
   creditCardIdx: index("credit_card_statements_credit_card_idx").on(table.creditCardId),
@@ -127,8 +127,8 @@ export const creditCardStatements = pgTable("credit_card_statements", {
   ownerIdx: index("credit_card_statements_owner_idx").on(table.ownerId),
   // Performance: Index for statement date queries
   statementDateIdx: index("credit_card_statements_statement_date_idx").on(table.statementDate),
-  // Uniqueness: Prevent duplicate file uploads
-  fileHashUnique: unique("credit_card_statements_file_hash_unique").on(table.fileHash),
+  // Uniqueness: Prevent duplicate file uploads per owner
+  fileHashUnique: unique("credit_card_statements_file_hash_unique").on(table.ownerId, table.fileHash),
   // Performance: Composite index for owner and creation date
   ownerCreatedAtIdx: index("credit_card_statements_owner_created_at_idx").on(table.ownerId, table.createdAt),
 }));
@@ -150,7 +150,7 @@ export const statementLineItems = pgTable("statement_line_items", {
   isDuplicate: boolean("is_duplicate").default(false).notNull(),
   duplicateReason: varchar("duplicate_reason", { length: 255 }),
   rawData: jsonb("raw_data"), // store original parsed data
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
 }, (table) => ({
   // Performance: Index for filtering line items by statement
   statementIdx: index("statement_line_items_statement_idx").on(table.statementId),

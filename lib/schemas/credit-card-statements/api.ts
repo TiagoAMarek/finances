@@ -9,15 +9,15 @@ import { StatementStatusEnum, LineItemTypeEnum } from "./entity";
 // Note: File data not stored - only metadata (fileName, fileHash) persisted after parsing
 export const StatementUploadSchema = z.object({
   creditCardId: z
-    .number({ error: VALIDATION_MESSAGES.invalid.creditCard })
+    .number()
     .int()
     .positive(VALIDATION_MESSAGES.invalid.creditCard),
   bankCode: z
-    .string({ error: VALIDATION_MESSAGES.file.bankCodeRequired })
+    .string()
     .min(1, VALIDATION_MESSAGES.file.bankCodeRequired)
     .max(50, VALIDATION_MESSAGES.file.bankCodeMax),
   fileName: z
-    .string({ error: VALIDATION_MESSAGES.file.fileNameRequired })
+    .string()
     .min(1, VALIDATION_MESSAGES.file.fileNameRequired)
     .max(255, VALIDATION_MESSAGES.file.fileNameMax)
     // Security: Prevent path traversal and invalid characters
@@ -26,8 +26,9 @@ export const StatementUploadSchema = z.object({
       VALIDATION_MESSAGES.file.fileNameInvalid
     ),
   fileHash: z
-    .string({ error: VALIDATION_MESSAGES.file.fileHashRequired })
-    .length(64, VALIDATION_MESSAGES.file.fileHashLength),
+    .string()
+    .length(64, VALIDATION_MESSAGES.file.fileHashLength)
+    .regex(/^[a-f0-9]+$/i, VALIDATION_MESSAGES.file.fileHashLength),
 });
 
 // Statement Update Schema

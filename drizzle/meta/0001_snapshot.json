@@ -1,10 +1,8 @@
 {
-  "id": "b5620008-1a03-4966-890e-f9d9c5cc7c31",
-  "prevId": "c87292cd-fb6e-4c73-bae8-84fab02e450f",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "bank_accounts": {
+    "public.bank_accounts": {
       "name": "bank_accounts",
       "schema": "",
       "columns": {
@@ -46,21 +44,24 @@
         "bank_accounts_owner_id_users_id_fk": {
           "name": "bank_accounts_owner_id_users_id_fk",
           "tableFrom": "bank_accounts",
-          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "categories": {
+    "public.categories": {
       "name": "categories",
       "schema": "",
       "columns": {
@@ -120,21 +121,24 @@
         "categories_owner_id_users_id_fk": {
           "name": "categories_owner_id_users_id_fk",
           "tableFrom": "categories",
-          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "credit_cards": {
+    "public.credit_cards": {
       "name": "credit_cards",
       "schema": "",
       "columns": {
@@ -176,21 +180,24 @@
         "credit_cards_owner_id_users_id_fk": {
           "name": "credit_cards_owner_id_users_id_fk",
           "tableFrom": "credit_cards",
-          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "default_categories": {
+    "public.default_categories": {
       "name": "default_categories",
       "schema": "",
       "columns": {
@@ -228,9 +235,12 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "transactions": {
+    "public.transactions": {
       "name": "transactions",
       "schema": "",
       "columns": {
@@ -306,73 +316,76 @@
         "transactions_category_id_categories_id_fk": {
           "name": "transactions_category_id_categories_id_fk",
           "tableFrom": "transactions",
-          "tableTo": "categories",
           "columnsFrom": [
             "category_id"
           ],
+          "tableTo": "categories",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "transactions_owner_id_users_id_fk": {
           "name": "transactions_owner_id_users_id_fk",
           "tableFrom": "transactions",
-          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "transactions_account_id_bank_accounts_id_fk": {
           "name": "transactions_account_id_bank_accounts_id_fk",
           "tableFrom": "transactions",
-          "tableTo": "bank_accounts",
           "columnsFrom": [
             "account_id"
           ],
+          "tableTo": "bank_accounts",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "transactions_credit_card_id_credit_cards_id_fk": {
           "name": "transactions_credit_card_id_credit_cards_id_fk",
           "tableFrom": "transactions",
-          "tableTo": "credit_cards",
           "columnsFrom": [
             "credit_card_id"
           ],
+          "tableTo": "credit_cards",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "transactions_to_account_id_bank_accounts_id_fk": {
           "name": "transactions_to_account_id_bank_accounts_id_fk",
           "tableFrom": "transactions",
-          "tableTo": "bank_accounts",
           "columnsFrom": [
             "to_account_id"
           ],
+          "tableTo": "bank_accounts",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "users": {
+    "public.users": {
       "name": "users",
       "schema": "",
       "columns": {
@@ -401,19 +414,28 @@
       "uniqueConstraints": {
         "users_email_unique": {
           "name": "users_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
-      }
+      },
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     }
   },
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "b5620008-1a03-4966-890e-f9d9c5cc7c31",
+  "prevId": "c87292cd-fb6e-4c73-bae8-84fab02e450f",
+  "sequences": {},
+  "policies": {},
+  "views": {},
+  "roles": {}
 }
