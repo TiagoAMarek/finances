@@ -8,7 +8,7 @@ import { Page } from '@playwright/test';
 /**
  * Wait for all Recharts to be fully rendered
  * Implements community best practices for chart stability
- * This replaces the 1500ms hard-coded wait for charts
+ * Enhanced with additional checks for animation completion and element stability
  */
 export async function waitForChartsToRender(page: Page): Promise<void> {
   const charts = page.locator('.recharts-wrapper');
@@ -20,10 +20,10 @@ export async function waitForChartsToRender(page: Page): Promise<void> {
   }
   
   try {
-    // Wait for chart SVG surfaces to be visible
+    // Wait for chart SVG surfaces to be visible with extended timeout
     await page.waitForSelector('.recharts-surface', { 
       state: 'visible',
-      timeout: 5000 
+      timeout: 7000 
     });
     
     // Wait for chart content to be rendered (paths, rects, lines, etc.)
@@ -38,8 +38,37 @@ export async function waitForChartsToRender(page: Page): Promise<void> {
           return hasContent !== null;
         });
       },
-      { timeout: 5000 }
+      { timeout: 7000 }
     );
+    
+    // Wait for specific chart elements based on type
+    await page.waitForFunction(
+      () => {
+        const rechartSurfaces = document.querySelectorAll('.recharts-surface');
+        if (rechartSurfaces.length === 0) return false;
+        
+        // Check for bar charts
+        const barCharts = document.querySelectorAll('.recharts-bar-rectangle');
+        // Check for line charts
+        const lineCharts = document.querySelectorAll('.recharts-line-curve');
+        
+        // If we have bar or line charts, ensure they're rendered
+        if (barCharts.length > 0 || lineCharts.length > 0) {
+          return Array.from(barCharts).every(bar => {
+            const rect = bar.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0;
+          }) && Array.from(lineCharts).every(line => {
+            const rect = line.getBoundingClientRect();
+            return rect.width > 0;
+          });
+        }
+        
+        return true; // No specific chart types found, assume ready
+      },
+      { timeout: 5000 }
+    ).catch(() => {
+      // If specific chart elements aren't found, continue anyway
+    });
     
     // Wait for chart dimensions to stabilize (community best practice)
     await page.waitForFunction(
@@ -54,19 +83,38 @@ export async function waitForChartsToRender(page: Page): Promise<void> {
           return rect && rect.width > 0 && rect.height > 0;
         });
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     );
     
-    // Small stabilization delay to ensure all rendering is complete
+    // Ensure all animations are complete (even if we've disabled them)
+    await page.waitForFunction(
+      () => {
+        const charts = document.querySelectorAll('.recharts-wrapper *');
+        return Array.from(charts).every(el => {
+          const style = window.getComputedStyle(el);
+          const animationName = style.getPropertyValue('animation-name');
+          const transitionDuration = style.getPropertyValue('transition-duration');
+          // Check that no active animations or transitions are running
+          return animationName === 'none' && (transitionDuration === '0s' || transitionDuration === '');
+        });
+      },
+      { timeout: 2000 }
+    ).catch(() => {
+      // Animation check failed, but we've already disabled animations
+    });
+    
+    // Multiple RAF cycles to ensure all rendering is complete
     // This is a community-recommended practice for chart libraries
     await page.evaluate(() => new Promise(resolve => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(resolve);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
       });
     }));
     
-    // Additional 50ms buffer for any final paint operations
-    await page.waitForTimeout(50);
+    // Extended stabilization buffer for complex charts (dashboard, reports)
+    await page.waitForTimeout(150);
     
   } catch (error) {
     // If waiting fails, chart might not be present or already rendered
@@ -144,18 +192,39 @@ export async function waitForImagesToLoad(page: Page): Promise<void> {
 }
 
 /**
- * Wait for fonts to be loaded
+ * Wait for fonts to be loaded with extended timeout
  * Returns immediately if document.fonts API is not available
+ * Extended wait time helps ensure web fonts are fully loaded before screenshots
  */
-export async function waitForFontsToLoad(page: Page): Promise<void> {
+export async function waitForFontsToLoad(page: Page, timeout = 5000): Promise<void> {
   try {
-    await page.evaluate(() => {
+    // Wait for document.fonts.ready with timeout
+    await page.evaluate((timeoutMs) => {
       if (!document.fonts || !document.fonts.ready) {
         return Promise.resolve();
       }
-      // Cast to Promise<void> to satisfy type checker
-      return document.fonts.ready.then(() => undefined);
+      
+      // Race between fonts ready and timeout
+      return Promise.race([
+        document.fonts.ready.then(() => undefined),
+        new Promise<void>((resolve) => setTimeout(resolve, timeoutMs))
+      ]);
+    }, timeout);
+    
+    // Additional check to ensure fonts are actually loaded
+    await page.waitForFunction(
+      () => {
+        if (!document.fonts) return true;
+        // Check if all fonts have finished loading
+        return document.fonts.status === 'loaded';
+      },
+      { timeout: timeout }
+    ).catch(() => {
+      // If check fails, continue anyway - fonts might already be loaded
     });
+    
+    // Extra stabilization delay for font rendering
+    await page.waitForTimeout(100);
   } catch {
     // If fonts API fails, continue anyway
   }
