@@ -4,6 +4,13 @@
  */
 
 /**
+ * Fixed date for visual regression tests to ensure consistent screenshots
+ * Set to January 25, 2024 to match the mock transaction data
+ * This date is used with Playwright's clock API to mock Date.now() and new Date()
+ */
+export const FIXED_DATE = new Date('2024-01-25T12:00:00.000Z');
+
+/**
  * Standard viewport sizes for responsive testing
  */
 export const VIEWPORTS = {

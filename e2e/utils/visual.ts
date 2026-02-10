@@ -233,24 +233,80 @@ export async function hideScrollbars(page: Page): Promise<void> {
 }
 
 /**
+ * Hide Next.js development mode indicators (build button, error overlay, etc.)
+ * These elements appear only in dev mode and would cause visual regression test failures
+ * @param page - Playwright page instance
+ */
+export async function hideNextJsDevIndicators(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: `
+      /* Hide Next.js dev mode build indicator button and overlays */
+      /* Use specific selectors to avoid hiding the main app container */
+      #__next-build-watcher,
+      [data-nextjs-toast-errors-parent],
+      [data-nextjs-dialog-overlay],
+      [data-nextjs-dialog],
+      [data-nextjs-portal],
+      .__next-dev-overlay,
+      nextjs-portal,
+      [id*="nextjs-portal"],
+      [class*="nextjs-toast"],
+      [class*="nextjs-dialog"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    `,
+  });
+}
+
+/**
  * Disable all animations including Recharts animations
+ * Implements community best practices for visual regression testing
  * @param page - Playwright page instance
  */
 export async function disableAnimations(page: Page): Promise<void> {
+  // Emulate prefers-reduced-motion media query at browser level
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  
+  // Apply comprehensive CSS animation disabling
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
         animation-duration: 0s !important;
         animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
         transition-duration: 0s !important;
         transition-delay: 0s !important;
+        transition-property: none !important;
+        scroll-behavior: auto !important;
+      }
+      
+      /* Disable SVG animations specifically for charts */
+      svg {
+        animation: none !important;
+      }
+      
+      svg * {
+        animation: none !important;
+        transition: none !important;
+      }
+      
+      /* Disable caret blinking */
+      * {
+        caret-color: transparent !important;
+      }
+      
+      /* Remove any transform transitions */
+      html {
+        filter: none !important;
       }
     `,
   });
   
-  // Disable Recharts animations specifically
+  // Override matchMedia for components that check prefers-reduced-motion
   await page.evaluate(() => {
-    // Override matchMedia to force prefers-reduced-motion
     const originalMatchMedia = window.matchMedia;
     if (originalMatchMedia) {
       Object.defineProperty(window, 'matchMedia', {
@@ -301,6 +357,9 @@ export async function preparePageForVisualTest(page: Page): Promise<void> {
   
   // Wait for network to be idle
   await page.waitForLoadState('networkidle');
+  
+  // Hide Next.js development mode indicators
+  await hideNextJsDevIndicators(page);
   
   // Disable all animations (including Recharts)
   await disableAnimations(page);
