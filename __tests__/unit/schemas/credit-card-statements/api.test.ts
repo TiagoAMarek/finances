@@ -45,6 +45,8 @@ describe("StatementUploadSchema", () => {
       { name: "empty fileHash", data: { ...validUpload, fileHash: "" } },
       { name: "fileHash shorter than 64 chars", data: { ...validUpload, fileHash: "a".repeat(63) } },
       { name: "fileHash longer than 64 chars", data: { ...validUpload, fileHash: "a".repeat(65) } },
+      { name: "fileHash with non-hex characters", data: { ...validUpload, fileHash: "g".repeat(64) } },
+      { name: "fileHash with special characters", data: { ...validUpload, fileHash: "a".repeat(62) + "!@" } },
     ])("should reject $name", ({ data }) => {
       expect(() => StatementUploadSchema.parse(data)).toThrow();
     });

@@ -1,4 +1,6 @@
 {
+  "id": "ade62c89-6368-480b-b67e-94a63f10e71d",
+  "prevId": "c5366078-e907-4df9-8dd6-82db9881172a",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -41,6 +43,7 @@
       },
       "indexes": {
         "bank_accounts_owner_idx": {
+          "name": "bank_accounts_owner_idx",
           "columns": [
             {
               "expression": "owner_id",
@@ -49,33 +52,32 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "bank_accounts_owner_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "bank_accounts_owner_id_users_id_fk": {
           "name": "bank_accounts_owner_id_users_id_fk",
           "tableFrom": "bank_accounts",
+          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.categories": {
       "name": "categories",
@@ -134,6 +136,7 @@
       },
       "indexes": {
         "categories_owner_idx": {
+          "name": "categories_owner_idx",
           "columns": [
             {
               "expression": "owner_id",
@@ -142,33 +145,32 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "categories_owner_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "categories_owner_id_users_id_fk": {
           "name": "categories_owner_id_users_id_fk",
           "tableFrom": "categories",
+          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.credit_card_statements": {
       "name": "credit_card_statements",
@@ -294,6 +296,7 @@
       },
       "indexes": {
         "credit_card_statements_credit_card_idx": {
+          "name": "credit_card_statements_credit_card_idx",
           "columns": [
             {
               "expression": "credit_card_id",
@@ -302,13 +305,13 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "credit_card_statements_credit_card_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         },
         "credit_card_statements_owner_idx": {
+          "name": "credit_card_statements_owner_idx",
           "columns": [
             {
               "expression": "owner_id",
@@ -317,13 +320,13 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "credit_card_statements_owner_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         },
         "credit_card_statements_statement_date_idx": {
+          "name": "credit_card_statements_statement_date_idx",
           "columns": [
             {
               "expression": "statement_date",
@@ -332,13 +335,13 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "credit_card_statements_statement_date_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         },
         "credit_card_statements_owner_created_at_idx": {
+          "name": "credit_card_statements_owner_created_at_idx",
           "columns": [
             {
               "expression": "owner_id",
@@ -353,54 +356,54 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "credit_card_statements_owner_created_at_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "credit_card_statements_credit_card_id_credit_cards_id_fk": {
           "name": "credit_card_statements_credit_card_id_credit_cards_id_fk",
           "tableFrom": "credit_card_statements",
+          "tableTo": "credit_cards",
           "columnsFrom": [
             "credit_card_id"
           ],
-          "tableTo": "credit_cards",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "credit_card_statements_owner_id_users_id_fk": {
           "name": "credit_card_statements_owner_id_users_id_fk",
           "tableFrom": "credit_card_statements",
+          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "credit_card_statements_file_hash_unique": {
           "name": "credit_card_statements_file_hash_unique",
+          "nullsNotDistinct": false,
           "columns": [
+            "owner_id",
             "file_hash"
-          ],
-          "nullsNotDistinct": false
+          ]
         }
       },
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.credit_cards": {
       "name": "credit_cards",
@@ -441,6 +444,7 @@
       },
       "indexes": {
         "credit_cards_owner_idx": {
+          "name": "credit_cards_owner_idx",
           "columns": [
             {
               "expression": "owner_id",
@@ -449,33 +453,32 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "credit_cards_owner_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "credit_cards_owner_id_users_id_fk": {
           "name": "credit_cards_owner_id_users_id_fk",
           "tableFrom": "credit_cards",
+          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.default_categories": {
       "name": "default_categories",
@@ -517,8 +520,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.statement_line_items": {
       "name": "statement_line_items",
@@ -613,6 +616,7 @@
       },
       "indexes": {
         "statement_line_items_statement_idx": {
+          "name": "statement_line_items_statement_idx",
           "columns": [
             {
               "expression": "statement_id",
@@ -621,13 +625,13 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "statement_line_items_statement_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         },
         "statement_line_items_transaction_idx": {
+          "name": "statement_line_items_transaction_idx",
           "columns": [
             {
               "expression": "transaction_id",
@@ -636,13 +640,13 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "statement_line_items_transaction_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         },
         "statement_line_items_date_amount_desc_idx": {
+          "name": "statement_line_items_date_amount_desc_idx",
           "columns": [
             {
               "expression": "date",
@@ -663,72 +667,71 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "statement_line_items_date_amount_desc_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "statement_line_items_statement_id_credit_card_statements_id_fk": {
           "name": "statement_line_items_statement_id_credit_card_statements_id_fk",
           "tableFrom": "statement_line_items",
+          "tableTo": "credit_card_statements",
           "columnsFrom": [
             "statement_id"
           ],
-          "tableTo": "credit_card_statements",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         },
         "statement_line_items_suggested_category_id_categories_id_fk": {
           "name": "statement_line_items_suggested_category_id_categories_id_fk",
           "tableFrom": "statement_line_items",
+          "tableTo": "categories",
           "columnsFrom": [
             "suggested_category_id"
           ],
-          "tableTo": "categories",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "statement_line_items_final_category_id_categories_id_fk": {
           "name": "statement_line_items_final_category_id_categories_id_fk",
           "tableFrom": "statement_line_items",
+          "tableTo": "categories",
           "columnsFrom": [
             "final_category_id"
           ],
-          "tableTo": "categories",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "statement_line_items_transaction_id_transactions_id_fk": {
           "name": "statement_line_items_transaction_id_transactions_id_fk",
           "tableFrom": "statement_line_items",
+          "tableTo": "transactions",
           "columnsFrom": [
             "transaction_id"
           ],
-          "tableTo": "transactions",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.transactions": {
       "name": "transactions",
@@ -803,6 +806,7 @@
       },
       "indexes": {
         "transactions_owner_date_idx": {
+          "name": "transactions_owner_date_idx",
           "columns": [
             {
               "expression": "owner_id",
@@ -817,13 +821,13 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "transactions_owner_date_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         },
         "transactions_category_idx": {
+          "name": "transactions_category_idx",
           "columns": [
             {
               "expression": "category_id",
@@ -832,85 +836,84 @@
               "nulls": "last"
             }
           ],
-          "with": {},
-          "name": "transactions_category_idx",
           "isUnique": false,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "transactions_category_id_categories_id_fk": {
           "name": "transactions_category_id_categories_id_fk",
           "tableFrom": "transactions",
+          "tableTo": "categories",
           "columnsFrom": [
             "category_id"
           ],
-          "tableTo": "categories",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "transactions_owner_id_users_id_fk": {
           "name": "transactions_owner_id_users_id_fk",
           "tableFrom": "transactions",
+          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "transactions_account_id_bank_accounts_id_fk": {
           "name": "transactions_account_id_bank_accounts_id_fk",
           "tableFrom": "transactions",
+          "tableTo": "bank_accounts",
           "columnsFrom": [
             "account_id"
           ],
-          "tableTo": "bank_accounts",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "transactions_credit_card_id_credit_cards_id_fk": {
           "name": "transactions_credit_card_id_credit_cards_id_fk",
           "tableFrom": "transactions",
+          "tableTo": "credit_cards",
           "columnsFrom": [
             "credit_card_id"
           ],
-          "tableTo": "credit_cards",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "transactions_to_account_id_bank_accounts_id_fk": {
           "name": "transactions_to_account_id_bank_accounts_id_fk",
           "tableFrom": "transactions",
+          "tableTo": "bank_accounts",
           "columnsFrom": [
             "to_account_id"
           ],
-          "tableTo": "bank_accounts",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.users": {
       "name": "users",
@@ -947,28 +950,26 @@
       "uniqueConstraints": {
         "users_email_unique": {
           "name": "users_email_unique",
+          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ],
-          "nullsNotDistinct": false
+          ]
         }
       },
       "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {},
   "schemas": {},
-  "_meta": {
-    "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "id": "c5366078-e907-4df9-8dd6-82db9881172a",
-  "prevId": "f9a75b0c-5fc3-41e8-840e-3b7b05fbeaa3",
   "sequences": {},
+  "roles": {},
   "policies": {},
   "views": {},
-  "roles": {}
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
 }
