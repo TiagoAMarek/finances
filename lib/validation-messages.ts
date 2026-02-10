@@ -46,15 +46,10 @@ export const VALIDATION_MESSAGES = {
   // File upload validation messages
   file: {
     base64Invalid: "Dados do arquivo devem estar em formato Base64 válido",
-    fileNameInvalid: "Nome do arquivo contém caracteres inválidos",
     fileTooLarge: "Arquivo excede o tamanho máximo permitido (10MB)",
-    fileNameRequired: "Nome do arquivo é obrigatório",
     fileDataRequired: "Dados do arquivo são obrigatórios",
-    fileHashRequired: "Hash do arquivo é obrigatório",
-    fileHashLength: "Hash do arquivo deve ter 64 caracteres (SHA-256)",
     bankCodeRequired: "Código do banco é obrigatório",
     bankCodeMax: "Código do banco deve ter no máximo 50 caracteres",
-    fileNameMax: "Nome do arquivo deve ter no máximo 255 caracteres",
   },
 
   // Statement validation messages

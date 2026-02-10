@@ -28,8 +28,6 @@ describe("CreditCardStatementSchema", () => {
     fees: "10.00",
     interest: "5.00",
     totalAmount: "265.00",
-    fileName: "statement.pdf",
-    fileHash: "a".repeat(64),
     status: "pending" as const,
     createdAt: "2024-01-15T10:00:00Z",
     updatedAt: "2024-01-15T10:00:00Z",

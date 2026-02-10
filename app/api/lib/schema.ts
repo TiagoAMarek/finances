@@ -111,8 +111,7 @@ export const creditCardStatements = pgTable("credit_card_statements", {
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 })
     .default("0.00")
     .notNull(), // amount due
-  fileName: varchar("file_name", { length: 255 }).notNull(),
-  fileHash: varchar("file_hash", { length: 64 }).notNull(), // SHA-256 for duplicate detection
+
   status: varchar("status", { length: 20 })
     .$type<"pending" | "reviewed" | "imported" | "cancelled">()
     .default("pending")
@@ -127,8 +126,8 @@ export const creditCardStatements = pgTable("credit_card_statements", {
   ownerIdx: index("credit_card_statements_owner_idx").on(table.ownerId),
   // Performance: Index for statement date queries
   statementDateIdx: index("credit_card_statements_statement_date_idx").on(table.statementDate),
-  // Uniqueness: Prevent duplicate file uploads per owner
-  fileHashUnique: unique("credit_card_statements_file_hash_unique").on(table.ownerId, table.fileHash),
+  // Uniqueness: One statement per card per closing date per owner
+  statementUnique: unique("credit_card_statements_owner_card_date_unique").on(table.ownerId, table.creditCardId, table.statementDate),
   // Performance: Composite index for owner and creation date
   ownerCreatedAtIdx: index("credit_card_statements_owner_created_at_idx").on(table.ownerId, table.createdAt),
 }));

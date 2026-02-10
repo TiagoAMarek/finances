@@ -12,22 +12,15 @@ import {
 } from "@/lib/schemas/credit-card-statements/api";
 
 describe("StatementUploadSchema", () => {
-  // Valid SHA-256 hash (64 hex characters)
-  const validFileHash = "a".repeat(64);
-
   const validUpload = {
     creditCardId: 1,
     bankCode: "itau",
-    fileName: "statement.pdf",
-    fileHash: validFileHash,
   };
 
   describe("valid data", () => {
     it.each([
       { name: "valid upload data", data: validUpload },
       { name: "long bank codes up to 50 chars", data: { ...validUpload, bankCode: "a".repeat(50) } },
-      { name: "long file names up to 255 chars", data: { ...validUpload, fileName: "a".repeat(251) + ".pdf" } },
-      { name: "valid SHA-256 hash", data: { ...validUpload, fileHash: "b".repeat(64) } },
     ])("should accept $name", ({ data }) => {
       expect(() => StatementUploadSchema.parse(data)).not.toThrow();
     });
@@ -40,27 +33,8 @@ describe("StatementUploadSchema", () => {
       { name: "zero creditCardId", data: { ...validUpload, creditCardId: 0 } },
       { name: "empty bankCode", data: { ...validUpload, bankCode: "" } },
       { name: "bankCode longer than 50 chars", data: { ...validUpload, bankCode: "a".repeat(51) } },
-      { name: "empty fileName", data: { ...validUpload, fileName: "" } },
-      { name: "fileName longer than 255 chars", data: { ...validUpload, fileName: "a".repeat(256) } },
-      { name: "empty fileHash", data: { ...validUpload, fileHash: "" } },
-      { name: "fileHash shorter than 64 chars", data: { ...validUpload, fileHash: "a".repeat(63) } },
-      { name: "fileHash longer than 64 chars", data: { ...validUpload, fileHash: "a".repeat(65) } },
-      { name: "fileHash with non-hex characters", data: { ...validUpload, fileHash: "g".repeat(64) } },
-      { name: "fileHash with special characters", data: { ...validUpload, fileHash: "a".repeat(62) + "!@" } },
     ])("should reject $name", ({ data }) => {
       expect(() => StatementUploadSchema.parse(data)).toThrow();
-    });
-  });
-
-  describe("security - path traversal", () => {
-    it.each([
-      { name: "double dots (..)", fileName: "../../../etc/passwd" },
-      { name: "forward slashes", fileName: "path/to/file.pdf" },
-      { name: "backslashes", fileName: "path\\to\\file.pdf" },
-      { name: "mixed path separators", fileName: "..\\secret/file.pdf" },
-    ])("should reject fileName with $name", ({ fileName }) => {
-      const invalid = { ...validUpload, fileName };
-      expect(() => StatementUploadSchema.parse(invalid)).toThrow();
     });
   });
 });

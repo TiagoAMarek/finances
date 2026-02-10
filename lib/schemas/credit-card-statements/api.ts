@@ -6,7 +6,7 @@ import { VALIDATION_MESSAGES } from "@/lib/validation-messages";
 import { StatementStatusEnum, LineItemTypeEnum } from "./entity";
 
 // Statement Upload Schema
-// Note: File data not stored - only metadata (fileName, fileHash) persisted after parsing
+// Note: File is only used to extract parsed data, no file metadata is persisted
 export const StatementUploadSchema = z.object({
   creditCardId: z
     .number()
@@ -16,19 +16,6 @@ export const StatementUploadSchema = z.object({
     .string()
     .min(1, VALIDATION_MESSAGES.file.bankCodeRequired)
     .max(50, VALIDATION_MESSAGES.file.bankCodeMax),
-  fileName: z
-    .string()
-    .min(1, VALIDATION_MESSAGES.file.fileNameRequired)
-    .max(255, VALIDATION_MESSAGES.file.fileNameMax)
-    // Security: Prevent path traversal and invalid characters
-    .refine(
-      (val) => !val.includes("..") && !val.includes("/") && !val.includes("\\"),
-      VALIDATION_MESSAGES.file.fileNameInvalid
-    ),
-  fileHash: z
-    .string()
-    .length(64, VALIDATION_MESSAGES.file.fileHashLength)
-    .regex(/^[a-f0-9]+$/i, VALIDATION_MESSAGES.file.fileHashLength),
 });
 
 // Statement Update Schema
