@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -21,6 +21,14 @@ interface ChartProps {
  */
 export const Chart = memo<ChartProps>(({ data, height }) => {
   const containerClass = height ? 'w-full' : 'w-full h-40 sm:h-[200px]';
+  
+  // Check environment inside component to avoid build-time evaluation
+  const isAnimationActive = useMemo(() => {
+    // Disable animations in test/visual regression environments
+    if (typeof window === 'undefined') return true; // Server-side, animations don't matter
+    return process.env.NODE_ENV !== 'test' && 
+           process.env.NEXT_PUBLIC_USE_MOCKS !== 'true';
+  }, []);
 
   return (
     <div className={containerClass} style={height ? { height } : undefined}>
@@ -53,12 +61,14 @@ export const Chart = memo<ChartProps>(({ data, height }) => {
           <Bar
             dataKey="receitas"
             fill="#22c55e"
+            isAnimationActive={isAnimationActive}
             name="Receitas"
             radius={[2, 2, 0, 0]}
           />
           <Bar
             dataKey="despesas"
             fill="#ef4444"
+            isAnimationActive={isAnimationActive}
             name="Despesas"
             radius={[2, 2, 0, 0]}
           />

@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   CartesianGrid,
   Line,
@@ -87,12 +87,21 @@ const CustomTooltip = memo<TooltipProps>(function CustomTooltip({
  * - Custom tooltip with transaction details
  * - Responsive design with configurable height
  * - Consistent styling with application theme
+ * - Animations disabled in test environments for stability
  */
 export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
   function ExpenseAnalysisChart({ data, height }) {
     const containerClass = height
       ? 'p-2'
       : 'p-2 h-64 sm:h-80 lg:h-[350px]';
+
+    // Check environment inside component to avoid build-time evaluation
+    const isAnimationActive = useMemo(() => {
+      // Disable animations in test/visual regression environments
+      if (typeof window === 'undefined') return true; // Server-side, animations don't matter
+      return process.env.NODE_ENV !== 'test' && 
+             process.env.NEXT_PUBLIC_USE_MOCKS !== 'true';
+    }, []);
 
     return (
       <div className={containerClass} style={height ? { height: `${height}px` } : undefined}>
@@ -131,6 +140,7 @@ export const ExpenseAnalysisChart = memo<ExpenseAnalysisChartProps>(
                 r: 6,
                 className: "transition-all duration-200 hover:r-8",
               }}
+              isAnimationActive={isAnimationActive}
               stroke="#ef4444"
               strokeWidth={3}
               type="monotone"
