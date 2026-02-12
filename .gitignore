@@ -6,6 +6,8 @@ __pycache__/
 **/*.db
 **/coverage
 package-lock.json
+tsconfig.tsbuildinfo
+tsconfig.test.tsbuildinfo
 
 # Playwright
 /test-results/

@@ -48,6 +48,8 @@ import {
   bankAccounts,
   creditCards,
   transactions,
+  creditCardStatements,
+  statementLineItems,
 } from "@/app/api/lib/schema";
 
 // ============================================================================
@@ -101,6 +103,44 @@ export const TransactionDrizzleInsertSchema = createInsertSchema(transactions);
 export const TransactionDrizzleUpdateSchema = createUpdateSchema(transactions);
 
 // ============================================================================
+// Credit Card Statements
+// ============================================================================
+export const CreditCardStatementSelectSchema = createSelectSchema(creditCardStatements, {
+  status: z.enum(["pending", "reviewed", "imported", "cancelled"]),
+  statementDate: z.string(), // Drizzle maps date to string
+  dueDate: z.string(),
+  previousBalance: z.string(),
+  paymentsReceived: z.string(),
+  purchases: z.string(),
+  fees: z.string(),
+  interest: z.string(),
+  totalAmount: z.string(),
+  importedAt: () => z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export const CreditCardStatementDrizzleInsertSchema = createInsertSchema(creditCardStatements);
+export const CreditCardStatementDrizzleUpdateSchema = createUpdateSchema(creditCardStatements);
+
+// ============================================================================
+// Statement Line Items
+// ============================================================================
+export const StatementLineItemSelectSchema = createSelectSchema(statementLineItems, {
+  type: z.enum(["purchase", "payment", "fee", "interest", "reversal"]),
+  date: z.string(),
+  amount: z.string(),
+  category: (schema) => schema.nullable().optional(),
+  suggestedCategoryId: (schema) => schema.nullable().optional(),
+  finalCategoryId: (schema) => schema.nullable().optional(),
+  transactionId: (schema) => schema.nullable().optional(),
+  duplicateReason: (schema) => schema.nullable().optional(),
+  rawData: () => z.unknown().nullable().optional(),
+  createdAt: z.string(),
+});
+export const StatementLineItemDrizzleInsertSchema = createInsertSchema(statementLineItems);
+export const StatementLineItemDrizzleUpdateSchema = createUpdateSchema(statementLineItems);
+
+// ============================================================================
 // Inferred Types - Convenience exports for type usage throughout the app
 // ============================================================================
 export type User = z.infer<typeof UserSelectSchema>;
@@ -109,3 +149,6 @@ export type DefaultCategory = z.infer<typeof DefaultCategorySelectSchema>;
 export type BankAccount = z.infer<typeof BankAccountSelectSchema>;
 export type CreditCard = z.infer<typeof CreditCardSelectSchema>;
 export type Transaction = z.infer<typeof TransactionSelectSchema>;
+export type CreditCardStatement = z.infer<typeof CreditCardStatementSelectSchema>;
+export type StatementLineItem = z.infer<typeof StatementLineItemSelectSchema>;
+

@@ -9,6 +9,8 @@ import {
   boolean,
   timestamp,
   index,
+  jsonb,
+  unique,
 } from "drizzle-orm/pg-core";
 
 // Users table
@@ -79,6 +81,84 @@ export const creditCards = pgTable("credit_cards", {
   ownerIdx: index("credit_cards_owner_idx").on(table.ownerId),
 }));
 
+// Credit card statements table
+export const creditCardStatements = pgTable("credit_card_statements", {
+  id: serial("id").primaryKey(),
+  creditCardId: integer("credit_card_id")
+    .notNull()
+    .references(() => creditCards.id),
+  ownerId: integer("owner_id")
+    .notNull()
+    .references(() => users.id),
+  bankCode: varchar("bank_code", { length: 50 }).notNull(), // 'itau', 'nubank', etc.
+  statementDate: date("statement_date").notNull(), // closing date
+  dueDate: date("due_date").notNull(),
+  previousBalance: decimal("previous_balance", { precision: 10, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  paymentsReceived: decimal("payments_received", { precision: 10, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  purchases: decimal("purchases", { precision: 10, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  fees: decimal("fees", { precision: 10, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  interest: decimal("interest", { precision: 10, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 })
+    .default("0.00")
+    .notNull(), // amount due
+
+  status: varchar("status", { length: 20 })
+    .$type<"pending" | "reviewed" | "imported" | "cancelled">()
+    .default("pending")
+    .notNull(),
+  importedAt: timestamp("imported_at", { mode: "string" }),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+}, (table) => ({
+  // Performance: Index for filtering statements by credit card
+  creditCardIdx: index("credit_card_statements_credit_card_idx").on(table.creditCardId),
+  // Performance: Index for filtering statements by owner
+  ownerIdx: index("credit_card_statements_owner_idx").on(table.ownerId),
+  // Performance: Index for statement date queries
+  statementDateIdx: index("credit_card_statements_statement_date_idx").on(table.statementDate),
+  // Uniqueness: One statement per card per closing date per owner
+  statementUnique: unique("credit_card_statements_owner_card_date_unique").on(table.ownerId, table.creditCardId, table.statementDate),
+  // Performance: Composite index for owner and creation date
+  ownerCreatedAtIdx: index("credit_card_statements_owner_created_at_idx").on(table.ownerId, table.createdAt),
+}));
+
+// Statement line items table
+export const statementLineItems = pgTable("statement_line_items", {
+  id: serial("id").primaryKey(),
+  statementId: integer("statement_id")
+    .notNull()
+    .references(() => creditCardStatements.id, { onDelete: "cascade" }),
+  date: date("date").notNull(),
+  description: varchar("description", { length: 500 }).notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  type: varchar("type", { length: 20 }).notNull(), // 'purchase', 'payment', 'fee', 'interest', 'reversal'
+  category: varchar("category", { length: 100 }), // original category from PDF
+  suggestedCategoryId: integer("suggested_category_id").references(() => categories.id), // from AI
+  finalCategoryId: integer("final_category_id").references(() => categories.id), // user confirmed
+  transactionId: integer("transaction_id").references(() => transactions.id), // linked after import
+  isDuplicate: boolean("is_duplicate").default(false).notNull(),
+  duplicateReason: varchar("duplicate_reason", { length: 255 }),
+  rawData: jsonb("raw_data"), // store original parsed data
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+}, (table) => ({
+  // Performance: Index for filtering line items by statement
+  statementIdx: index("statement_line_items_statement_idx").on(table.statementId),
+  // Performance: Index for finding linked transactions
+  transactionIdx: index("statement_line_items_transaction_idx").on(table.transactionId),
+  // Performance: Composite index for date, amount, description (duplicate detection)
+  dateAmountDescIdx: index("statement_line_items_date_amount_desc_idx").on(table.date, table.amount, table.description),
+}));
+
 // Transactions table
 export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),
@@ -134,6 +214,7 @@ export const creditCardsRelations = relations(creditCards, ({ one, many }) => ({
     references: [users.id],
   }),
   transactions: many(transactions),
+  statements: many(creditCardStatements),
 }));
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
@@ -156,5 +237,38 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
   toAccount: one(bankAccounts, {
     fields: [transactions.toAccountId],
     references: [bankAccounts.id],
+  }),
+}));
+
+// Credit card statements relations
+export const creditCardStatementsRelations = relations(creditCardStatements, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [creditCardStatements.ownerId],
+    references: [users.id],
+  }),
+  creditCard: one(creditCards, {
+    fields: [creditCardStatements.creditCardId],
+    references: [creditCards.id],
+  }),
+  lineItems: many(statementLineItems),
+}));
+
+// Statement line items relations
+export const statementLineItemsRelations = relations(statementLineItems, ({ one }) => ({
+  statement: one(creditCardStatements, {
+    fields: [statementLineItems.statementId],
+    references: [creditCardStatements.id],
+  }),
+  suggestedCategory: one(categories, {
+    fields: [statementLineItems.suggestedCategoryId],
+    references: [categories.id],
+  }),
+  finalCategory: one(categories, {
+    fields: [statementLineItems.finalCategoryId],
+    references: [categories.id],
+  }),
+  transaction: one(transactions, {
+    fields: [statementLineItems.transactionId],
+    references: [transactions.id],
   }),
 }));

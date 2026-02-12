@@ -1,0 +1,2 @@
+ALTER TABLE "credit_card_statements" DROP CONSTRAINT "credit_card_statements_file_hash_unique";--> statement-breakpoint
+ALTER TABLE "credit_card_statements" ADD CONSTRAINT "credit_card_statements_file_hash_unique" UNIQUE("owner_id","file_hash");

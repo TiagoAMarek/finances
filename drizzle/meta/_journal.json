@@ -22,6 +22,27 @@
       "when": 1769537407151,
       "tag": "0002_many_power_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1770404918542,
+      "tag": "0003_robust_matthew_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1770661200224,
+      "tag": "0004_married_puma",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1770749437112,
+      "tag": "0005_good_microbe",
+      "breakpoints": true
     }
   ]
 }
